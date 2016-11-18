@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL;
 
-class Utils
+class Core extends \PhalconApi\Core
 {
     public static function getShortClass($class){
 

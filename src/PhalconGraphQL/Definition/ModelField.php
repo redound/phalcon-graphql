@@ -2,9 +2,9 @@
 
 namespace PhalconGraphQL\Definition;
 
+use PhalconGraphQL\Core;
 use PhalconGraphQL\Resolvers\AllModelResolver;
 use PhalconGraphQL\Resolvers\FindModelResolver;
-use PhalconGraphQL\Utils;
 
 class ModelField extends Field
 {
@@ -13,7 +13,7 @@ class ModelField extends Field
     public function __construct($model=null, $name=null, $type=null, $description=null)
     {
         if($type === null){
-            $type = Utils::getShortClass($model);
+            $type = Core::getShortClass($model);
         }
 
         parent::__construct($name, $type, $description);
@@ -61,7 +61,7 @@ class ModelField extends Field
     public static function all($model=null, $name=null, $type=null, $description=null)
     {
         if($name === null){
-            $name = 'all' . ucfirst(Utils::getShortClass($model)) . 's';
+            $name = 'all' . ucfirst(Core::getShortClass($model)) . 's';
         }
 
         return self::factory($model, $name, $type, $description)
@@ -73,7 +73,7 @@ class ModelField extends Field
     public static function find($model=null, $name=null, $type=null, $description=null)
     {
         if($name === null){
-            $name = 'find' . ucfirst(Utils::getShortClass($model));
+            $name = 'find' . ucfirst(Core::getShortClass($model));
         }
 
         return self::factory($model, $name, $type, $description)

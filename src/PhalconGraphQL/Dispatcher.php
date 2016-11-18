@@ -9,7 +9,6 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\SchemaFactory;
 use PhalconGraphQL\Handlers\Handler;
-use PhalconGraphQL\Resolvers\ResolverInterface;
 
 class Dispatcher extends \Phalcon\Mvc\User\Plugin
 {

@@ -9,7 +9,7 @@ use Phalcon\Mvc\Model\Manager;
 use Phalcon\Mvc\Model\MetaData;
 use Phalcon\Mvc\Model\RelationInterface;
 use PhalconGraphQL\Constants\Services;
-use PhalconGraphQL\Utils;
+use PhalconGraphQL\Core;
 
 class ModelObjectType extends ObjectType
 {
@@ -26,7 +26,7 @@ class ModelObjectType extends ObjectType
     {
         // Use class name if name not provided
         if($name === null) {
-            $name = Utils::getShortClass($modelClass);
+            $name = Core::getShortClass($modelClass);
         }
 
         parent::__construct($name, $description);
@@ -160,7 +160,7 @@ class ModelObjectType extends ObjectType
             /** @var RelationInterface $relation */
             foreach ($modelsManager->getRelations($modelClass) as $relation) {
 
-                $referencedModelClass = Utils::getShortClass($relation->getReferencedModel());
+                $referencedModelClass = Core::getShortClass($relation->getReferencedModel());
 
                 $options = $relation->getOptions();
                 $relationName = is_array($options) && array_key_exists('alias',
