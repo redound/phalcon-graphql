@@ -4,13 +4,15 @@ namespace PhalconGraphQL;
 
 use GraphQL\GraphQL;
 use Phalcon\Http\Request;
+use PhalconApi\Exception;
+use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\SchemaFactory;
 use PhalconGraphQL\Handlers\Handler;
 
-class Dispatcher extends \Phalcon\Mvc\User\Plugin
+class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 {
     protected $defaultNamespace;
 
@@ -79,11 +81,19 @@ class Dispatcher extends \Phalcon\Mvc\User\Plugin
                         $methodName = $parts[1];
 
                         $obj = new $className;
+                        if ($obj instanceof \Phalcon\Di\Injectable) {
+                            $obj->setDI($this->di);
+                        }
+
                         $source = $obj->$methodName($source, $args, $field);
                     }
                     else if(class_exists($resolverFn, true) && method_exists($resolverFn, 'resolve')) {
 
                         $resolverObject = new $resolverFn();
+                        if ($resolverObject instanceof \Phalcon\Di\Injectable) {
+                            $resolverObject->setDI($this->di);
+                        }
+
                         $source = $resolverObject->resolve($source, $args, $field);
                     }
                     else {
@@ -102,39 +112,23 @@ class Dispatcher extends \Phalcon\Mvc\User\Plugin
         $graphqlSchema = SchemaFactory::build($this, $schema);
 
         if(!$request) {
-            $request = $this->di->get('request');
+            $request = $this->di->get(Services::REQUEST);
         }
 
-        if ($request->getContentType() === 'application/json') {
-            $data = $request->getJsonRawBody(true);
-        } else {
-            $data = $request->getQuery();
-        }
+        $data = $request->getPostedData();
 
         $requestString = isset($data['query']) && !empty($data['query']) ? $data['query'] : null;
         $operationName = isset($data['operation']) && !empty($data['operation']) ? $data['operation'] : null;
         $variableValues = isset($data['variables']) && !empty($data['variables']) ? $data['variables'] : null;
-
-        try {
-
-            $result = GraphQL::execute(
-                $graphqlSchema,
-                $requestString,
-                null, // rootValue
-                null, // context
-                $variableValues,
-                $operationName
-            );
-
-        } catch (\Exception $exception) {
-
-            $result = [
-                'errors' => [
-                    ['message' => $exception->getMessage()]
-                ]
-            ];
-
-        }
+        
+        $result = GraphQL::execute(
+            $graphqlSchema,
+            $requestString,
+            null, // rootValue
+            null, // context
+            $variableValues,
+            $operationName
+        );
 
         return $result;
     }

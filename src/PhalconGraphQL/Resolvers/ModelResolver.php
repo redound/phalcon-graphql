@@ -5,7 +5,7 @@ namespace PhalconGraphQL\Resolvers;
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\ModelField;
 
-abstract class ModelResolver implements ResolverInterface
+abstract class ModelResolver extends Resolver
 {
     protected function getModel(Field $field){
 
