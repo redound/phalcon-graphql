@@ -117,9 +117,6 @@ class ModelObjectType extends ObjectType
         /** @var Manager $modelsManager */
         $modelsManager = $this->di->get(Services::MODELS_MANAGER);
 
-        $embedNode = in_array($this->_relationEmbedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-        $embedEdges = in_array($this->_relationEmbedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
-
         $modelClass = $this->_modelClass;
         $model = new $modelClass();
 
