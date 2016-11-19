@@ -9,8 +9,8 @@ class Field
     protected $_name;
     protected $_description;
     protected $_type;
-    protected $_nonNull;
-    protected $_isList;
+    protected $_nonNull = false;
+    protected $_isList = false;
     protected $_isNonNullList;
     protected $_resolvers = [];
     protected $_args = [];
@@ -61,14 +61,6 @@ class Field
     public function getType()
     {
         return $this->_type;
-    }
-
-    public function embed(){
-
-        $this->_type = $this->_isList ? Types::connection($this->_type) : Types::edge($this->_type);
-        $this->_isList = false;
-
-        return $this;
     }
 
     public function nonNull($nonNull = true)

@@ -2,12 +2,30 @@
 
 namespace PhalconGraphQL\Definition;
 
-use PhalconGraphQL\Handlers\PassHandler;
+use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 
 class Schema
 {
+    const EMBED_MODE_NONE = 0;
+    const EMBED_MODE_NODE = 1;
+    const EMBED_MODE_EDGES = 2;
+    const EMBED_MODE_ALL = 3;
+
+    protected static $defaultEmbedMode = Schema::EMBED_MODE_NONE;
+
     protected $_enumTypes = [];
     protected $_objectTypes = [];
+
+    public static function getDefaultEmbedMode(){
+
+        return self::$defaultEmbedMode;
+    }
+
+    public static function setDefaultEmbedMode($embedMode){
+
+        self::$defaultEmbedMode = $embedMode;
+    }
+
 
     public function enum(EnumType $enumType)
     {
@@ -26,43 +44,9 @@ class Schema
         return $this;
     }
 
-    public function embeddedObject(ObjectType $objectType, array $connectionFields=[], array $edgeFields=[])
+    public function objects(ObjectTypeGroupInterface $objectTypeGroup)
     {
-        $name = $objectType->getName();
-
-        $connectionName = Types::connection($name);
-        $edgeName = Types::edge($name);
-
-        // Object
-        $this->object($objectType);
-
-        // Connection
-        $connectionType = ObjectType::factory($connectionName)
-            ->handler(PassHandler::class)
-            ->field(Field::listFactory('edges', $edgeName)
-                ->nonNull()
-                ->isNonNullList()
-            );
-
-        foreach($connectionFields as $field){
-            $connectionType->field($field);
-        }
-
-        $this->object($connectionType);
-
-        // Edge
-        $edgeType = ObjectType::factory($edgeName)
-            ->handler(PassHandler::class)
-            ->field(Field::factory('node', $name)
-                ->nonNull()
-            );
-
-        foreach($edgeFields as $field){
-            $edgeType->field($field);
-        }
-
-        $this->object($edgeType);
-
+        $this->_objectTypes = array_merge($this->_objectTypes, $objectTypeGroup->getObjectTypes());
         return $this;
     }
 

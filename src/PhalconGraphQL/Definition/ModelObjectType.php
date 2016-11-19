@@ -18,7 +18,7 @@ class ModelObjectType extends ObjectType
 
     protected $_excludedFields = [];
     protected $_excludeRelations = false;
-    protected $_embedRelations = false;
+    protected $_relationEmbedMode;
 
     protected $di;
 
@@ -31,6 +31,7 @@ class ModelObjectType extends ObjectType
 
         parent::__construct($name, $description);
 
+        $this->_relationEmbedMode = Schema::getDefaultEmbedMode();
         $this->_modelClass = $modelClass;
 
         $this->di = Di::getDefault();
@@ -49,9 +50,33 @@ class ModelObjectType extends ObjectType
         return $this;
     }
 
-    public function embedRelations($embedRelations = true)
+    public function embedRelationsOnlyEdges()
     {
-        $this->_embedRelations = $embedRelations;
+        $this->_relationEmbedMode = Schema::EMBED_MODE_EDGES;
+        $this->_built = false;
+
+        return $this;
+    }
+
+    public function embedRelationsOnlyNode()
+    {
+        $this->_relationEmbedMode = Schema::EMBED_MODE_NODE;
+        $this->_built = false;
+
+        return $this;
+    }
+
+    public function embedRelations()
+    {
+        $this->_relationEmbedMode = Schema::EMBED_MODE_ALL;
+        $this->_built = false;
+
+        return $this;
+    }
+
+    public function relationEmbedMode($embedMode)
+    {
+        $this->_relationEmbedMode = $embedMode;
         $this->_built = false;
 
         return $this;
@@ -91,6 +116,9 @@ class ModelObjectType extends ObjectType
 
         /** @var Manager $modelsManager */
         $modelsManager = $this->di->get(Services::MODELS_MANAGER);
+
+        $embedNode = in_array($this->_relationEmbedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
+        $embedEdges = in_array($this->_relationEmbedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
 
         $modelClass = $this->_modelClass;
         $model = new $modelClass();
@@ -167,12 +195,9 @@ class ModelObjectType extends ObjectType
                     $options) ? $options['alias'] : $referencedModelClass;
                 $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
 
-                $field = Field::factory(lcfirst($relationName), $referencedModelClass)
-                    ->isList($isList);
-
-                if($this->_embedRelations){
-                    $field->embed();
-                }
+                $field = ModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
+                    ->isList($isList)
+                    ->embedMode($this->_relationEmbedMode);
 
                 $newFields[] = $field;
             }
