@@ -11,6 +11,8 @@ class Types
     const ID = "ID";
 
     const QUERY = "Query";
+    const MUTATION = "Mutation";
+
     const VIEWER = "Viewer";
 
     public static function connection($name){

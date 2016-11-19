@@ -4,7 +4,6 @@ namespace PhalconGraphQL;
 
 use GraphQL\GraphQL;
 use Phalcon\Http\Request;
-use PhalconApi\Exception;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\ObjectType;
@@ -109,7 +108,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
     public function dispatch(Schema $schema, Request $request = null)
     {
-        $graphqlSchema = SchemaFactory::build($this, $schema);
+        $graphqlSchema = SchemaFactory::build($this, $schema, $this->getDI());
 
         if(!$request) {
             $request = $this->di->get(Services::REQUEST);

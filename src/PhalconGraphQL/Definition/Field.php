@@ -2,6 +2,7 @@
 
 namespace PhalconGraphQL\Definition;
 
+use Phalcon\DiInterface;
 use PhalconGraphQL\Resolvers\EmptyResolver;
 
 class Field
@@ -14,6 +15,7 @@ class Field
     protected $_isNonNullList;
     protected $_resolvers = [];
     protected $_args = [];
+    protected $_built = false;
 
     public function __construct($name=null, $type=null, $description=null)
     {
@@ -123,6 +125,14 @@ class Field
     {
         return $this->_args;
     }
+
+    public function build(Schema $schema, DiInterface $di)
+    {
+        // Empty
+        $this->_built = true;
+    }
+
+
 
     public static function factory($name=null, $type=null, $description=null)
     {

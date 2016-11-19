@@ -2,12 +2,16 @@
 
 namespace PhalconGraphQL\Definition;
 
+use Phalcon\DiInterface;
+use PhalconApi\Exception;
+
 class ObjectType
 {
     protected $_name;
     protected $_description;
     protected $_handler;
     protected $_fields = [];
+    protected $_built = false;
 
     public function __construct($name=null, $description=null)
     {
@@ -79,6 +83,8 @@ class ObjectType
         $this->removeField($field->getName());
 
         $this->_fields[] = $field;
+        $this->_built = false;
+
         return $this;
     }
 
@@ -117,7 +123,21 @@ class ObjectType
 
     public function getFields()
     {
+        if(!$this->_built){
+            throw new Exception("Unable to get fields from '" . $this->getName() . "', object type is not built yet'");
+        }
+
         return $this->_fields;
+    }
+
+    public function build(Schema $schema, DiInterface $di){
+
+        /** @var Field $field */
+        foreach($this->_fields as $field){
+            $field->build($schema, $di);
+        }
+
+        $this->_built = true;
     }
 
     /**

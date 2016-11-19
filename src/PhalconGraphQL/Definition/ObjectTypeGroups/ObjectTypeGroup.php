@@ -2,7 +2,9 @@
 
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
 
+use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\ObjectType;
+use PhalconGraphQL\Definition\Schema;
 
 class ObjectTypeGroup implements ObjectTypeGroupInterface
 {
@@ -12,6 +14,11 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
 
         $this->_types[] = $objectType;
         return $this;
+    }
+
+    public function build(Schema $schema, DiInterface $di)
+    {
+        // Empty
     }
 
     /**

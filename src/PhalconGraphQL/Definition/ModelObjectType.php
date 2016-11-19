@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Definition;
 
 use Phalcon\Db\Column;
-use Phalcon\Di;
+use Phalcon\DiInterface;
 use Phalcon\Mvc\Model;
 use Phalcon\Mvc\Model\Manager;
 use Phalcon\Mvc\Model\MetaData;
@@ -14,13 +14,10 @@ use PhalconGraphQL\Core;
 class ModelObjectType extends ObjectType
 {
     protected $_modelClass;
-    protected $_built = false;
 
     protected $_excludedFields = [];
     protected $_excludeRelations = false;
-    protected $_relationEmbedMode;
-
-    protected $di;
+    protected $_relationEmbedMode = null;
 
     public function __construct($modelClass, $name=null, $description=null)
     {
@@ -31,10 +28,7 @@ class ModelObjectType extends ObjectType
 
         parent::__construct($name, $description);
 
-        $this->_relationEmbedMode = Schema::getDefaultEmbedMode();
         $this->_modelClass = $modelClass;
-
-        $this->di = Di::getDefault();
     }
 
     public function exclude($field)
@@ -45,60 +39,35 @@ class ModelObjectType extends ObjectType
     public function excludeRelations($excludeRelations = true)
     {
         $this->_excludeRelations = $excludeRelations;
-        $this->_built = false;
-
         return $this;
     }
 
     public function embedRelationsOnlyEdges()
     {
         $this->_relationEmbedMode = Schema::EMBED_MODE_EDGES;
-        $this->_built = false;
-
         return $this;
     }
 
     public function embedRelationsOnlyNode()
     {
         $this->_relationEmbedMode = Schema::EMBED_MODE_NODE;
-        $this->_built = false;
-
         return $this;
     }
 
     public function embedRelations()
     {
         $this->_relationEmbedMode = Schema::EMBED_MODE_ALL;
-        $this->_built = false;
-
         return $this;
+    }
+
+    public function getRelationEmbedMode()
+    {
+        return $this->_relationEmbedMode;
     }
 
     public function relationEmbedMode($embedMode)
     {
         $this->_relationEmbedMode = $embedMode;
-        $this->_built = false;
-
-        return $this;
-    }
-
-    public function getFields()
-    {
-        // Delay building, build when the fields are queried
-        if(!$this->_built){
-
-            $this->build();
-            $this->_built = true;
-        }
-
-        return parent::getFields();
-    }
-
-    public function field(Field $field)
-    {
-        parent::field($field);
-        $this->_built = false;
-
         return $this;
     }
 
@@ -109,13 +78,21 @@ class ModelObjectType extends ObjectType
         return parent::removeField($fieldName);
     }
 
-    protected function build()
+    public function build(Schema $schema, DiInterface $di)
     {
+        if($this->_built){
+            return;
+        }
+
+        if($this->_relationEmbedMode === null){
+            $this->_relationEmbedMode = $schema->getEmbedMode();
+        }
+
         /** @var MetaData $modelsMetadata */
-        $modelsMetadata = $this->di->get(Services::MODELS_METADATA);
+        $modelsMetadata = $di->get(Services::MODELS_METADATA);
 
         /** @var Manager $modelsManager */
-        $modelsManager = $this->di->get(Services::MODELS_MANAGER);
+        $modelsManager = $di->get(Services::MODELS_MANAGER);
 
         $modelClass = $this->_modelClass;
         $model = new $modelClass();
@@ -201,6 +178,10 @@ class ModelObjectType extends ObjectType
         }
 
         $this->_fields = array_merge($newFields, $originalFields);
+
+        parent::build($schema, $di);
+
+        $this->_built = true;
     }
 
     protected function getMappedDatabaseType($type)

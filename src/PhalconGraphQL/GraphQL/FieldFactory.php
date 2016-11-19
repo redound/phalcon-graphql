@@ -4,7 +4,6 @@ namespace PhalconGraphQL\GraphQL;
 
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\InputField;
-use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Dispatcher;
 
 class FieldFactory

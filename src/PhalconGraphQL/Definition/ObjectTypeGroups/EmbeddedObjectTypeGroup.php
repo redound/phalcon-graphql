@@ -1,7 +1,9 @@
 <?php
 
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
-
+;
+use Phalcon\DiInterface;
+use PhalconApi\Exception;
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
@@ -23,7 +25,7 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
     public function __construct(ObjectType $mainObjectType, $embedMode = null)
     {
         $this->_mainObjectType = $mainObjectType;
-        $this->_embedMode = $embedMode === null ? Schema::getDefaultEmbedMode() : $embedMode;
+        $this->_embedMode = $embedMode;
     }
 
     public function onlyNode(){
@@ -44,7 +46,11 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
         return $this;
     }
 
-    protected function build(){
+    public function build(Schema $schema, DiInterface $di){
+
+        if($this->_embedMode === null){
+            $this->_embedMode = $schema->getEmbedMode();
+        }
 
         $objectTypes = [];
 
@@ -93,17 +99,14 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
         }
 
         $this->_objectTypes = $objectTypes;
+
+        $this->_built = true;
     }
 
-    /**
-     * @return ObjectType[]
-     */
     public function getObjectTypes()
     {
         if(!$this->_built){
-
-            $this->build();
-            $this->_built = true;
+            throw new Exception("Unable to get object types from embedded object type '" . $this->_mainObjectType->getName() . "', not built yet");
         }
 
         return $this->_objectTypes;

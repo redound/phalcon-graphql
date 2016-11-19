@@ -10,7 +10,6 @@ use PhalconGraphQL\Dispatcher;
 
 class ObjectTypeFactory
 {
-
     public static function build(Dispatcher $dispatcher, Schema $schema, SchemaObjectType $objectType, TypeRegistry $typeRegistry)
     {
         return new ObjectType([
