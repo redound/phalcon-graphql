@@ -84,27 +84,25 @@ class ModelField extends Field
             return;
         }
 
-        if($this->_embedMode === null){
-            $this->_embedMode = $schema->getEmbedMode();
-        }
+        if($this->_isList) {
 
-        $embedNode = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-        $embedEdges = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
+            if($this->_embedMode === null){
+                $this->_embedMode = $schema->getEmbedMode();
+            }
 
-        if($embedEdges && $this->_isList){
+            $embedNode = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
+            $embedEdges = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
 
-            $this->_type = Types::connection($this->_type);
-            $this->_isList = false;
-        }
-        else if($embedNode && !$this->_isList){
+            if($embedEdges){
 
-            $this->_type = Types::edge($this->_type);
-            $this->_isList = false;
-        }
-        else if($embedNode && $this->_isList){
+                $this->_type = Types::connection($this->_type);
+                $this->_isList = false;
+            }
+            else if($embedNode){
 
-            $this->_type = Types::edge($this->_type);
-            $this->_isList = true;
+                $this->_type = Types::edge($this->_type);
+                $this->_isList = true;
+            }
         }
 
         $this->_built = true;
