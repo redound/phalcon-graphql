@@ -2,6 +2,8 @@
 
 namespace PhalconGraphQL\Definition;
 
+use Phalcon\DiInterface;
+
 class InputField
 {
     protected $_name;
@@ -11,6 +13,8 @@ class InputField
     protected $_isList;
     protected $_isNonNullList;
     protected $_defaultValue;
+
+    protected $_built = false;
 
     public function __construct($name=null, $type=null)
     {
@@ -100,6 +104,13 @@ class InputField
     {
         return $this->_defaultValue;
     }
+
+    public function build(Schema $schema, DiInterface $di)
+    {
+        // Empty
+        $this->_built = true;
+    }
+
 
     public static function factory($name=null, $type=null)
     {

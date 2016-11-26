@@ -18,6 +18,8 @@ class Schema
     protected $_objectTypes = [];
     protected $_objectTypeGroups = [];
 
+    protected $_inputObjectTypes = [];
+
     protected $_built = false;
 
 
@@ -79,6 +81,17 @@ class Schema
         return $this->_objectTypes;
     }
 
+    public function inputObject(InputObjectType $objectType)
+    {
+        $this->_inputObjectTypes[] = $objectType;
+        return $this;
+    }
+
+    public function getInputObjectTypes()
+    {
+        return $this->_inputObjectTypes;
+    }
+
     public function objectGroup(ObjectTypeGroupInterface $objectTypeGroup)
     {
         $this->_objectTypeGroups[] = $objectTypeGroup;
@@ -109,6 +122,13 @@ class Schema
         foreach($objectTypes as $objectType){
             $objectType->build($this, $di);
         }
+
+        /** @var InputObjectType $inputObjectType */
+        foreach($this->_inputObjectTypes as $objectType){
+            $objectType->build($this, $di);
+        }
+
+        $this->_objectTypes = $objectTypes;
 
         $this->_built = true;
     }

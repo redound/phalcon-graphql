@@ -6,18 +6,16 @@ use PhalconGraphQL\Definition\InputField;
 
 class InputFieldFactory
 {
-
-    public static function build(InputField $inputField, TypeRegistry $typeRegistry)
+    public static function build(InputField $field, TypeRegistry $typeRegistry)
     {
-        $type = $inputField->getType();
-        $nonNull = $inputField->getNonNull();
-        $isList = $inputField->getIsList();
-        $isNonNullList = $inputField->getIsNonNullList();
+        $type = $field->getType();
+        $nonNull = $field->getNonNull();
+        $isList = $field->getIsList();
+        $isNonNullList = $field->getIsNonNullList();
 
         return [
-            'description' => $inputField->getDescription(),
-            'type' => $typeRegistry->resolve($type, $nonNull, $isList, $isNonNullList),
-            'defaultValue' => $inputField->getDescription()
+            'description' => $field->getDescription(),
+            'type' => $typeRegistry->resolve($type, $nonNull, $isList, $isNonNullList)
         ];
     }
 }

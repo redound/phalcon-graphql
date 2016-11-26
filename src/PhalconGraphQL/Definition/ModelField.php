@@ -150,4 +150,48 @@ class ModelField extends Field
             ->resolver(FindModelResolver::class)
             ->arg(InputField::factory('id', Types::ID));
     }
+
+    public static function create($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
+    {
+        $modelName = ucfirst(Core::getShortClass($model));
+
+        if($name === null){
+            $name = 'create' . $modelName;
+        }
+
+        if($inputType === null){
+            $inputType = Types::createInput($modelName);
+        }
+
+        return self::factory($model, $name, $returnType, $description)
+            ->arg(InputField::factory('input', $inputType)->nonNull());
+    }
+
+    public static function update($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
+    {
+        $modelName = ucfirst(Core::getShortClass($model));
+
+        if($name === null){
+            $name = 'update' . $modelName;
+        }
+
+        if($inputType === null){
+            $inputType = Types::updateInput($modelName);
+        }
+
+        return self::factory($model, $name, $returnType, $description)
+            ->arg(InputField::factory('input', $inputType)->nonNull());
+    }
+
+    public static function delete($model=null, $name=null, $description=null)
+    {
+        if($name === null){
+
+            $modelName = ucfirst(Core::getShortClass($model));
+            $name = 'delete' . $modelName;
+        }
+
+        return self::factory($model, $name, Types::BOOLEAN, $description)
+            ->arg(InputField::factory('id', Types::ID)->nonNull());
+    }
 }

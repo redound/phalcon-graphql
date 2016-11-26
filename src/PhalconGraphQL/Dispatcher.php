@@ -118,8 +118,8 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
         $requestString = isset($data['query']) && !empty($data['query']) ? $data['query'] : null;
         $operationName = isset($data['operation']) && !empty($data['operation']) ? $data['operation'] : null;
-        $variableValues = isset($data['variables']) && !empty($data['variables']) ? $data['variables'] : null;
-        
+        $variableValues = isset($data['variables']) && !empty($data['variables']) ? json_decode($data['variables'], true) : null;
+
         $result = GraphQL::execute(
             $graphqlSchema,
             $requestString,

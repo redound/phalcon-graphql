@@ -3,26 +3,27 @@
 namespace PhalconGraphQL\Definition;
 
 use Phalcon\DiInterface;
-use Phalcon\Mvc\Model;
-use Phalcon\Mvc\Model\Manager;
+use Phalcon\Mvc\Model\ManagerInterface;
 use Phalcon\Mvc\Model\MetaData;
-use Phalcon\Mvc\Model\RelationInterface;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Core;
 
-class ModelObjectType extends ObjectType
+class ModelInputObjectType extends InputObjectType
 {
+    const TYPE_CREATE = 'create';
+    const TYPE_UPDATE = 'update';
+
     protected $_modelClass;
 
     protected $_excludedFields = [];
-    protected $_excludeRelations = false;
-    protected $_relationEmbedMode = null;
+
+    protected $_excludeIdentity = false;
 
     public function __construct($modelClass, $name=null, $description=null)
     {
         // Use class name if name not provided
         if($name === null) {
-            $name = Core::getShortClass($modelClass);
+            $this->_name = Types::input(Core::getShortClass($modelClass));
         }
 
         parent::__construct($name, $description);
@@ -35,38 +36,9 @@ class ModelObjectType extends ObjectType
         return $this->removeField($field);
     }
 
-    public function excludeRelations($excludeRelations = true)
+    public function excludeIdentity($excludeIdentity = true)
     {
-        $this->_excludeRelations = $excludeRelations;
-        return $this;
-    }
-
-    public function embedRelationsOnlyEdges()
-    {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_EDGES;
-        return $this;
-    }
-
-    public function embedRelationsOnlyNode()
-    {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_NODE;
-        return $this;
-    }
-
-    public function embedRelations()
-    {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_ALL;
-        return $this;
-    }
-
-    public function getRelationEmbedMode()
-    {
-        return $this->_relationEmbedMode;
-    }
-
-    public function relationEmbedMode($embedMode)
-    {
-        $this->_relationEmbedMode = $embedMode;
+        $this->_excludeIdentity = $excludeIdentity;
         return $this;
     }
 
@@ -83,14 +55,10 @@ class ModelObjectType extends ObjectType
             return;
         }
 
-        if($this->_relationEmbedMode === null){
-            $this->_relationEmbedMode = $schema->getEmbedMode();
-        }
-
         /** @var MetaData $modelsMetadata */
         $modelsMetadata = $di->get(Services::MODELS_METADATA);
 
-        /** @var Manager $modelsManager */
+        /** @var ManagerInterface $modelsManager */
         $modelsManager = $di->get(Services::MODELS_MANAGER);
 
         $modelClass = $this->_modelClass;
@@ -112,8 +80,8 @@ class ModelObjectType extends ObjectType
             $skip = array_merge($skip, $model->excludedFields());
         }
 
-        if(method_exists($model, 'excludedOutputFields')){
-            $skip = array_merge($skip, $model->excludedOutputFields());
+        if(method_exists($model, 'excludedInputFields')){
+            $skip = array_merge($skip, $model->excludedInputFields());
         }
 
         if(method_exists($model, 'typeMap')){
@@ -125,14 +93,18 @@ class ModelObjectType extends ObjectType
 
         foreach ($dataTypes as $attributeName => $dataType) {
 
+            if($attributeName == $identityField && $this->_excludeIdentity){
+                continue;
+            }
+
             $mappedAttributeName = is_array($columnMap) && array_key_exists($attributeName, $columnMap) ? $columnMap[$attributeName] : $attributeName;
 
             $type = null;
-            if($attributeName == $identityField){
-                $type = Types::ID;
-            }
-            else if(array_key_exists($mappedAttributeName, $typeMap)){
+            if(array_key_exists($mappedAttributeName, $typeMap)){
                 $type = $typeMap[$mappedAttributeName];
+            }
+            else if($attributeName == $identityField){
+                $type = Types::ID;
             }
             else {
                 $type = Types::getMappedDatabaseType($dataType);
@@ -151,33 +123,12 @@ class ModelObjectType extends ObjectType
                 continue;
             }
 
-            $field = Field::factory($attribute, $type);
+            $field = InputField::factory($attribute, $type);
             if(in_array($attribute, $mappedNonNullAttributes)){
                 $field->nonNull();
             }
 
             $newFields[] = $field;
-        }
-
-        // Relations
-        if(!$this->_excludeRelations) {
-
-            /** @var RelationInterface $relation */
-            foreach ($modelsManager->getRelations($modelClass) as $relation) {
-
-                $referencedModelClass = Core::getShortClass($relation->getReferencedModel());
-
-                $options = $relation->getOptions();
-                $relationName = is_array($options) && array_key_exists('alias',
-                    $options) ? $options['alias'] : $referencedModelClass;
-                $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
-
-                $field = ModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
-                    ->isList($isList)
-                    ->embedMode($this->_relationEmbedMode);
-
-                $newFields[] = $field;
-            }
         }
 
         $this->_fields = array_merge($newFields, $originalFields);
@@ -192,6 +143,25 @@ class ModelObjectType extends ObjectType
      */
     public static function factory($modelClass, $name=null, $description=null)
     {
-        return new ModelObjectType($modelClass, $name, $description);
+        return new ModelInputObjectType($modelClass, $name, $description);
+    }
+
+    public static function create($modelClass, $name=null, $description=null){
+
+        if($name === null){
+            $name = Types::createInput(Core::getShortClass($modelClass));
+        }
+
+        return self::factory($modelClass, $name, $description)
+            ->excludeIdentity();
+    }
+
+    public static function update($modelClass, $name=null, $description=null){
+
+        if($name === null){
+            $name = Types::updateInput(Core::getShortClass($modelClass));
+        }
+
+        return self::factory($modelClass, $name, $description);
     }
 }

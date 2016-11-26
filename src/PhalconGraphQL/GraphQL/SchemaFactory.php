@@ -5,6 +5,7 @@ namespace PhalconGraphQL\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\EnumType;
+use PhalconGraphQL\Definition\InputObjectType;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Definition\Schema;
@@ -36,16 +37,14 @@ class SchemaFactory
             $typeRegistry->register($enumType->getName(), EnumTypeFactory::build($enumType));
         }
 
-        $objectTypes = $schema->getObjectTypes();
-
-        /** @var ObjectTypeGroupInterface $objectTypeGroup */
-        foreach($schema->getObjectTypeGroups() as $objectTypeGroup){
-            $objectTypes = array_merge($objectTypes, $objectTypeGroup->getObjectTypes());
+        /** @var ObjectType $objectType */
+        foreach ($schema->getObjectTypes() as $objectType) {
+            $typeRegistry->register($objectType->getName(), ObjectTypeFactory::build($dispatcher, $schema, $objectType, $typeRegistry));
         }
 
-        /** @var ObjectType $objectType */
-        foreach ($objectTypes as $objectType) {
-            $typeRegistry->register($objectType->getName(), ObjectTypeFactory::build($dispatcher, $schema, $objectType, $typeRegistry));
+        /** @var InputObjectType $inputObjectType */
+        foreach ($schema->getInputObjectTypes() as $inputObjectType) {
+            $typeRegistry->register($inputObjectType->getName(), InputObjectTypeFactory::build($inputObjectType, $typeRegistry));
         }
 
         $schemaFields = [];
