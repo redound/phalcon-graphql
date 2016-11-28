@@ -3,23 +3,18 @@
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
 ;
 use Phalcon\DiInterface;
-use PhalconApi\Exception;
 use PhalconGraphQL\Definition\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Handlers\PassHandler;
 
-class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
+class EmbeddedObjectTypeGroup extends ObjectTypeGroup
 {
     /** @var ObjectType */
     protected $_mainObjectType;
 
     protected $_embedMode;
-
-    protected $_objectTypes;
-
-    protected $_built;
 
 
     public function __construct(ObjectType $mainObjectType, $embedMode = null)
@@ -46,10 +41,12 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
         return $this;
     }
 
-    public function build(Schema $schema, DiInterface $di){
+    public function getDefaultObjectTypes(Schema $schema, DiInterface $di){
 
-        if($this->_embedMode === null){
-            $this->_embedMode = $schema->getEmbedMode();
+        $embedMode = $this->_embedMode;
+
+        if($embedMode === null){
+            $embedMode = $schema->getEmbedMode();
         }
 
         $objectTypes = [];
@@ -59,8 +56,8 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
         $connectionName = Types::connection($name);
         $edgeName = Types::edge($name);
 
-        $embedNode = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-        $embedEdges = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
+        $embedNode = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
+        $embedEdges = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
 
         // Object
         $objectTypes[] = $this->_mainObjectType;
@@ -98,18 +95,7 @@ class EmbeddedObjectTypeGroup implements ObjectTypeGroupInterface
             $objectTypes[] = $edgeType;
         }
 
-        $this->_objectTypes = $objectTypes;
-
-        $this->_built = true;
-    }
-
-    public function getObjectTypes()
-    {
-        if(!$this->_built){
-            throw new Exception("Unable to get object types from embedded object type '" . $this->_mainObjectType->getName() . "', not built yet");
-        }
-
-        return $this->_objectTypes;
+        return $objectTypes;
     }
 
     /**

@@ -16,7 +16,7 @@ class ModelObjectType extends ObjectType
 
     protected $_excludedFields = [];
     protected $_excludeRelations = false;
-    protected $_relationEmbedMode = null;
+    protected $_relationEmbedMode;
 
     public function __construct($modelClass, $name=null, $description=null)
     {
@@ -83,8 +83,10 @@ class ModelObjectType extends ObjectType
             return;
         }
 
-        if($this->_relationEmbedMode === null){
-            $this->_relationEmbedMode = $schema->getEmbedMode();
+        $relationEmbedMode = $this->_relationEmbedMode;
+
+        if($relationEmbedMode === null){
+            $relationEmbedMode = $schema->getEmbedMode();
         }
 
         /** @var MetaData $modelsMetadata */
@@ -174,7 +176,7 @@ class ModelObjectType extends ObjectType
 
                 $field = ModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
                     ->isList($isList)
-                    ->embedMode($this->_relationEmbedMode);
+                    ->embedMode($relationEmbedMode);
 
                 $newFields[] = $field;
             }

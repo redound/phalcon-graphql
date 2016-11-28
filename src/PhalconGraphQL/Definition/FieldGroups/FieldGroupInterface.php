@@ -13,5 +13,10 @@ interface FieldGroupInterface
      */
     public function getFields();
 
+    /**
+     * @return mixed
+     */
+    public function getHandler();
+
     public function build(Schema $schema, DiInterface $di);
 }

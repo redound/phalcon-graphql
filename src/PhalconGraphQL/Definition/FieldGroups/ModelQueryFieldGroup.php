@@ -15,13 +15,12 @@ class ModelQueryFieldGroup extends FieldGroup
         $this->_modelClass = $modelClass;
     }
 
-    public function build(Schema $schema, DiInterface $di)
+    public function getDefaultFields(Schema $schema, DiInterface $di)
     {
-        $modelFields = [];
-        $modelFields[] = ModelField::all($this->_modelClass);
-        $modelFields[] = ModelField::find($this->_modelClass);
-
-        $this->_fields = array_merge($modelFields, $this->_fields);
+        return [
+            ModelField::all($this->_modelClass),
+            ModelField::find($this->_modelClass)
+        ];
     }
 
     /**

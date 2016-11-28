@@ -6,6 +6,7 @@ use GraphQL\GraphQL;
 use Phalcon\Http\Request;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\SchemaFactory;
@@ -15,15 +16,23 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 {
     protected $defaultNamespace;
 
+    protected $handlerCache = [];
+
     public function setDefaultNamespace($namespace)
     {
         $this->defaultNamespace = rtrim($namespace, '\\');
     }
 
-    public function createHandler(ObjectType $objectType, Schema $schema)
+    public function getHandler(Schema $schema, ObjectType $objectType, $fieldGroup)
     {
+        $handlerClassName = $fieldGroup && $fieldGroup->getHandler() ? $fieldGroup->getHandler() : $objectType->getHandler();
+        $objectKey = $objectType->getName() . ':' . $handlerClassName;
+
+        if(array_key_exists($objectKey, $this->handlerCache)){
+            return $this->handlerCache[$objectKey];
+        }
+
         $handler = null;
-        $handlerClassName = $objectType->getHandler();
 
         if ($handlerClassName) {
 
@@ -50,15 +59,20 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
             $handler->setObjectType($objectType);
         }
 
+        $this->handlerCache[$objectKey] = $handler;
+
         return $handler;
     }
 
-    public function createResolver($handler, Field $field)
+    public function createResolver($schema, ObjectType $objectType, Field $field, $fieldGroup)
     {
-        return function ($source, $args) use ($handler, $field) {
+        $dispatcher = $this;
+
+        return function ($source, $args) use ($schema, $objectType, $field, $dispatcher, $fieldGroup) {
 
             $resolvers = $field->getResolvers();
             $fieldName = $field->getName();
+            $handler = $dispatcher->getHandler($schema, $objectType, $fieldGroup);
 
             if (empty($resolvers)) {
                 return $handler->$fieldName($source, $args, $field);

@@ -4,7 +4,6 @@ namespace PhalconGraphQL\Definition;
 
 use Phalcon\DiInterface;
 use PhalconApi\Exception;
-use PhalconGraphQL\Definition\FieldGroups\FieldGroup;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 
 class ObjectType
@@ -136,9 +135,15 @@ class ObjectType
     public function fieldGroup(FieldGroupInterface $fieldGroup)
     {
         $this->_fieldGroups[] = $fieldGroup;
-        $this->_built = false;
-
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldGroups()
+    {
+        return $this->_fieldGroups;
     }
 
     public function build(Schema $schema, DiInterface $di){
@@ -147,21 +152,15 @@ class ObjectType
             return;
         }
 
-        $fields = $this->_fields;
-
         /** @var FieldGroupInterface $fieldGroup */
         foreach($this->_fieldGroups as $fieldGroup){
-
             $fieldGroup->build($schema, $di);
-            $fields = array_merge($fields, $fieldGroup->getFields());
         }
 
         /** @var Field $field */
-        foreach($fields as $field){
+        foreach($this->_fields as $field){
             $field->build($schema, $di);
         }
-
-        $this->_fields = $fields;
 
         $this->_built = true;
     }

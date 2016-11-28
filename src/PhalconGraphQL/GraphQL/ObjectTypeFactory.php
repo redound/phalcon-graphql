@@ -4,6 +4,7 @@ namespace PhalconGraphQL\GraphQL;
 
 use GraphQL\Type\Definition\ObjectType;
 use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType as SchemaObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Dispatcher;
@@ -15,15 +16,21 @@ class ObjectTypeFactory
         return new ObjectType([
             'name' => $objectType->getName(),
             'description' => $objectType->getDescription(),
-            'fields' => function () use ($dispatcher, $objectType, $typeRegistry, $schema) {
+            'fields' => function() use ($objectType, $dispatcher, $schema, $typeRegistry){
 
                 $fields = [];
 
-                $handler = $dispatcher->createHandler($objectType, $schema);
+                /** @var FieldGroupInterface $fieldGroup */
+                foreach ($objectType->getFieldGroups() as $fieldGroup) {
+
+                    foreach($fieldGroup->getFields() as $field) {
+                        $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, $fieldGroup, $typeRegistry);
+                    }
+                }
 
                 /** @var Field $field */
                 foreach ($objectType->getFields() as $field) {
-                    $fields[$field->getName()] = FieldFactory::build($dispatcher, $handler, $field, $typeRegistry);
+                    $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, null, $typeRegistry);
                 }
 
                 return $fields;

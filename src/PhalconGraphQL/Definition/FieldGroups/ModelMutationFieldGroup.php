@@ -15,14 +15,13 @@ class ModelMutationFieldGroup extends FieldGroup
         $this->_modelClass = $modelClass;
     }
 
-    public function build(Schema $schema, DiInterface $di)
+    public function getDefaultFields(Schema $schema, DiInterface $di)
     {
-        $modelFields = [];
-        $modelFields[] = ModelField::create($this->_modelClass);
-        $modelFields[] = ModelField::update($this->_modelClass);
-        $modelFields[] = ModelField::delete($this->_modelClass);
-
-        $this->_fields = array_merge($modelFields, $this->_fields);
+        return [
+            ModelField::create($this->_modelClass),
+            ModelField::update($this->_modelClass),
+            ModelField::delete($this->_modelClass)
+        ];
     }
 
     /**

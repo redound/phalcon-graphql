@@ -86,12 +86,14 @@ class ModelField extends Field
 
         if($this->_isList) {
 
-            if($this->_embedMode === null){
-                $this->_embedMode = $schema->getEmbedMode();
+            $embedMode = $this->_embedMode;
+
+            if($embedMode === null){
+                $embedMode = $schema->getEmbedMode();
             }
 
-            $embedNode = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-            $embedEdges = in_array($this->_embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
+            $embedNode = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
+            $embedEdges = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
 
             if($embedEdges){
 

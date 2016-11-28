@@ -109,17 +109,13 @@ class Schema
             return;
         }
 
-        $objectTypes = $this->_objectTypes;
-
         /** @var ObjectTypeGroupInterface $objectTypeGroup */
         foreach($this->_objectTypeGroups as $objectTypeGroup){
-
             $objectTypeGroup->build($this, $di);
-            $objectTypes = array_merge($objectTypes, $objectTypeGroup->getObjectTypes());
         }
 
         /** @var ObjectType $objectType */
-        foreach($objectTypes as $objectType){
+        foreach($this->_objectTypes as $objectType){
             $objectType->build($this, $di);
         }
 
@@ -127,8 +123,6 @@ class Schema
         foreach($this->_inputObjectTypes as $objectType){
             $objectType->build($this, $di);
         }
-
-        $this->_objectTypes = $objectTypes;
 
         $this->_built = true;
     }
