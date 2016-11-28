@@ -12,6 +12,15 @@ class FieldGroup implements FieldGroupInterface
     protected $_handler;
     protected $_build = false;
 
+    public function __construct($handler=null)
+    {
+        if($handler === null){
+            $handler = $this->getDefaultHandler();
+        }
+
+        $this->_handler = $handler;
+    }
+
     public function add(Field $field){
 
         $this->_fields[] = $field;
@@ -53,6 +62,11 @@ class FieldGroup implements FieldGroupInterface
         return [];
     }
 
+    protected function getDefaultHandler(){
+
+        return null;
+    }
+
     /**
      * @return Field[]
      */
@@ -64,8 +78,8 @@ class FieldGroup implements FieldGroupInterface
     /**
      * @return static
      */
-    public static function factory(){
+    public static function factory($handler=null){
 
-        return new FieldGroup();
+        return new FieldGroup($handler);
     }
 }

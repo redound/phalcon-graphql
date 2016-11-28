@@ -6,16 +6,9 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\ModelField;
 use PhalconGraphQL\Definition\Schema;
 
-class ModelQueryFieldGroup extends FieldGroup
+class ModelQueryFieldGroup extends ModelFieldGroup
 {
-    protected $_modelClass;
-
-    public function __construct($modelClass)
-    {
-        $this->_modelClass = $modelClass;
-    }
-
-    public function getDefaultFields(Schema $schema, DiInterface $di)
+    protected function getDefaultFields(Schema $schema, DiInterface $di)
     {
         return [
             ModelField::all($this->_modelClass),
@@ -26,8 +19,8 @@ class ModelQueryFieldGroup extends FieldGroup
     /**
      * @return static
      */
-    public static function factory($modelClass){
+    public static function factory($modelClass, $handler=null){
 
-        return new ModelQueryFieldGroup($modelClass);
+        return new ModelQueryFieldGroup($modelClass, $handler=null);
     }
 }

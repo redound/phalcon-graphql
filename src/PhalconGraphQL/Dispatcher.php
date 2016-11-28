@@ -57,6 +57,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
             $handler->setSchema($schema);
             $handler->setObjectType($objectType);
+            $handler->setFieldGroup($fieldGroup);
         }
 
         $this->handlerCache[$objectKey] = $handler;

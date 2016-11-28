@@ -3,6 +3,7 @@
 namespace PhalconGraphQL\Handlers;
 
 use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Mvc\Plugin;
@@ -11,6 +12,9 @@ class Handler extends Plugin
 {
     /** @var ObjectType */
     protected $objectType;
+
+    /** @var FieldGroupInterface */
+    protected $fieldGroup;
 
     /** @var Schema */
     protected $schema;
@@ -21,6 +25,14 @@ class Handler extends Plugin
     public function setObjectType($objectType)
     {
         $this->objectType = $objectType;
+    }
+
+    /**
+     * @param FieldGroupInterface $fieldGroup
+     */
+    public function setFieldGroup($fieldGroup)
+    {
+        $this->fieldGroup = $fieldGroup;
     }
 
     /**

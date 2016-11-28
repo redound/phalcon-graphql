@@ -5,17 +5,16 @@ namespace PhalconGraphQL\Definition\FieldGroups;
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\ModelField;
 use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Handlers\ModelMutationHandler;
 
-class ModelMutationFieldGroup extends FieldGroup
+class ModelMutationFieldGroup extends ModelFieldGroup
 {
-    protected $_modelClass;
-
-    public function __construct($modelClass)
+    protected function getDefaultHandler()
     {
-        $this->_modelClass = $modelClass;
+        return ModelMutationHandler::class;
     }
 
-    public function getDefaultFields(Schema $schema, DiInterface $di)
+    protected function getDefaultFields(Schema $schema, DiInterface $di)
     {
         return [
             ModelField::create($this->_modelClass),
@@ -27,8 +26,8 @@ class ModelMutationFieldGroup extends FieldGroup
     /**
      * @return static
      */
-    public static function factory($modelClass){
+    public static function factory($modelClass, $handler=null){
 
-        return new ModelMutationFieldGroup($modelClass);
+        return new ModelMutationFieldGroup($modelClass, $handler);
     }
 }
