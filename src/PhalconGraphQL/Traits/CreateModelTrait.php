@@ -2,9 +2,7 @@
 
 trait CreateModelTrait
 {
-    use ModelMutationTrait;
-
-    protected function _create(\PhalconGraphQL\Definition\Field $field, $data)
+    protected function _create(\PhalconGraphQL\Definition\Fields\Field $field, $data)
     {
         $this->_beforeHandleWrite();
         $this->_beforeHandleCreate();
@@ -83,7 +81,7 @@ trait CreateModelTrait
 
     protected function _onCreateFailed(\Phalcon\Mvc\Model $item, $data)
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to create item', [
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to create item', [
             'messages' => $this->_getMessages($item->getMessages()),
             'data' => $data,
             'item' => $item->toArray()

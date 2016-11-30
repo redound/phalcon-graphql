@@ -2,14 +2,14 @@
 
 namespace PhalconGraphQL\Resolvers;
 
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 
 class AllModelResolver extends ModelResolver
 {
+    use \AllModelTrait;
+
     public function resolve($source, $args, Field $field)
     {
-        $model = $this->getModel($field);
-
-        return $model::find();
+        return $this->_all($field);
     }
 }

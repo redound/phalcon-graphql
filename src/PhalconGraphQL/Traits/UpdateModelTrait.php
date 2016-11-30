@@ -2,14 +2,12 @@
 
 trait UpdateModelTrait
 {
-    use ModelMutationTrait;
-
-    protected function _update(\PhalconGraphQL\Definition\Field $field, $data)
+    protected function _update(\PhalconGraphQL\Definition\Fields\Field $field, $data)
     {
         $primaryKey = $this->_getModelPrimaryKey($field);
         $id = isset($data[$primaryKey]) ? $data[$primaryKey] : null;
         if($id === null){
-            throw new Exception(\PhalconApi\Constants\ErrorCodes::POST_DATA_INVALID, 'No ID found in data (key is ' . $primaryKey . ')', $data);
+            throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::POST_DATA_INVALID, 'No ID found in data (key is ' . $primaryKey . ')', $data);
         }
 
         $this->_beforeHandleWrite();
@@ -93,7 +91,7 @@ trait UpdateModelTrait
 
     protected function _onUpdateFailed(\Phalcon\Mvc\Model $item, $data)
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to update item', [
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to update item', [
             'messages' => $this->_getMessages($item->getMessages()),
             'data' => $data,
             'item' => $item->toArray()

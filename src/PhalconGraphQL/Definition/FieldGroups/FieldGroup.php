@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Definition\FieldGroups;
 
 use Phalcon\DiInterface;
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Schema;
 
 class FieldGroup implements FieldGroupInterface

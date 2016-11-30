@@ -2,9 +2,7 @@
 
 trait DeleteModelTrait
 {
-    use ModelMutationTrait;
-
-    protected function _delete(\PhalconGraphQL\Definition\Field $field, $id)
+    protected function _delete(\PhalconGraphQL\Definition\Fields\Field $field, $id)
     {
         $this->_beforeHandleWrite();
         $this->_beforeHandleDelete($id);
@@ -70,7 +68,7 @@ trait DeleteModelTrait
 
     protected function _onDeleteFailed(\Phalcon\Mvc\Model $item)
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to delete item', [
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to delete item', [
             'messages' => $this->_getMessages($item->getMessages()),
             'item' => $item->toArray()
         ]);

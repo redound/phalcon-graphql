@@ -9,6 +9,8 @@ use Phalcon\Mvc\Model\MetaData;
 use Phalcon\Mvc\Model\RelationInterface;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Core;
+use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\ModelField;
 
 class ModelObjectType extends ObjectType
 {

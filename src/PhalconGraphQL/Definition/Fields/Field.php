@@ -1,8 +1,11 @@
 <?php
 
-namespace PhalconGraphQL\Definition;
+namespace PhalconGraphQL\Definition\Fields;
 
 use Phalcon\DiInterface;
+use PhalconGraphQL\Definition\InputField;
+use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Resolvers\EmptyResolver;
 
 class Field
@@ -113,6 +116,12 @@ class Field
     public function getResolvers()
     {
         return $this->_resolvers;
+    }
+
+    public function clearResolvers()
+    {
+        $this->_resolvers = [];
+        return $this;
     }
 
     public function arg(InputField $inputField)

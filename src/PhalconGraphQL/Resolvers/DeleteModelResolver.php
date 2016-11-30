@@ -4,12 +4,13 @@ namespace PhalconGraphQL\Resolvers;
 
 use PhalconGraphQL\Definition\Fields\Field;
 
-class FindModelResolver extends ModelResolver
+class DeleteModelResolver extends ModelResolver
 {
-    use \FindModelTrait;
+    use \ModelMutationTrait;
+    use \DeleteModelTrait;
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_find($field, $args['id']);
+        return $this->_delete($field, $args['id']);
     }
 }

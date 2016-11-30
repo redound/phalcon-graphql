@@ -2,8 +2,8 @@
 
 namespace PhalconGraphQL\GraphQL;
 
-use PhalconGraphQL\Definition\Field;
-use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
+use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;

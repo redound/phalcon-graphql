@@ -4,12 +4,13 @@ namespace PhalconGraphQL\Resolvers;
 
 use PhalconGraphQL\Definition\Fields\Field;
 
-class FindModelResolver extends ModelResolver
+class CreateModelResolver extends ModelResolver
 {
-    use \FindModelTrait;
+    use \ModelMutationTrait;
+    use \CreateModelTrait;
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_find($field, $args['id']);
+        return $this->_create($field, $args['input']);
     }
 }

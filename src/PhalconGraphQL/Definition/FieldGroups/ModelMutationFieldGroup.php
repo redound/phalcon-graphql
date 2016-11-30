@@ -3,7 +3,9 @@
 namespace PhalconGraphQL\Definition\FieldGroups;
 
 use Phalcon\DiInterface;
-use PhalconGraphQL\Definition\ModelField;
+use PhalconGraphQL\Definition\Fields\CreateModelField;
+use PhalconGraphQL\Definition\Fields\DeleteModelField;
+use PhalconGraphQL\Definition\Fields\UpdateModelField;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Handlers\ModelMutationHandler;
 
@@ -17,9 +19,9 @@ class ModelMutationFieldGroup extends ModelFieldGroup
     protected function getDefaultFields(Schema $schema, DiInterface $di)
     {
         return [
-            ModelField::create($this->_modelClass),
-            ModelField::update($this->_modelClass),
-            ModelField::delete($this->_modelClass)
+            CreateModelField::factory($this->_modelClass)->clearResolvers(),
+            UpdateModelField::factory($this->_modelClass)->clearResolvers(),
+            DeleteModelField::factory($this->_modelClass)->clearResolvers()
         ];
     }
 

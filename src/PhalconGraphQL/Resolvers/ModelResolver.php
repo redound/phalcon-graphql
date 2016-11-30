@@ -2,8 +2,8 @@
 
 namespace PhalconGraphQL\Resolvers;
 
-use PhalconGraphQL\Definition\Field;
-use PhalconGraphQL\Definition\ModelField;
+use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\ModelField;
 
 abstract class ModelResolver extends Resolver
 {

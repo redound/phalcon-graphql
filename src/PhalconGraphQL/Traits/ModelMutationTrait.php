@@ -4,17 +4,17 @@ trait ModelMutationTrait
 {
     protected function _onNotAllowed()
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
     protected function _onDataInvalid($data)
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', ['data' => $data]);
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', ['data' => $data]);
     }
 
     protected function _onItemNotFound($id)
     {
-        throw new Exception(\PhalconApi\Constants\ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
+        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
     }
 
     protected function _beforeAssignData(\Phalcon\Mvc\Model $item, $data)
@@ -73,7 +73,7 @@ trait ModelMutationTrait
     /**
      * @return \Phalcon\Mvc\Model
      */
-    protected function _createModelInstance(\PhalconGraphQL\Definition\Field $field)
+    protected function _createModelInstance(\PhalconGraphQL\Definition\Fields\Field $field)
     {
         $modelClass = $this->getModel($field);
 
@@ -83,14 +83,14 @@ trait ModelMutationTrait
     /**
      * @return \Phalcon\Mvc\Model
      */
-    protected function _findModel(\PhalconGraphQL\Definition\Field $field, $id)
+    protected function _findModel(\PhalconGraphQL\Definition\Fields\Field $field, $id)
     {
         $modelClass = $this->getModel($field);
 
         return $modelClass::findFirst($id);
     }
 
-    protected function _getModelPrimaryKey(\PhalconGraphQL\Definition\Field $field)
+    protected function _getModelPrimaryKey(\PhalconGraphQL\Definition\Fields\Field $field)
     {
         $modelClass = $this->getModel($field);
 

@@ -3,9 +3,9 @@
 namespace PhalconGraphQL\Handlers;
 
 use PhalconApi\Exception;
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\ModelFieldGroup;
-use PhalconGraphQL\Definition\ModelField;
+use PhalconGraphQL\Definition\Fields\ModelField;
 
 class ModelHandler extends Handler
 {

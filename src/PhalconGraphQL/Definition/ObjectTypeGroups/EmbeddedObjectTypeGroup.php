@@ -1,9 +1,9 @@
 <?php
 
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
-;
+
 use Phalcon\DiInterface;
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;

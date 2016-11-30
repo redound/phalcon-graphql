@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Resolvers;
 
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 
 class EmptyResolver implements ResolverInterface
 {

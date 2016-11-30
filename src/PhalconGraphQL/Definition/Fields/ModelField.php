@@ -1,9 +1,12 @@
 <?php
 
-namespace PhalconGraphQL\Definition;
+namespace PhalconGraphQL\Definition\Fields;
 
 use Phalcon\DiInterface;
 use PhalconGraphQL\Core;
+use PhalconGraphQL\Definition\InputField;
+use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Resolvers\AllModelResolver;
 use PhalconGraphQL\Resolvers\FindModelResolver;
 
@@ -127,73 +130,5 @@ class ModelField extends Field
     public static function listFactory($model=null, $name=null, $type=null, $description=null)
     {
         return self::factory($model, $name, $type, $description)->isList();
-    }
-
-
-    public static function all($model=null, $name=null, $type=null, $description=null)
-    {
-        if($name === null){
-            $name = 'all' . ucfirst(Core::getShortClass($model)) . 's';
-        }
-
-        return self::factory($model, $name, $type, $description)
-            ->resolver(AllModelResolver::class)
-            ->isList()
-            ->nonNull();
-    }
-
-    public static function find($model=null, $name=null, $type=null, $description=null)
-    {
-        if($name === null){
-            $name = 'find' . ucfirst(Core::getShortClass($model));
-        }
-
-        return self::factory($model, $name, $type, $description)
-            ->resolver(FindModelResolver::class)
-            ->arg(InputField::factory('id', Types::ID));
-    }
-
-    public static function create($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
-    {
-        $modelName = ucfirst(Core::getShortClass($model));
-
-        if($name === null){
-            $name = 'create' . $modelName;
-        }
-
-        if($inputType === null){
-            $inputType = Types::createInput($modelName);
-        }
-
-        return self::factory($model, $name, $returnType, $description)
-            ->arg(InputField::factory('input', $inputType)->nonNull());
-    }
-
-    public static function update($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
-    {
-        $modelName = ucfirst(Core::getShortClass($model));
-
-        if($name === null){
-            $name = 'update' . $modelName;
-        }
-
-        if($inputType === null){
-            $inputType = Types::updateInput($modelName);
-        }
-
-        return self::factory($model, $name, $returnType, $description)
-            ->arg(InputField::factory('input', $inputType)->nonNull());
-    }
-
-    public static function delete($model=null, $name=null, $description=null)
-    {
-        if($name === null){
-
-            $modelName = ucfirst(Core::getShortClass($model));
-            $name = 'delete' . $modelName;
-        }
-
-        return self::factory($model, $name, Types::BOOLEAN, $description)
-            ->arg(InputField::factory('id', Types::ID)->nonNull());
     }
 }

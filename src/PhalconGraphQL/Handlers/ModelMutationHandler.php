@@ -4,10 +4,14 @@ namespace PhalconGraphQL\Handlers;
 
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\CreateModelField;
+use PhalconGraphQL\Definition\Fields\DeleteModelField;
+use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\UpdateModelField;
 
 class ModelMutationHandler extends ModelHandler
 {
+    use \ModelMutationTrait;
     use \CreateModelTrait;
     use \UpdateModelTrait;
     use \DeleteModelTrait;
@@ -17,13 +21,13 @@ class ModelMutationHandler extends ModelHandler
         /** @var Field $field */
         list($source, $args, $field) = $arguments;
 
-        if(stripos($name, 'create') === 0){
+        if($field instanceof CreateModelField){
             return $this->_create($field, $args['input']);
         }
-        else if(stripos($name, 'update') === 0){
+        else if($field instanceof UpdateModelField){
             return $this->_update($field, $args['input']);
         }
-        else if(stripos($name, 'delete') === 0){
+        else if($field instanceof DeleteModelField){
             return $this->_delete($field, $args['id']);
         }
 

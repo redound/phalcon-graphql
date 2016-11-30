@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\GraphQL;
 
 use GraphQL\Type\Definition\ObjectType;
-use PhalconGraphQL\Definition\Field;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType as SchemaObjectType;
 use PhalconGraphQL\Definition\Schema;
