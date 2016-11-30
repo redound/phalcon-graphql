@@ -2,8 +2,10 @@
 
 trait UpdateModelTrait
 {
-    protected function _update(\PhalconGraphQL\Definition\Fields\Field $field, $data)
+    protected function _update(\PhalconGraphQL\Definition\Fields\Field $field, $args)
     {
+        $data = $args['input'];
+
         $primaryKey = $this->_getModelPrimaryKey($field);
         $id = isset($data[$primaryKey]) ? $data[$primaryKey] : null;
         if($id === null){

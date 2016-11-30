@@ -18,7 +18,7 @@ class CreateModelField extends ModelField
         }
 
         if($inputType === null){
-            $inputType = Types::createInput($modelName);
+            $inputType = Types::addCreateInput($modelName);
         }
 
         $this

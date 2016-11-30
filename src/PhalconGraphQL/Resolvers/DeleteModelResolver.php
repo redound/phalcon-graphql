@@ -11,6 +11,6 @@ class DeleteModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_delete($field, $args['id']);
+        return $this->_delete($field, $args);
     }
 }

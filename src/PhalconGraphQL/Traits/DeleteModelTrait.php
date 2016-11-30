@@ -2,8 +2,10 @@
 
 trait DeleteModelTrait
 {
-    protected function _delete(\PhalconGraphQL\Definition\Fields\Field $field, $id)
+    protected function _delete(\PhalconGraphQL\Definition\Fields\Field $field, $args)
     {
+        $id = $args['id'];
+
         $this->_beforeHandleWrite();
         $this->_beforeHandleDelete($id);
 

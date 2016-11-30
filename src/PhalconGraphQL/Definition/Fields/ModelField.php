@@ -57,9 +57,9 @@ class ModelField extends Field
         return $this;
     }
 
-    public function embed(){
+    public function embedRelay(){
 
-        $this->_embedMode = Schema::EMBED_MODE_ALL;
+        $this->_embedMode = Schema::EMBED_MODE_RELAY;
         return $this;
     }
 
@@ -95,18 +95,15 @@ class ModelField extends Field
                 $embedMode = $schema->getEmbedMode();
             }
 
-            $embedNode = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-            $embedEdges = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
+            if($embedMode == Schema::EMBED_MODE_LIST){
 
-            if($embedEdges){
-
-                $this->_type = Types::connection($this->_type);
+                $this->_type = Types::addList($this->_type);
                 $this->_isList = false;
             }
-            else if($embedNode){
+            if($embedMode == Schema::EMBED_MODE_RELAY){
 
-                $this->_type = Types::edge($this->_type);
-                $this->_isList = true;
+                $this->_type = Types::addConnection($this->_type);
+                $this->_isList = false;
             }
         }
 

@@ -7,6 +7,7 @@ use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
+use PhalconGraphQL\Handlers\ListEmbedHandler;
 use PhalconGraphQL\Handlers\PassHandler;
 
 class EmbeddedObjectTypeGroup extends ObjectTypeGroup
@@ -16,6 +17,10 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
 
     protected $_embedMode;
 
+    protected $_collectionFields = [];
+
+    protected $_itemFields = [];
+
 
     public function __construct(ObjectType $mainObjectType, $embedMode = null)
     {
@@ -23,22 +28,38 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
         $this->_embedMode = $embedMode;
     }
 
-    public function onlyNode(){
+    public function embedList(){
 
-        $this->_embedMode = Schema::EMBED_MODE_NODE;
+        $this->_embedMode = Schema::EMBED_MODE_LIST;
         return $this;
     }
 
-    public function onlyEdges(){
+    public function embedRelay(){
 
-        $this->_embedMode = Schema::EMBED_MODE_EDGES;
+        $this->_embedMode = Schema::EMBED_MODE_RELAY;
         return $this;
     }
 
-    public function all(){
+    public function collectionField(Field $field){
 
-        $this->_embedMode = Schema::EMBED_MODE_ALL;
+        $this->_collectionFields[] = $field;
         return $this;
+    }
+
+    public function getCollectionFields()
+    {
+        return $this->_collectionFields;
+    }
+
+    public function itemField(Field $field){
+
+        $this->_itemFields[] = $field;
+        return $this;
+    }
+
+    public function getItemFields()
+    {
+        return $this->_itemFields;
     }
 
     public function getDefaultObjectTypes(Schema $schema, DiInterface $di){
@@ -53,46 +74,59 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
 
         $name = $this->_mainObjectType->getName();
 
-        $connectionName = Types::connection($name);
-        $edgeName = Types::edge($name);
-
-        $embedNode = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_NODE]);
-        $embedEdges = in_array($embedMode, [Schema::EMBED_MODE_ALL, Schema::EMBED_MODE_EDGES]);
-
         // Object
         $objectTypes[] = $this->_mainObjectType;
 
-        // Edges
-        if($embedEdges) {
+        if($embedMode == Schema::EMBED_MODE_RELAY) {
 
+            $connectionName = Types::addConnection($name);
+            $edgeName = Types::addEdge($name);
+
+            // Edges
             $connectionType = ObjectType::factory($connectionName)
                 ->handler(PassHandler::class)
-                ->field(Field::listFactory('edges', $embedNode ? $edgeName : $name)
+                ->field(Field::listFactory('edges', $edgeName)
                     ->nonNull()
-                    ->isNonNullList($embedNode)
-                );
+                    ->isNonNullList(true)
+                )
+                ->field(Field::int('totalCount'));
 
-//        foreach($connectionFields as $field){
-//            $connectionType->field($field);
-//        }
+            foreach ($this->_collectionFields as $field) {
+                $connectionType->field($field);
+            }
 
             $objectTypes[] = $connectionType;
-        }
 
-        // Node
-        if($embedNode) {
-
+            // Node
             $edgeType = ObjectType::factory($edgeName)
                 ->handler(PassHandler::class)
                 ->field(Field::factory('node', $name)
                     ->nonNull()
                 );
 
-//        foreach($edgeFields as $field){
-//            $edgeType->field($field);
-//        }
+            foreach ($this->_itemFields as $field) {
+                $edgeType->field($field);
+            }
 
             $objectTypes[] = $edgeType;
+        }
+        else if($embedMode == Schema::EMBED_MODE_LIST) {
+
+            $listName = Types::addList($name);
+
+            // List
+            $listType = ObjectType::factory($listName)
+                ->handler(ListEmbedHandler::class)
+                ->field(Field::listFactory('items', $name)
+                    ->nonNull()
+                )
+                ->field(Field::int('totalCount'));
+
+            foreach ($this->_collectionFields as $field) {
+                $listType->field($field);
+            }
+
+            $objectTypes[] = $listType;
         }
 
         return $objectTypes;

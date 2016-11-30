@@ -43,21 +43,15 @@ class ModelObjectType extends ObjectType
         return $this;
     }
 
-    public function embedRelationsOnlyEdges()
+    public function embedRelationsList()
     {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_EDGES;
+        $this->_relationEmbedMode = Schema::EMBED_MODE_LIST;
         return $this;
     }
 
-    public function embedRelationsOnlyNode()
+    public function embedRelationsRelay()
     {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_NODE;
-        return $this;
-    }
-
-    public function embedRelations()
-    {
-        $this->_relationEmbedMode = Schema::EMBED_MODE_ALL;
+        $this->_relationEmbedMode = Schema::EMBED_MODE_RELAY;
         return $this;
     }
 

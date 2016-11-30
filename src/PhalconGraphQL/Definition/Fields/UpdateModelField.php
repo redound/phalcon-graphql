@@ -18,7 +18,7 @@ class UpdateModelField extends ModelField
         }
 
         if($inputType === null){
-            $inputType = Types::updateInput($modelName);
+            $inputType = Types::addUpdateInput($modelName);
         }
 
         $this

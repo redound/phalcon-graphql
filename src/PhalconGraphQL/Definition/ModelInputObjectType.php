@@ -23,7 +23,7 @@ class ModelInputObjectType extends InputObjectType
     {
         // Use class name if name not provided
         if($name === null) {
-            $this->_name = Types::input(Core::getShortClass($modelClass));
+            $this->_name = Types::addInput(Core::getShortClass($modelClass));
         }
 
         parent::__construct($name, $description);
@@ -149,7 +149,7 @@ class ModelInputObjectType extends InputObjectType
     public static function create($modelClass, $name=null, $description=null){
 
         if($name === null){
-            $name = Types::createInput(Core::getShortClass($modelClass));
+            $name = Types::addCreateInput(Core::getShortClass($modelClass));
         }
 
         return self::factory($modelClass, $name, $description)
@@ -159,7 +159,7 @@ class ModelInputObjectType extends InputObjectType
     public static function update($modelClass, $name=null, $description=null){
 
         if($name === null){
-            $name = Types::updateInput(Core::getShortClass($modelClass));
+            $name = Types::addUpdateInput(Core::getShortClass($modelClass));
         }
 
         return self::factory($modelClass, $name, $description);

@@ -2,8 +2,10 @@
 
 trait CreateModelTrait
 {
-    protected function _create(\PhalconGraphQL\Definition\Fields\Field $field, $data)
+    protected function _create(\PhalconGraphQL\Definition\Fields\Field $field, $args)
     {
+        $data = $args['input'];
+
         $this->_beforeHandleWrite();
         $this->_beforeHandleCreate();
 

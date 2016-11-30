@@ -10,6 +10,7 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\SchemaFactory;
 use PhalconGraphQL\Handlers\Handler;
+use PhalconGraphQL\Resolvers\Resolver;
 
 class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 {
@@ -103,8 +104,15 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
                     else if(class_exists($resolverFn, true) && method_exists($resolverFn, 'resolve')) {
 
                         $resolverObject = new $resolverFn();
+
                         if ($resolverObject instanceof \Phalcon\Di\Injectable) {
                             $resolverObject->setDI($this->di);
+                        }
+
+                        if($resolverObject instanceof Resolver){
+
+                            $resolverObject->setSchema($schema);
+                            $resolverObject->setObjectType($objectType);
                         }
 
                         $source = $resolverObject->resolve($source, $args, $field);

@@ -10,6 +10,6 @@ class FindModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_find($field, $args['id']);
+        return $this->_find($field, $args);
     }
 }

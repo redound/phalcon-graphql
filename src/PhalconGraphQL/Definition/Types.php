@@ -17,27 +17,32 @@ class Types
 
     const VIEWER = "Viewer";
 
-    public static function connection($name){
+    public static function addConnection($name){
 
         return $name . 'Connection';
     }
 
-    public static function edge($name){
+    public static function addEdge($name){
 
         return $name . 'Edge';
     }
 
-    public static function input($name){
+    public static function addList($name){
+
+        return $name . 'List';
+    }
+
+    public static function addInput($name){
 
         return ucfirst($name) . 'Input';
     }
 
-    public static function createInput($name){
+    public static function addCreateInput($name){
 
         return 'Create' . ucfirst($name) . 'Input';
     }
 
-    public static function updateInput($name){
+    public static function addUpdateInput($name){
 
         return 'Update' . ucfirst($name) . 'Input';
     }

@@ -10,6 +10,6 @@ class AllModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_all($field);
+        return $this->_all($args, $field, $this->schema);
     }
 }
