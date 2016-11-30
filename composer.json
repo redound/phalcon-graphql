@@ -26,6 +26,8 @@
             "PhalconGraphQL\\": "src/PhalconGraphQL"
         },
         "psr-0": {
+            "AllModelTrait": "src/PhalconGraphQL/Traits",
+            "FindModelTrait": "src/PhalconGraphQL/Traits",
             "CreateModelTrait": "src/PhalconGraphQL/Traits",
             "DeleteModelTrait": "src/PhalconGraphQL/Traits",
             "UpdateModelTrait": "src/PhalconGraphQL/Traits",
