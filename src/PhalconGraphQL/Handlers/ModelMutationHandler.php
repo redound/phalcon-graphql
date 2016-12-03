@@ -22,13 +22,13 @@ class ModelMutationHandler extends ModelHandler
         list($source, $args, $field) = $arguments;
 
         if($field instanceof CreateModelField){
-            return $this->_create($field, $args);
+            return $this->_create($args, $field);
         }
         else if($field instanceof UpdateModelField){
-            return $this->_update($field, $args);
+            return $this->_update($args, $field);
         }
         else if($field instanceof DeleteModelField){
-            return $this->_delete($field, $args);
+            return $this->_delete($args, $field);
         }
 
         throw new Exception(ErrorCodes::GENERAL_SYSTEM, 'No handler function found for field ' . $name);

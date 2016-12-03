@@ -1,87 +1,87 @@
 <?php
 
+use PhalconGraphQL\Definition\Fields\Field;
+use Phalcon\Mvc\Model;
+use PhalconApi\Exception;
+use PhalconApi\Constants\ErrorCodes;
+
 trait DeleteModelTrait
 {
-    protected function _delete(\PhalconGraphQL\Definition\Fields\Field $field, $args)
+    protected function _delete($args, Field $field)
     {
         $id = $args['id'];
 
-        $this->_beforeHandleWrite();
-        $this->_beforeHandleDelete($id);
+        $this->_beforeHandle($args, $field);
+        $this->_beforeHandleDelete($id, $args, $field);
 
-        $item = $this->_findModel($field, $id);
+        $item = $this->_findModel($id, $field);
 
         if (!$item) {
-            return $this->_onItemNotFound($id);
+            return $this->_onItemNotFound($id, $args, $field);
         }
 
-        if (!$this->_deleteAllowed($item)) {
-            return $this->_onNotAllowed();
+        if (!$this->_deleteAllowed($item, $args, $field)) {
+            return $this->_onNotAllowed($args, $field);
         }
 
-        $success = $this->_deleteItem($item);
+        $success = $this->_deleteItem($item, $args, $field);
 
         if (!$success) {
-            return $this->_onDeleteFailed($item);
+            return $this->_onDeleteFailed($item, $args, $field);
         }
 
-        $response = $this->_getDeleteResponse($item);
+        $response = $this->_getDeleteResponse($item, $args, $field);
 
-        $this->_afterHandleDelete($item, $response);
-        $this->_afterHandleWrite();
+        $this->_afterHandleDelete($item, $response, $args, $field);
+        $this->_afterHandle($args, $field);
 
         return $response;
     }
 
-    protected function _beforeHandleDelete($id)
+    protected function _beforeHandleDelete($id, $args, Field $field)
     {
     }
 
-    protected function _deleteAllowed(\Phalcon\Mvc\Model $item)
+    protected function _deleteAllowed(Model $item, $args, Field $field)
     {
         return true;
     }
 
-    /**
-     * @param \Phalcon\Mvc\Model $item
-     *
-     * @return bool Delete succeeded/failed
-     */
-    protected function _deleteItem(\Phalcon\Mvc\Model $item)
+    protected function _deleteItem(Model $item, $args, Field $field)
     {
-        $this->_beforeDelete($item);
+        $this->_beforeDelete($item, $args, $field);
 
         $success = $item->delete();
 
         if ($success) {
-            $this->_afterDelete($item);
+            $this->_afterDelete($item, $args, $field);
         }
 
         return $success;
     }
 
-    protected function _beforeDelete(\Phalcon\Mvc\Model $item)
+    protected function _beforeDelete(Model $item, $args, Field $field)
     {
     }
 
-    protected function _afterDelete(\Phalcon\Mvc\Model $item)
+    protected function _afterDelete(Model $item, $args, Field $field)
     {
     }
 
-    protected function _onDeleteFailed(\Phalcon\Mvc\Model $item)
+    protected function _onDeleteFailed(Model $item, $args, Field $field)
     {
-        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_FAILED, 'Unable to delete item', [
+        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to delete item', [
             'messages' => $this->_getMessages($item->getMessages()),
             'item' => $item->toArray()
         ]);
     }
 
-    protected function _getDeleteResponse(\Phalcon\Mvc\Model $deletedItem)
+    protected function _getDeleteResponse(Model $deletedItem, $args, Field $field)
     {
         return true;
     }
 
-    protected function _afterHandleDelete(\Phalcon\Mvc\Model $deletedItem, $response)
+    protected function _afterHandleDelete(Model $deletedItem, $response, $args, Field $field)
     {
     }
 }

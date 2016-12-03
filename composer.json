@@ -31,7 +31,8 @@
             "CreateModelTrait": "src/PhalconGraphQL/Traits",
             "DeleteModelTrait": "src/PhalconGraphQL/Traits",
             "UpdateModelTrait": "src/PhalconGraphQL/Traits",
-            "ModelMutationTrait": "src/PhalconGraphQL/Traits"
+            "ModelMutationTrait": "src/PhalconGraphQL/Traits",
+            "ModelQueryTrait": "src/PhalconGraphQL/Traits"
         }
     }
 }

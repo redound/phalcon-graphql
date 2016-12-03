@@ -87,6 +87,8 @@ class ModelField extends Field
             return;
         }
 
+        $this->executeBeforeBuildPlugins($schema, $di);
+
         if($this->_isList) {
 
             $embedMode = $this->_embedMode;
@@ -108,6 +110,8 @@ class ModelField extends Field
         }
 
         $this->_built = true;
+
+        $this->executeAfterBuildPlugins($schema, $di);
     }
 
 

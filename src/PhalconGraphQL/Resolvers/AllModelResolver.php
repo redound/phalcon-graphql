@@ -6,10 +6,11 @@ use PhalconGraphQL\Definition\Fields\Field;
 
 class AllModelResolver extends ModelResolver
 {
+    use \ModelQueryTrait;
     use \AllModelTrait;
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_all($args, $field, $this->schema);
+        return $this->_all($args, $field);
     }
 }

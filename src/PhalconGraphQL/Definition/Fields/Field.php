@@ -6,6 +6,7 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
+use PhalconGraphQL\Plugins\FieldPluginInterface;
 use PhalconGraphQL\Resolvers\EmptyResolver;
 
 class Field
@@ -19,6 +20,7 @@ class Field
     protected $_resolvers = [];
     protected $_handler;
     protected $_args = [];
+    protected $_plugins = [];
     protected $_built = false;
 
     public function __construct($name=null, $type=null, $description=null)
@@ -34,6 +36,17 @@ class Field
         if($description !== null){
             $this->_description = $description;
         }
+    }
+
+    public function plugin(FieldPluginInterface $plugin)
+    {
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
+    public function getPlugins()
+    {
+        return $this->_plugins;
     }
 
     public function name($name)
@@ -149,8 +162,29 @@ class Field
 
     public function build(Schema $schema, DiInterface $di)
     {
-        // Empty
+        if($this->_built){
+            return;
+        }
+
+        $this->executeBeforeBuildPlugins($schema, $di);
         $this->_built = true;
+        $this->executeAfterBuildPlugins($schema, $di);
+    }
+
+    protected function executeBeforeBuildPlugins(Schema $schema, DiInterface $di)
+    {
+        /** @var FieldPluginInterface $plugin */
+        foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
+            $plugin->beforeBuildField($this, $di);
+        }
+    }
+
+    protected function executeAfterBuildPlugins(Schema $schema, DiInterface $di)
+    {
+        /** @var FieldPluginInterface $plugin */
+        foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
+            $plugin->afterBuildField($this, $di);
+        }
     }
 
 

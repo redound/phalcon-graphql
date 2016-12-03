@@ -1,30 +1,61 @@
 <?php
 
+use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
+use PhalconGraphQL\Definition\Fields\Field;
+
 trait AllModelTrait
 {
-    protected function _all($args, \PhalconGraphQL\Definition\Fields\Field $field, \PhalconGraphQL\Definition\Schema $schema)
+    protected function _all($args, Field $field)
     {
-        $model = $this->getModel($field);
+        $this->_beforeHandle($args, $field);
+        $this->_beforeHandleAll($args, $field);
 
-        $options = [];
+        $data = $this->_getAllData($args, $field);
 
-        if(isset($args['offset']) && !empty($args['offset'])){
-            $options['offset'] = (int)$args['offset'];
+        if (!$this->_allAllowed($data, $args, $field)) {
+            return $this->_onNotAllowed($args, $field);
         }
 
-        if(isset($args['limit']) && !empty($args['limit'])){
-            $options['limit'] = (int)$args['limit'];
-        }
+        $response = $this->_getAllResponse($data, $args, $field);
 
-        $result = $model::find($options);
+        $this->_afterHandleAll($data, $response, $args, $field);
+        $this->_afterHandle($args, $field);
 
-        return $this->_getAllResponse($result, $field, $schema);
+        return $response;
     }
 
-    protected function _getAllResponse($result, \PhalconGraphQL\Definition\Fields\Field $field, \PhalconGraphQL\Definition\Schema $schema)
+    protected function _beforeHandleAll($args, Field $field)
+    {
+    }
+
+    protected function _getAllData($args, Field $field)
+    {
+        /** @var \Phalcon\Mvc\Model\Manager $modelsManager */
+        $modelsManager = $this->di->get(\PhalconGraphQL\Constants\Services::MODELS_MANAGER);
+        $model = $this->getModel($field);
+
+        $phqlBuilder = $modelsManager->createBuilder()
+            ->from($model);
+
+        $this->_modifyQuery($phqlBuilder, $args, $field);
+        $this->_modifyAllQuery($phqlBuilder, $args, $field);
+
+        return $phqlBuilder->getQuery()->execute();
+    }
+
+    protected function _modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    {
+    }
+
+    protected function _allAllowed($data, $args, Field $field)
+    {
+        return true;
+    }
+
+    protected function _getAllResponse($result, $args, Field $field)
     {
         $model = $this->getModel($field);
-        $returnType = $schema->findObjectType($field->getType());
+        $returnType = $this->schema->findObjectType($field->getType());
 
         if($returnType->getHandler() == \PhalconGraphQL\Handlers\ListEmbedHandler::class) {
 
@@ -34,5 +65,9 @@ trait AllModelTrait
 
             return $result;
         }
+    }
+
+    protected function _afterHandleAll($data, $response, $args, Field $field)
+    {
     }
 }

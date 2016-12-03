@@ -6,6 +6,7 @@ use Phalcon\DiInterface;
 use PhalconApi\Exception;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Plugins\ObjectTypePluginInterface;
 
 class ObjectType
 {
@@ -14,6 +15,7 @@ class ObjectType
     protected $_handler;
     protected $_fields = [];
     protected $_fieldGroups = [];
+    protected $_plugins = [];
     protected $_built = false;
 
     public function __construct($name=null, $description=null)
@@ -25,6 +27,17 @@ class ObjectType
         if($description !== null){
             $this->_description = $description;
         }
+    }
+
+    public function plugin(ObjectTypePluginInterface $plugin)
+    {
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
+    public function getPlugins()
+    {
+        return $this->_plugins;
     }
 
     /**
@@ -116,7 +129,6 @@ class ObjectType
         foreach($this->_fields as $index => $field){
 
             if($field->getName() == $fieldName){
-
                 return true;
             }
         }
@@ -153,6 +165,8 @@ class ObjectType
             return;
         }
 
+        $this->executeBeforeBuildPlugins($schema, $di);
+
         /** @var FieldGroupInterface $fieldGroup */
         foreach($this->_fieldGroups as $fieldGroup){
 
@@ -169,6 +183,24 @@ class ObjectType
         }
 
         $this->_built = true;
+
+        $this->executeAfterBuildPlugins($schema, $di);
+    }
+
+    protected function executeBeforeBuildPlugins(Schema $schema, DiInterface $di)
+    {
+        /** @var ObjectTypePluginInterface $plugin */
+        foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
+            $plugin->beforeBuildObjectType($this, $di);
+        }
+    }
+
+    protected function executeAfterBuildPlugins(Schema $schema, DiInterface $di)
+    {
+        /** @var ObjectTypePluginInterface $plugin */
+        foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
+            $plugin->afterBuildObjectType($this, $di);
+        }
     }
 
     /**

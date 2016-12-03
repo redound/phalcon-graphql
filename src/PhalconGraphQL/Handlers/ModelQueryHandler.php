@@ -10,6 +10,7 @@ use PhalconGraphQL\Definition\Fields\FindModelField;
 
 class ModelQueryHandler extends ModelHandler
 {
+    use \ModelQueryTrait;
     use \AllModelTrait;
     use \FindModelTrait;
 
@@ -19,10 +20,10 @@ class ModelQueryHandler extends ModelHandler
         list($source, $args, $field) = $arguments;
 
         if($field instanceof AllModelField){
-            return $this->_all($args, $field, $this->schema);
+            return $this->_all($args, $field);
         }
         else if($field instanceof FindModelField){
-            return $this->_find($field, $args);
+            return $this->_find($args, $field);
         }
 
         throw new Exception(ErrorCodes::GENERAL_SYSTEM, 'No handler function found for field ' . $name);

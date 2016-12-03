@@ -1,60 +1,65 @@
 <?php
 
+use PhalconGraphQL\Definition\Fields\Field;
+use PhalconApi\Constants\ErrorCodes;
+use PhalconApi\Exception;
+use Phalcon\Mvc\Model;
+
 trait ModelMutationTrait
 {
-    protected function _onNotAllowed()
+    protected function _onNotAllowed($args, Field $field)
     {
-        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
+        throw new Exception(ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
-    protected function _onDataInvalid($data)
+    protected function _onDataInvalid($data, $args, Field $field)
     {
-        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', ['data' => $data]);
+        throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', ['data' => $data]);
     }
 
-    protected function _onItemNotFound($id)
+    protected function _onItemNotFound($id, $args, Field $field)
     {
-        throw new \PhalconApi\Exception(\PhalconApi\Constants\ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
+        throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
     }
 
-    protected function _beforeAssignData(\Phalcon\Mvc\Model $item, $data)
-    {
-    }
-
-    protected function _afterAssignData(\Phalcon\Mvc\Model $item, $data)
+    protected function _beforeAssignData(Model $item, $data, $args, Field $field)
     {
     }
 
-    protected function _beforeSave(\Phalcon\Mvc\Model $item)
+    protected function _afterAssignData(Model $item, $data, $args, Field $field)
     {
     }
 
-    protected function _afterSave(\Phalcon\Mvc\Model $item)
+    protected function _beforeSave(Model $item, $args, Field $field)
     {
     }
 
-    protected function _beforeHandleWrite()
+    protected function _afterSave(Model $item, $args, Field $field)
     {
     }
 
-    protected function _afterHandleWrite()
+    protected function _beforeHandle($args, Field $field)
+    {
+    }
+
+    protected function _afterHandle($args, Field $field)
     {
     }
 
 
     /*** GENERAL HOOKS ***/
 
-    protected function _dataValid($data, $isUpdate)
+    protected function _dataValid($data, $isUpdate, $args, Field $field)
     {
         return true;
     }
 
-    protected function _saveAllowed($data)
+    protected function _saveAllowed($data, $args, Field $field)
     {
         return true;
     }
 
-    protected function _transformPostData($data)
+    protected function _transformPostData($data, $args, Field $field)
     {
         $result = [];
 
@@ -70,31 +75,25 @@ trait ModelMutationTrait
         return $value;
     }
 
-    /**
-     * @return \Phalcon\Mvc\Model
-     */
-    protected function _createModelInstance(\PhalconGraphQL\Definition\Fields\Field $field)
+    protected function _createModelInstance(Field $field)
     {
         $modelClass = $this->getModel($field);
 
         return new $modelClass();
     }
 
-    /**
-     * @return \Phalcon\Mvc\Model
-     */
-    protected function _findModel(\PhalconGraphQL\Definition\Fields\Field $field, $id)
+    protected function _findModel($id, Field $field)
     {
         $modelClass = $this->getModel($field);
 
         return $modelClass::findFirst($id);
     }
 
-    protected function _getModelPrimaryKey(\PhalconGraphQL\Definition\Fields\Field $field)
+    protected function _getModelPrimaryKey(Field $field)
     {
         $modelClass = $this->getModel($field);
 
-        /** @var \Phalcon\Mvc\Model $modelInstance */
+        /** @var Model $modelInstance */
         $modelInstance = new $modelClass();
 
         return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance);
@@ -104,7 +103,7 @@ trait ModelMutationTrait
     {
         $messages = isset($messages) ? $messages : [];
 
-        return array_map(function (\Phalcon\Mvc\Model\Message $message) {
+        return array_map(function (Model\Message $message) {
             return $message->getMessage();
         }, $messages);
     }

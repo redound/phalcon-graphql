@@ -10,8 +10,6 @@ use PhalconGraphQL\Resolvers\AllModelResolver;
 
 class AllModelField extends ModelField
 {
-    protected $_pagingMode = null;
-
     public function __construct($model=null, $name=null, $type=null, $description=null, $embedMode=null)
     {
         if($name === null){
@@ -24,50 +22,6 @@ class AllModelField extends ModelField
             ->resolver(AllModelResolver::class)
             ->isList()
             ->nonNull();
-    }
-
-    public function pagingMode($pagingMode)
-    {
-        $this->_pagingMode = $pagingMode;
-        return $this;
-    }
-
-    public function pagingOffset()
-    {
-        $this->_pagingMode = Schema::PAGING_MODE_OFFSET;
-        return $this;
-    }
-
-    public function noPaging()
-    {
-        $this->_pagingMode = Schema::PAGING_MODE_NONE;
-        return $this;
-    }
-
-    public function getPagingMode()
-    {
-        return $this->_pagingMode;
-    }
-
-    public function build(Schema $schema, DiInterface $di)
-    {
-        if ($this->_built) {
-            return;
-        }
-
-        $pagingMode = $this->_pagingMode;
-        if($pagingMode === null){
-            $pagingMode = $schema->getPagingMode();
-        }
-
-        if($pagingMode == Schema::PAGING_MODE_OFFSET){
-
-            $this
-                ->arg(InputField::int('offset'))
-                ->arg(InputField::int('limit'));
-        }
-
-        parent::build($schema, $di);
     }
 
     public static function factory($model=null, $name=null, $type=null, $description=null)

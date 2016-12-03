@@ -6,6 +6,7 @@ use Phalcon\DiInterface;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
+use PhalconGraphQL\Plugins\PluginInterface;
 
 class Schema
 {
@@ -13,11 +14,7 @@ class Schema
     const EMBED_MODE_LIST = 1;
     const EMBED_MODE_RELAY = 2;
 
-    const PAGING_MODE_NONE = 0;
-    const PAGING_MODE_OFFSET = 1;
-
     protected $_embedMode = Schema::EMBED_MODE_NONE;
-    protected $_pagingMode = Schema::PAGING_MODE_NONE;
 
     protected $_enumTypes = [];
     protected $_objectTypes = [];
@@ -28,6 +25,8 @@ class Schema
 
     protected $_mountables = [];
 
+    protected $_plugins = [];
+
     protected $_built = false;
 
 
@@ -36,6 +35,17 @@ class Schema
         if($embedMode !== null){
             $this->_embedMode = $embedMode;
         }
+    }
+
+    public function plugin(PluginInterface $plugin){
+
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
+    public function getPlugins()
+    {
+        return $this->_plugins;
     }
 
     public function embedMode($embedMode){
@@ -61,23 +71,6 @@ class Schema
         return $this->_embedMode;
     }
 
-    public function pagingMode($pagingMode)
-    {
-        $this->_pagingMode = $pagingMode;
-        return $this;
-    }
-
-    public function pagingOffset()
-    {
-        $this->_pagingMode = Schema::PAGING_MODE_OFFSET;
-        return $this;
-    }
-
-    public function getPagingMode()
-    {
-        return $this->_pagingMode;
-    }
-
     public function enum(EnumType $enumType)
     {
         $this->_enumTypes[] = $enumType;
@@ -94,7 +87,6 @@ class Schema
         $this->_objectTypes[] = $objectType;
         $this->_objectTypesByName[$objectType->getName()] = $objectType;
 
-
         return $this;
     }
 
@@ -103,12 +95,6 @@ class Schema
         return $this->_objectTypes;
     }
 
-    /**
-     * @param $name
-     *
-     * @throws Exception
-     * @return ObjectType|null
-     */
     public function findObjectType($name)
     {
         return array_key_exists($name, $this->_objectTypesByName) ? $this->_objectTypesByName[$name] : null;
@@ -151,6 +137,11 @@ class Schema
 
         if($this->_built){
             return;
+        }
+
+        /** @var PluginInterface $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->beforeBuildSchema($this, $di);
         }
 
         /** @var SchemaMountableInterface $mountable */
@@ -220,6 +211,11 @@ class Schema
         /** @var InputObjectType $inputObjectType */
         foreach($this->_inputObjectTypes as $objectType){
             $objectType->build($this, $di);
+        }
+
+        /** @var PluginInterface $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->afterBuildSchema($this, $di);
         }
 
         $this->_built = true;
