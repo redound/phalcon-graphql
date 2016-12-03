@@ -71,7 +71,7 @@ class ModelCollection extends Collection
     }
 
 
-    public function addAll($objectType=Types::QUERY, $name=null, $description=null)
+    public function all($objectType=Types::QUERY, $name=null, $description=null)
     {
         $field = AllModelField::factory($this->_modelClass, $name, null, $description);
         $this->configureAllField($field);
@@ -82,7 +82,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function addFind($objectType=Types::QUERY, $name=null, $description=null)
+    public function find($objectType=Types::QUERY, $name=null, $description=null)
     {
         $field = FindModelField::factory($this->_modelClass, $name, null, $description);
         $this->configureFindField($field);
@@ -93,7 +93,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function addCreate($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
+    public function create($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
     {
         $inputObject = ModelInputObjectType::create($this->_modelClass);
         $this->configureCreateInputObjectType($inputObject);
@@ -109,7 +109,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function addUpdate($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
+    public function update($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
     {
         $inputObject = ModelInputObjectType::update($this->_modelClass);
         $this->configureUpdateInputObjectType($inputObject);
@@ -125,7 +125,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function addDelete($objectType=Types::MUTATION, $name=null, $description=null)
+    public function delete($objectType=Types::MUTATION, $name=null, $description=null)
     {
         $field = DeleteModelField::factory($this->_modelClass, $name, null, $description);
         $this->configureDeleteField($field);
