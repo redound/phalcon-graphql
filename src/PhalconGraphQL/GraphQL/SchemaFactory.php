@@ -39,11 +39,6 @@ class SchemaFactory
 
         $objectTypes = $schema->getObjectTypes();
 
-        /** @var ObjectTypeGroupInterface $objectTypeGroup */
-        foreach ($schema->getObjectTypeGroups() as $objectTypeGroup) {
-            $objectTypes = array_merge($objectTypes, $objectTypeGroup->getObjectTypes());
-        }
-
         /** @var ObjectType $objectType */
         foreach ($objectTypes as $objectType) {
             $typeRegistry->register($objectType->getName(), ObjectTypeFactory::build($dispatcher, $schema, $objectType, $typeRegistry));

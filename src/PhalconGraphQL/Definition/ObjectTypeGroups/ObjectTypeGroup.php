@@ -22,11 +22,6 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
     {
         $objectTypes = array_merge($this->_objectTypes, $this->getDefaultObjectTypes($schema, $di));
 
-        /** @var ObjectType $type */
-        foreach($objectTypes as $type){
-            $type->build($schema, $di);
-        }
-
         $this->_objectTypes = $objectTypes;
         $this->_built = true;
     }

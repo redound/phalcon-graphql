@@ -49,7 +49,10 @@ class FieldGroup implements FieldGroupInterface
 
         /** @var Field $field */
         foreach($fields as $field){
-            $field->build($schema, $di);
+
+            if(!$field->getHandler()) {
+                $field->handler($this->_handler);
+            }
         }
 
         $this->_fields = $fields;

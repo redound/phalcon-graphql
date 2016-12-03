@@ -155,7 +155,12 @@ class ObjectType
 
         /** @var FieldGroupInterface $fieldGroup */
         foreach($this->_fieldGroups as $fieldGroup){
+
             $fieldGroup->build($schema, $di);
+
+            foreach($fieldGroup->getFields() as $field){
+                $this->field($field);
+            }
         }
 
         /** @var Field $field */

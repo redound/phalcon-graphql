@@ -26,6 +26,8 @@ class Schema
 
     protected $_inputObjectTypes = [];
 
+    protected $_mountables = [];
+
     protected $_built = false;
 
 
@@ -90,6 +92,9 @@ class Schema
     public function object(ObjectType $objectType)
     {
         $this->_objectTypes[] = $objectType;
+        $this->_objectTypesByName[$objectType->getName()] = $objectType;
+
+
         return $this;
     }
 
@@ -106,10 +111,6 @@ class Schema
      */
     public function findObjectType($name)
     {
-        if(!$this->_built){
-            throw new Exception(ErrorCodes::GENERAL_SYSTEM, 'Unable to find object type, schema is not built yet');
-        }
-
         return array_key_exists($name, $this->_objectTypesByName) ? $this->_objectTypesByName[$name] : null;
     }
 
@@ -135,10 +136,43 @@ class Schema
         return $this->_objectTypeGroups;
     }
 
+    public function mount(SchemaMountableInterface $mountable) {
+
+        $this->_mountables[] = $mountable;
+        return $this;
+    }
+
+    public function getMountables()
+    {
+        return $this->_mountables;
+    }
+
     public function build(DiInterface $di){
 
         if($this->_built){
             return;
+        }
+
+        /** @var SchemaMountableInterface $mountable */
+        foreach($this->_mountables as $mountable){
+
+            $mountable->build($this, $di);
+
+            foreach($mountable->getEnumTypes() as $enumType){
+                $this->enum($enumType);
+            }
+
+            foreach($mountable->getObjectTypes() as $objectType){
+                $this->object($objectType);
+            }
+
+            foreach($mountable->getInputObjectTypes() as $inputObjectType){
+                $this->inputObject($inputObjectType);
+            }
+
+            foreach($mountable->getObjectTypeGroups() as $objectTypeGroup){
+                $this->objectGroup($objectTypeGroup);
+            }
         }
 
         /** @var ObjectTypeGroupInterface $objectTypeGroup */
@@ -147,7 +181,33 @@ class Schema
             $objectTypeGroup->build($this, $di);
 
             foreach($objectTypeGroup->getObjectTypes() as $objectType){
-                $this->_objectTypesByName[$objectType->getName()] = $objectType;
+                $this->object($objectType);
+            }
+        }
+
+        /** @var SchemaMountableInterface $mountable */
+        foreach($this->_mountables as $mountable){
+
+            foreach($mountable->getFieldGroups() as $objectName => $fieldGroups){
+
+                $objectType = $this->findObjectType($objectName);
+                if($objectType){
+
+                    foreach($fieldGroups as $group){
+                        $objectType->fieldGroup($group);
+                    }
+                }
+            }
+
+            foreach($mountable->getFields() as $objectName => $fields){
+
+                $objectType = $this->findObjectType($objectName);
+                if($objectType){
+
+                    foreach($fields as $field){
+                        $objectType->field($field);
+                    }
+                }
             }
         }
 
@@ -155,8 +215,6 @@ class Schema
         foreach($this->_objectTypes as $objectType){
 
             $objectType->build($this, $di);
-
-            $this->_objectTypesByName[$objectType->getName()] = $objectType;
         }
 
         /** @var InputObjectType $inputObjectType */

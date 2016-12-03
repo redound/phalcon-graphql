@@ -20,17 +20,9 @@ class ObjectTypeFactory
 
                 $fields = [];
 
-                /** @var FieldGroupInterface $fieldGroup */
-                foreach ($objectType->getFieldGroups() as $fieldGroup) {
-
-                    foreach($fieldGroup->getFields() as $field) {
-                        $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, $fieldGroup, $typeRegistry);
-                    }
-                }
-
                 /** @var Field $field */
                 foreach ($objectType->getFields() as $field) {
-                    $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, null, $typeRegistry);
+                    $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, $typeRegistry);
                 }
 
                 return $fields;

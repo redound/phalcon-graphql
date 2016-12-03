@@ -11,7 +11,7 @@ use PhalconGraphQL\Dispatcher;
 
 class FieldFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, ObjectType $objectType, Field $field, $fieldGroup, TypeRegistry $typeRegistry)
+    public static function build(Dispatcher $dispatcher, Schema $schema, ObjectType $objectType, Field $field, TypeRegistry $typeRegistry)
     {
         $type = $field->getType();
         $nonNull = $field->getNonNull();
@@ -29,7 +29,7 @@ class FieldFactory
             'description' => $field->getDescription(),
             'type' => $typeRegistry->resolve($type, $nonNull, $isList, $isNonNullList),
             'args' => $args,
-            'resolve' => $dispatcher->createResolver($schema, $objectType, $field, $fieldGroup)
+            'resolve' => $dispatcher->createResolver($schema, $objectType, $field)
         ];
     }
 }

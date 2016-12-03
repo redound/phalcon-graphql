@@ -17,10 +17,6 @@ class ModelHandler extends Handler
             $model = $field->getModel();
         }
 
-        if(!$model && $this->fieldGroup && $this->fieldGroup instanceof ModelFieldGroup){
-            $model = $this->fieldGroup->getModel();
-        }
-
         if(!$model){
             throw new Exception('No model found for handler');
         }

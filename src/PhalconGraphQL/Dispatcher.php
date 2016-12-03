@@ -23,9 +23,9 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         $this->defaultNamespace = rtrim($namespace, '\\');
     }
 
-    public function getHandler(Schema $schema, ObjectType $objectType, $fieldGroup)
+    public function getHandler(Schema $schema, ObjectType $objectType, Field $field)
     {
-        $handlerClassName = $fieldGroup && $fieldGroup->getHandler() ? $fieldGroup->getHandler() : $objectType->getHandler();
+        $handlerClassName = $field->getHandler() ? $field->getHandler() : $objectType->getHandler();
         $objectKey = $objectType->getName() . ':' . $handlerClassName;
 
         if(array_key_exists($objectKey, $this->handlerCache)){
@@ -57,7 +57,6 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
             $handler->setSchema($schema);
             $handler->setObjectType($objectType);
-            $handler->setFieldGroup($fieldGroup);
         }
 
         $this->handlerCache[$objectKey] = $handler;
@@ -65,15 +64,15 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $handler;
     }
 
-    public function createResolver($schema, ObjectType $objectType, Field $field, $fieldGroup)
+    public function createResolver($schema, ObjectType $objectType, Field $field)
     {
         $dispatcher = $this;
 
-        return function ($source, $args) use ($schema, $objectType, $field, $dispatcher, $fieldGroup) {
+        return function ($source, $args) use ($schema, $objectType, $field, $dispatcher) {
 
             $resolvers = $field->getResolvers();
             $fieldName = $field->getName();
-            $handler = $dispatcher->getHandler($schema, $objectType, $fieldGroup);
+            $handler = $dispatcher->getHandler($schema, $objectType, $field);
 
             if (empty($resolvers)) {
                 return $handler->$fieldName($source, $args, $field);

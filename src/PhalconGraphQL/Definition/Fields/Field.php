@@ -17,6 +17,7 @@ class Field
     protected $_isList = false;
     protected $_isNonNullList;
     protected $_resolvers = [];
+    protected $_handler;
     protected $_args = [];
     protected $_built = false;
 
@@ -122,6 +123,17 @@ class Field
     {
         $this->_resolvers = [];
         return $this;
+    }
+
+    public function handler($handler)
+    {
+        $this->_handler = $handler;
+        return $this;
+    }
+
+    public function getHandler()
+    {
+        return $this->_handler;
     }
 
     public function arg(InputField $inputField)
