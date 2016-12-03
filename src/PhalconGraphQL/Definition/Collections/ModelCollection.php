@@ -136,6 +136,20 @@ class ModelCollection extends Collection
         return $this;
     }
 
+    public function crud($queryObjectType = Types::QUERY, $mutationObjectType = Types::MUTATION)
+    {
+        $this
+            ->all($queryObjectType)
+            ->find($queryObjectType)
+
+            ->create($mutationObjectType)
+            ->update($mutationObjectType)
+            ->delete($mutationObjectType);
+
+        return $this;
+
+    }
+
 
     protected function configureEmbeddedObjectTypeGroup(EmbeddedObjectTypeGroup $group){}
     protected function configureObjectType(ModelObjectType $objectType){}

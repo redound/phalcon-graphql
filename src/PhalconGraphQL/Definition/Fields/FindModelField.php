@@ -19,7 +19,7 @@ class FindModelField extends ModelField
 
         $this
             ->resolver(FindModelResolver::class)
-            ->arg(InputField::factory('id', Types::ID));
+            ->arg(InputField::factory('id', Types::ID)->nonNull());
     }
 
     public static function factory($model=null, $name=null, $type=null, $description=null)
