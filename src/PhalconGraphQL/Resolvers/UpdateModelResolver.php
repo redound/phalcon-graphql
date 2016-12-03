@@ -11,6 +11,6 @@ class UpdateModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_update($field, $args);
+        return $this->_update($args, $field);
     }
 }

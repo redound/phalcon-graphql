@@ -18,6 +18,7 @@ class ModelInputObjectType extends InputObjectType
     protected $_excludedFields = [];
 
     protected $_excludeIdentity = false;
+    protected $_fieldsOptional = false;
 
     public function __construct($modelClass, $name=null, $description=null)
     {
@@ -39,6 +40,12 @@ class ModelInputObjectType extends InputObjectType
     public function excludeIdentity($excludeIdentity = true)
     {
         $this->_excludeIdentity = $excludeIdentity;
+        return $this;
+    }
+
+    public function fieldsOptional($fieldsOptional = true)
+    {
+        $this->_fieldsOptional = $fieldsOptional;
         return $this;
     }
 
@@ -112,7 +119,7 @@ class ModelInputObjectType extends InputObjectType
 
             $mappedDataTypes[$mappedAttributeName] = $type;
 
-            if(in_array($attributeName, $nonNullAttributes)){
+            if((!$this->_fieldsOptional && in_array($attributeName, $nonNullAttributes)) || $attributeName == $identityField){
                 $mappedNonNullAttributes[] = $mappedAttributeName;
             }
         }
@@ -162,6 +169,7 @@ class ModelInputObjectType extends InputObjectType
             $name = Types::addUpdateInput(Core::getShortClass($modelClass));
         }
 
-        return self::factory($modelClass, $name, $description);
+        return self::factory($modelClass, $name, $description)
+            ->fieldsOptional();
     }
 }

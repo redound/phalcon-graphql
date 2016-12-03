@@ -11,6 +11,6 @@ class CreateModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_create($field, $args);
+        return $this->_create($args, $field);
     }
 }

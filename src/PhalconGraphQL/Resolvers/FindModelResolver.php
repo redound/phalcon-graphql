@@ -11,6 +11,6 @@ class FindModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_find($field, $args);
+        return $this->_find($args, $field);
     }
 }
