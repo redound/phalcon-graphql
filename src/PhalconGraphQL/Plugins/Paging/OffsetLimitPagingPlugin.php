@@ -7,6 +7,7 @@ use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Plugins\Plugin;
+use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 class OffsetLimitPagingPlugin extends Plugin
 {
@@ -17,6 +18,23 @@ class OffsetLimitPagingPlugin extends Plugin
             $field
                 ->arg(InputField::int('offset'))
                 ->arg(InputField::int('limit'));
+        }
+    }
+
+    public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    {
+        if($field instanceof AllModelField) {
+
+            $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
+            $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
+
+            if($offset !== null){
+                $query->offset($offset);
+            }
+
+            if($limit !== null){
+                $query->limit($limit);
+            }
         }
     }
 }

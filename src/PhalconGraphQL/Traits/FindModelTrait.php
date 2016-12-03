@@ -11,7 +11,10 @@ trait FindModelTrait
     {
         $id = $args['id'];
 
+        $this->_invokePlugins($field, 'beforeHandle', [$args, $field]);
         $this->_beforeHandle($args, $field);
+
+        $this->_invokePlugins($field, 'beforeHandleFind', [$args, $field]);
         $this->_beforeHandleFind($id, $args, $field);
 
         $item = $this->_getFindData($id, $args, $field);
@@ -25,8 +28,12 @@ trait FindModelTrait
         }
 
         $response = $this->_getFindResponse($item, $args, $field);
+        $this->_invokePlugins($field, 'modifyFindResponse', [$response, $args, $field]);
 
+        $this->_invokePlugins($field, 'afterHandleFind', [$item, $response, $args, $field]);
         $this->_afterHandleFind($item, $response, $args, $field);
+
+        $this->_invokePlugins($field, 'afterHandle', [$args, $field]);
         $this->_beforeHandle($args, $field);
 
         return $response;
@@ -48,7 +55,10 @@ trait FindModelTrait
                 ['id' => $id])
             ->limit(1);
 
+        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field]);
         $this->_modifyQuery($phqlBuilder, $args, $field);
+
+        $this->_invokePlugins($field, 'modifyFindQuery', [$phqlBuilder, $id, $args, $field]);
         $this->_modifyFindQuery($phqlBuilder, $id, $args, $field);
 
         $results = $phqlBuilder->getQuery()->execute();

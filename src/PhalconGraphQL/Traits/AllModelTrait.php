@@ -7,7 +7,10 @@ trait AllModelTrait
 {
     protected function _all($args, Field $field)
     {
+        $this->_invokePlugins($field, 'beforeHandle', [$args, $field]);
         $this->_beforeHandle($args, $field);
+
+        $this->_invokePlugins($field, 'beforeHandleAll', [$args, $field]);
         $this->_beforeHandleAll($args, $field);
 
         $data = $this->_getAllData($args, $field);
@@ -17,8 +20,12 @@ trait AllModelTrait
         }
 
         $response = $this->_getAllResponse($data, $args, $field);
+        $this->_invokePlugins($field, 'modifyAllResponse', [$response, $args, $field]);
 
+        $this->_invokePlugins($field, 'afterHandleAll', [$data, $response, $args, $field]);
         $this->_afterHandleAll($data, $response, $args, $field);
+
+        $this->_invokePlugins($field, 'afterHandle', [$args, $field]);
         $this->_afterHandle($args, $field);
 
         return $response;
@@ -37,7 +44,10 @@ trait AllModelTrait
         $phqlBuilder = $modelsManager->createBuilder()
             ->from($model);
 
+        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field]);
         $this->_modifyQuery($phqlBuilder, $args, $field);
+
+        $this->_invokePlugins($field, 'modifyAllQuery', [$phqlBuilder, $args, $field]);
         $this->_modifyAllQuery($phqlBuilder, $args, $field);
 
         return $phqlBuilder->getQuery()->execute();

@@ -34,4 +34,17 @@ trait ModelQueryTrait
     protected function _afterHandle($args, Field $field)
     {
     }
+
+    protected function _invokePlugins(Field $field, $methodName, $arguments=[])
+    {
+        $plugins = array_merge($this->schema->getPlugins(), $field->getPlugins());
+
+        foreach($plugins as $plugin){
+
+            if($plugin instanceof \PhalconGraphQL\Plugins\ModelHandlerPluginInterface){
+
+                call_user_func_array([$plugin, $methodName], $arguments);
+            }
+        }
+    }
 }
