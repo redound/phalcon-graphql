@@ -31,7 +31,9 @@ class SimpleSortingPlugin extends Plugin
 
             $field
                 ->arg(InputField::string('sortField'))
-                ->arg(InputField::factory('sortDirection', 'SortDirection'));
+                ->arg(InputField::factory('sortDirection', 'SortDirection')
+                    ->defaultValue(self::DIRECTION_ASC)
+                );
         }
     }
 
