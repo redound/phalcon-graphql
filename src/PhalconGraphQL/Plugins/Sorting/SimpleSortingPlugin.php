@@ -4,9 +4,10 @@ namespace PhalconGraphQL\Plugins\Sorting;
 
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\EnumType;
-use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\InputField;
+use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
@@ -25,28 +26,30 @@ class SimpleSortingPlugin extends Plugin
         );
     }
 
-    public function beforeBuildField(Field $field, DiInterface $di)
+    public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
-        if($field instanceof AllModelField) {
-
-            $field
-                ->arg(InputField::string('sortField'))
-                ->arg(InputField::factory('sortDirection', 'SortDirection')
-                    ->defaultValue(self::DIRECTION_ASC)
-                );
+        if(!($field instanceof ModelField) || !$field->getIsList()) {
+            return;
         }
+
+        $field
+            ->arg(InputField::string('sortField'))
+            ->arg(InputField::factory('sortDirection', 'SortDirection')
+                ->defaultValue(self::DIRECTION_ASC)
+            );
     }
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
-        if($field instanceof AllModelField) {
+        if(!($field instanceof ModelField)) {
+            return;
+        }
 
-            $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
-            $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
+        $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
+        $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-            if($field !== null){
-                $query->orderBy($field . ' ' . $direction);
-            }
+        if($field !== null){
+            $query->orderBy($field . ' ' . $direction);
         }
     }
 }

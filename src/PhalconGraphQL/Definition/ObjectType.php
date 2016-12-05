@@ -167,21 +167,6 @@ class ObjectType
 
         $this->executeBeforeBuildPlugins($schema, $di);
 
-        /** @var FieldGroupInterface $fieldGroup */
-        foreach($this->_fieldGroups as $fieldGroup){
-
-            $fieldGroup->build($schema, $di);
-
-            foreach($fieldGroup->getFields() as $field){
-                $this->field($field);
-            }
-        }
-
-        /** @var Field $field */
-        foreach($this->_fields as $field){
-            $field->build($schema, $di);
-        }
-
         $this->_built = true;
 
         $this->executeAfterBuildPlugins($schema, $di);

@@ -26,6 +26,7 @@
             "PhalconGraphQL\\": "src/PhalconGraphQL"
         },
         "psr-0": {
+            "RelationModelTrait": "src/PhalconGraphQL/Traits",
             "AllModelTrait": "src/PhalconGraphQL/Traits",
             "FindModelTrait": "src/PhalconGraphQL/Traits",
             "CreateModelTrait": "src/PhalconGraphQL/Traits",

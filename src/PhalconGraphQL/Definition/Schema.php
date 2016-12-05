@@ -5,6 +5,8 @@ namespace PhalconGraphQL\Definition;
 use Phalcon\DiInterface;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
+use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Plugins\PluginInterface;
 
@@ -40,6 +42,8 @@ class Schema
     public function plugin(PluginInterface $plugin){
 
         $this->_plugins[] = $plugin;
+        $plugin->setSchema($this);
+
         return $this;
     }
 
@@ -144,6 +148,9 @@ class Schema
             $plugin->beforeBuildSchema($this, $di);
         }
 
+
+        /*** MOUNTABLES ***/
+
         /** @var SchemaMountableInterface $mountable */
         foreach($this->_mountables as $mountable){
 
@@ -166,6 +173,9 @@ class Schema
             }
         }
 
+
+        /*** OBJECT TYPE GROUPS ***/
+
         /** @var ObjectTypeGroupInterface $objectTypeGroup */
         foreach($this->_objectTypeGroups as $objectTypeGroup){
 
@@ -175,6 +185,9 @@ class Schema
                 $this->object($objectType);
             }
         }
+
+
+        /*** MOUNTABLES ***/
 
         /** @var SchemaMountableInterface $mountable */
         foreach($this->_mountables as $mountable){
@@ -202,16 +215,50 @@ class Schema
             }
         }
 
+
+        /*** FIELD GROUPS ***/
+
         /** @var ObjectType $objectType */
         foreach($this->_objectTypes as $objectType){
 
+            /** @var FieldGroupInterface $fieldGroup */
+            foreach($objectType->getFieldGroups() as $fieldGroup){
+
+                $fieldGroup->build($this, $di);
+
+                foreach($fieldGroup->getFields() as $field){
+                    $objectType->field($field);
+                }
+            }
+        }
+
+
+        /*** OBJECT TYPES ***/
+
+        /** @var ObjectType $objectType */
+        foreach($this->_objectTypes as $objectType){
             $objectType->build($this, $di);
         }
+
+
+        /*** FIELDS ***/
+        /** @var ObjectType $objectType */
+        foreach($this->_objectTypes as $objectType){
+
+            /** @var Field $field */
+            foreach($objectType->getFields() as $field){
+                $field->build($this, $objectType, $di);
+            }
+        }
+
+
+        /*** INPUT OBJECT TYPES ***/
 
         /** @var InputObjectType $inputObjectType */
         foreach($this->_inputObjectTypes as $objectType){
             $objectType->build($this, $di);
         }
+
 
         /** @var PluginInterface $plugin */
         foreach($this->_plugins as $plugin){

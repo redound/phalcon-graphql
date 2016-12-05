@@ -18,8 +18,8 @@ class ModelQueryFieldGroup extends ModelFieldGroup
     protected function getDefaultFields(Schema $schema, DiInterface $di)
     {
         return [
-            AllModelField::factory($this->_modelClass)->clearResolvers(),
-            FindModelField::factory($this->_modelClass)->clearResolvers()
+            AllModelField::factory($this->_modelClass),
+            FindModelField::factory($this->_modelClass)
         ];
     }
 

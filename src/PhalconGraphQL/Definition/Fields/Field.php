@@ -4,10 +4,12 @@ namespace PhalconGraphQL\Definition\Fields;
 
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\InputField;
+use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Plugins\FieldPluginInterface;
 use PhalconGraphQL\Resolvers\EmptyResolver;
+use PhalconGraphQL\Resolvers\Resolver;
 
 class Field
 {
@@ -17,7 +19,7 @@ class Field
     protected $_nonNull = false;
     protected $_isList = false;
     protected $_isNonNullList;
-    protected $_resolvers = [];
+    protected $_resolver = Resolver::class;
     protected $_handler;
     protected $_args = [];
     protected $_plugins = [];
@@ -123,19 +125,13 @@ class Field
 
     public function resolver($resolver)
     {
-        $this->_resolvers[] = $resolver;
+        $this->_resolver = $resolver;
         return $this;
     }
 
-    public function getResolvers()
+    public function getResolver()
     {
-        return $this->_resolvers;
-    }
-
-    public function clearResolvers()
-    {
-        $this->_resolvers = [];
-        return $this;
+        return $this->_resolver;
     }
 
     public function handler($handler)
@@ -160,30 +156,30 @@ class Field
         return $this->_args;
     }
 
-    public function build(Schema $schema, DiInterface $di)
+    public function build(Schema $schema, ObjectType $objectType, DiInterface $di)
     {
         if($this->_built){
             return;
         }
 
-        $this->executeBeforeBuildPlugins($schema, $di);
+        $this->executeBeforeBuildPlugins($schema, $objectType, $di);
         $this->_built = true;
-        $this->executeAfterBuildPlugins($schema, $di);
+        $this->executeAfterBuildPlugins($schema, $objectType, $di);
     }
 
-    protected function executeBeforeBuildPlugins(Schema $schema, DiInterface $di)
+    protected function executeBeforeBuildPlugins(Schema $schema, ObjectType $objectType, DiInterface $di)
     {
         /** @var FieldPluginInterface $plugin */
         foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
-            $plugin->beforeBuildField($this, $di);
+            $plugin->beforeBuildField($this, $objectType, $di);
         }
     }
 
-    protected function executeAfterBuildPlugins(Schema $schema, DiInterface $di)
+    protected function executeAfterBuildPlugins(Schema $schema, ObjectType $objectType, DiInterface $di)
     {
         /** @var FieldPluginInterface $plugin */
         foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
-            $plugin->afterBuildField($this, $di);
+            $plugin->afterBuildField($this, $objectType, $di);
         }
     }
 

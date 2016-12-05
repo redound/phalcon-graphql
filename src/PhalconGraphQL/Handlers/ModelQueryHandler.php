@@ -7,10 +7,12 @@ use PhalconApi\Exception;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\FindModelField;
+use PhalconGraphQL\Definition\Fields\RelationModelField;
 
 class ModelQueryHandler extends ModelHandler
 {
     use \ModelQueryTrait;
+    use \RelationModelTrait;
     use \AllModelTrait;
     use \FindModelTrait;
 
@@ -19,7 +21,10 @@ class ModelQueryHandler extends ModelHandler
         /** @var Field $field */
         list($source, $args, $field) = $arguments;
 
-        if($field instanceof AllModelField){
+        if($field instanceof RelationModelField){
+            return $this->_relation($source, $args, $field);
+        }
+        else if($field instanceof AllModelField){
             return $this->_all($args, $field);
         }
         else if($field instanceof FindModelField){

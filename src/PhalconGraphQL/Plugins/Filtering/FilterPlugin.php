@@ -3,49 +3,78 @@
 namespace PhalconGraphQL\Plugins\Filtering;
 
 use Phalcon\DiInterface;
-use PhalconGraphQL\Definition\Fields\AllModelField;
+use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\InputObjectType;
-use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Definition\ObjectType;
+use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 
 class FilterPlugin extends Plugin
 {
-    public function beforeBuildSchema(Schema $schema, DiInterface $di)
-    {
-        $schema->inputObject(InputObjectType::factory('Filter')
-            ->field(InputField::string('field', 'The field to apply the filter to'))
-            ->field(InputField::string('value', 'The value to filter'))
-        );
-    }
+    protected $_createdFilterTypes = [];
 
-    public function beforeBuildField(Field $field, DiInterface $di)
+    public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
-        if($field instanceof AllModelField) {
-
-            $field
-                ->arg(InputField::factory('filters', 'Filter')->isList());
+        if(!($field instanceof ModelField) || !$field->getIsList()) {
+            return;
         }
+
+        $type = $field->getType();
+        $filterTypeName = $type . 'Filter';
+
+        /** @var ObjectType $fieldObjectType */
+        $fieldObjectType = $this->schema->findObjectType($type);
+        if(!$fieldObjectType){
+            return;
+        }
+
+        if(!in_array($filterTypeName, $this->_createdFilterTypes)) {
+
+            $inputType = InputObjectType::factory($filterTypeName);
+
+            $scalarTypes = Types::scalars();
+
+            /** @var EnumType $enumType */
+            foreach($this->schema->getEnumTypes() as $enumType){
+                $scalarTypes[] = $enumType->getName();
+            }
+
+            /** @var Field $typeField */
+            foreach($fieldObjectType->getFields() as $typeField){
+
+                if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
+                    continue;
+                }
+
+                $inputType->field(InputField::factory($typeField->getName(), $typeField->getType()));
+            }
+
+            $this->schema->inputObject($inputType);
+            $inputType->build($this->schema, $di);
+
+            $this->_createdFilterTypes[] = $inputType;
+        }
+
+        $field
+            ->arg(InputField::factory('filter', $filterTypeName));
     }
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
-        if($field instanceof AllModelField) {
+        $filter = isset($args['filter']) ? $args['filter'] : null;
 
-            $filters = isset($args['filters']) ? $args['filters'] : [];
+        if($filter === null) {
+            return;
+        }
 
-            foreach($filters as $filter) {
+        foreach($filter as $field => $value) {
 
-                $field = $filter['field'];
-                $value = $filter['value'];
-
-                if ($field !== null) {
-                    $query->andWhere('[' . $field . '] = ?1', [1 => $value]);
-                }
-            }
+            $query->andWhere('[' . $field . '] = ?1', [1 => $value]);
         }
     }
 }

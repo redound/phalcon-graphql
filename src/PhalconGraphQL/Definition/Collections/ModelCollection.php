@@ -175,7 +175,7 @@ class ModelCollection extends Collection
 
             /** @var ModelField $field */
             foreach($this->_queryFields as $field){
-                $field->clearResolvers()->handler($this->_queryHandler);
+                $field->handler($this->_queryHandler);
             }
         }
 
@@ -183,7 +183,7 @@ class ModelCollection extends Collection
 
             /** @var ModelField $field */
             foreach($this->_mutationFields as $field){
-                $field->clearResolvers()->handler($this->_mutationHandler);
+                $field->handler($this->_mutationHandler);
             }
         }
     }

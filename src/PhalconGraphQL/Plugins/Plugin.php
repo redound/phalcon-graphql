@@ -10,12 +10,22 @@ use PhalconGraphQL\Definition\Schema;
 
 abstract class Plugin implements PluginInterface
 {
-    public function beforeBuildField(Field $field, DiInterface $di)
+    /**
+     * @var Schema
+     */
+    protected $schema;
+
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
+    }
+
+    public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
 
     }
 
-    public function afterBuildField(Field $field, DiInterface $di)
+    public function afterBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
 
     }

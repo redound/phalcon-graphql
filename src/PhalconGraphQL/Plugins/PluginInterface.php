@@ -9,4 +9,6 @@ interface PluginInterface extends FieldPluginInterface, ObjectTypePluginInterfac
 {
     public function beforeBuildSchema(Schema $schema, DiInterface $di);
     public function afterBuildSchema(Schema $schema, DiInterface $di);
+
+    public function setSchema(Schema $schema);
 }

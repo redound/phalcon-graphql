@@ -11,6 +11,7 @@ use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
+use PhalconGraphQL\Definition\Fields\RelationModelField;
 
 class ModelObjectType extends ObjectType
 {
@@ -30,6 +31,11 @@ class ModelObjectType extends ObjectType
         parent::__construct($name, $description);
 
         $this->_modelClass = $modelClass;
+    }
+
+    public function getModel()
+    {
+        return $this->_modelClass;
     }
 
     public function exclude($field)
@@ -78,6 +84,8 @@ class ModelObjectType extends ObjectType
         if($this->_built){
             return;
         }
+
+        $this->executeBeforeBuildPlugins($schema, $di);
 
         $relationEmbedMode = $this->_relationEmbedMode;
 
@@ -170,7 +178,7 @@ class ModelObjectType extends ObjectType
                     $options) ? $options['alias'] : $referencedModelClass;
                 $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
 
-                $field = ModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
+                $field = RelationModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
                     ->isList($isList)
                     ->embedMode($relationEmbedMode);
 
@@ -180,9 +188,9 @@ class ModelObjectType extends ObjectType
 
         $this->_fields = array_merge($newFields, $originalFields);
 
-        parent::build($schema, $di);
-
         $this->_built = true;
+
+        $this->executeAfterBuildPlugins($schema, $di);
     }
 
     /**

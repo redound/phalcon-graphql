@@ -42,11 +42,13 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
             $handlerClassName = $this->defaultNamespace . '\\' . $objectType->getName() . 'Handler';
 
-            if (!class_exists($handlerClassName)) {
-                $handlerClassName = Handler::class;
+            if (class_exists($handlerClassName)) {
+                $handler = new $handlerClassName;
             }
+        }
 
-            $handler = new $handlerClassName;
+        if($handler === null){
+            return null;
         }
 
         if ($handler instanceof \Phalcon\Di\Injectable) {
@@ -70,56 +72,53 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
         return function ($source, $args) use ($schema, $objectType, $field, $dispatcher) {
 
-            $resolvers = $field->getResolvers();
+            $resolver = $field->getResolver();
             $fieldName = $field->getName();
             $handler = $dispatcher->getHandler($schema, $objectType, $field);
 
-            if (empty($resolvers)) {
+            if ($handler) {
                 return $handler->$fieldName($source, $args, $field);
             }
 
-            foreach ($resolvers as $resolverFn) {
+            if (is_callable($resolver)) {
 
-                if (is_callable($resolverFn)) {
+                $source = call_user_func($resolver, $source, $args, $field);
+            }
+            else if (is_string($resolver)) {
 
-                    $source = call_user_func($resolverFn, $source, $args, $field);
+                $parts = explode('::', $resolver);
+
+                if (count($parts) === 2) {
+
+                    $className = $parts[0];
+                    $methodName = $parts[1];
+
+                    $obj = new $className;
+                    if ($obj instanceof \Phalcon\Di\Injectable) {
+                        $obj->setDI($this->di);
+                    }
+
+                    $source = $obj->$methodName($source, $args, $field);
                 }
-                else if (is_string($resolverFn)) {
+                else if(class_exists($resolver, true) && method_exists($resolver, 'resolve')) {
 
-                    $parts = explode('::', $resolverFn);
+                    $resolverObject = new $resolver();
 
-                    if (count($parts) === 2) {
-
-                        $className = $parts[0];
-                        $methodName = $parts[1];
-
-                        $obj = new $className;
-                        if ($obj instanceof \Phalcon\Di\Injectable) {
-                            $obj->setDI($this->di);
-                        }
-
-                        $source = $obj->$methodName($source, $args, $field);
+                    if ($resolverObject instanceof \Phalcon\Di\Injectable) {
+                        $resolverObject->setDI($this->di);
                     }
-                    else if(class_exists($resolverFn, true) && method_exists($resolverFn, 'resolve')) {
 
-                        $resolverObject = new $resolverFn();
+                    if($resolverObject instanceof Resolver){
 
-                        if ($resolverObject instanceof \Phalcon\Di\Injectable) {
-                            $resolverObject->setDI($this->di);
-                        }
-
-                        if($resolverObject instanceof Resolver){
-
-                            $resolverObject->setSchema($schema);
-                            $resolverObject->setObjectType($objectType);
-                        }
-
-                        $source = $resolverObject->resolve($source, $args, $field);
+                        $resolverObject->setSchema($schema);
+                        $resolverObject->setObjectType($objectType);
                     }
-                    else {
 
-                        $source = $handler->$resolverFn($source, $args, $field);
-                    }
+                    $source = $resolverObject->resolve($source, $args, $field);
+                }
+                else {
+
+                    $source = $handler->$resolver($source, $args, $field);
                 }
             }
 

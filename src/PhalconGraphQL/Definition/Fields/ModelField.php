@@ -5,6 +5,7 @@ namespace PhalconGraphQL\Definition\Fields;
 use Phalcon\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\InputField;
+use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Resolvers\AllModelResolver;
@@ -81,13 +82,13 @@ class ModelField extends Field
         return $this;
     }
 
-    public function build(Schema $schema, DiInterface $di)
+    public function build(Schema $schema, ObjectType $objectType, DiInterface $di)
     {
         if($this->_built){
             return;
         }
 
-        $this->executeBeforeBuildPlugins($schema, $di);
+        $this->executeBeforeBuildPlugins($schema, $objectType, $di);
 
         if($this->_isList) {
 
@@ -111,7 +112,7 @@ class ModelField extends Field
 
         $this->_built = true;
 
-        $this->executeAfterBuildPlugins($schema, $di);
+        $this->executeAfterBuildPlugins($schema, $objectType, $di);
     }
 
 

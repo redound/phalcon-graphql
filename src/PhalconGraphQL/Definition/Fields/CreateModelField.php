@@ -21,11 +21,11 @@ class CreateModelField extends ModelField
             $inputType = Types::addCreateInput($modelName);
         }
 
+        parent::__construct($model, $name, $returnType, $description);
+
         $this
             ->resolver(CreateModelResolver::class)
             ->arg(InputField::factory('input', $inputType)->nonNull());
-
-        parent::__construct($model, $name, $returnType, $description);
     }
 
     public static function factory($model=null, $name=null, $returnType=null, $inputType=null, $description=null)

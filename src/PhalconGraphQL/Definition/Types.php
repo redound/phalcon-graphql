@@ -17,6 +17,11 @@ class Types
 
     const VIEWER = "Viewer";
 
+    public static function scalars(){
+
+        return [self::STRING, self::INT, self::FLOAT, self::BOOLEAN, self::ID];
+    }
+
     public static function addConnection($name){
 
         return $name . 'Connection';
