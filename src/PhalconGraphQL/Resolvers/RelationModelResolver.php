@@ -11,6 +11,6 @@ class RelationModelResolver extends ModelResolver
 
     public function resolve($source, $args, Field $field)
     {
-        return $this->_relation($args, $args, $field);
+        return $this->_relation($source, $args, $field);
     }
 }

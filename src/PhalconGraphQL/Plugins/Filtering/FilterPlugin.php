@@ -77,4 +77,9 @@ class FilterPlugin extends Plugin
             $query->andWhere('[' . $field . '] = ?1', [1 => $value]);
         }
     }
+
+    public function modifyRelationOptions($options, $source, $args, Field $field)
+    {
+        // TODO
+    }
 }

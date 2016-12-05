@@ -104,4 +104,24 @@ abstract class Plugin implements PluginInterface
     {
 
     }
+
+    public function beforeHandleRelation($source, $args, Field $field)
+    {
+
+    }
+
+    public function afterHandleRelation($data, $response, $source, $args, Field $field)
+    {
+
+    }
+
+    public function modifyRelationOptions($options, $source, $args, Field $field)
+    {
+
+    }
+
+    public function modifyRelationResponse($response, $source, $args, Field $field)
+    {
+
+    }
 }

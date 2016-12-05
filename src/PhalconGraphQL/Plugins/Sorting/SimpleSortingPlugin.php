@@ -41,15 +41,16 @@ class SimpleSortingPlugin extends Plugin
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
-        if(!($field instanceof ModelField)) {
-            return;
-        }
-
         $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
         if($field !== null){
             $query->orderBy($field . ' ' . $direction);
         }
+    }
+
+    public function modifyRelationOptions($options, $source, $args, Field $field)
+    {
+        // TODO
     }
 }

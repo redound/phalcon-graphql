@@ -38,13 +38,16 @@ trait ModelQueryTrait
     protected function _invokePlugins(Field $field, $methodName, $arguments=[])
     {
         $plugins = array_merge($this->schema->getPlugins(), $field->getPlugins());
+        $responses = [];
 
         foreach($plugins as $plugin){
 
             if($plugin instanceof \PhalconGraphQL\Plugins\ModelHandlerPluginInterface){
 
-                call_user_func_array([$plugin, $methodName], $arguments);
+                $responses[] = call_user_func_array([$plugin, $methodName], $arguments);
             }
         }
+
+        return $responses;
     }
 }

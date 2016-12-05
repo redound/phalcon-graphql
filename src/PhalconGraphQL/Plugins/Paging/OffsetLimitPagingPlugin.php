@@ -25,10 +25,6 @@ class OffsetLimitPagingPlugin extends Plugin
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
-        if(!($field instanceof ModelField)) {
-            return;
-        }
-
         $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
         $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
 
@@ -39,5 +35,23 @@ class OffsetLimitPagingPlugin extends Plugin
         if($limit !== null){
             $query->limit($limit);
         }
+    }
+
+    public function modifyRelationOptions($options, $source, $args, Field $field)
+    {
+        // TODO: Doensn't work yet
+
+        $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
+        $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
+
+        if ($offset !== null) {
+            $options['offset'] = $offset;
+        }
+
+        if ($limit !== null) {
+            $options['limit'] = $limit;
+        }
+
+        return $options;
     }
 }
