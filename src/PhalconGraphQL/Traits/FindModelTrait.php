@@ -28,7 +28,7 @@ trait FindModelTrait
         }
 
         $response = $this->_getFindResponse($item, $args, $field);
-        $this->_invokePlugins($field, 'modifyFindResponse', [$response, $args, $field]);
+        $response = $this->_invokePlugins($field, 'modifyFindResponse', [$args, $field], $response);
 
         $this->_invokePlugins($field, 'afterHandleFind', [$item, $response, $args, $field]);
         $this->_afterHandleFind($item, $response, $args, $field);

@@ -20,7 +20,7 @@ trait AllModelTrait
         }
 
         $response = $this->_getAllResponse($data, $args, $field);
-        $this->_invokePlugins($field, 'modifyAllResponse', [$response, $args, $field]);
+        $response = $this->_invokePlugins($field, 'modifyAllResponse', [$args, $field], $response);
 
         $this->_invokePlugins($field, 'afterHandleAll', [$data, $response, $args, $field]);
         $this->_afterHandleAll($data, $response, $args, $field);

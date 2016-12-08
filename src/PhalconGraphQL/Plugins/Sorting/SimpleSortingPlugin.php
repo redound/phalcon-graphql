@@ -4,8 +4,10 @@ namespace PhalconGraphQL\Plugins\Sorting;
 
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\EnumType;
+use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
+use PhalconGraphQL\Definition\Fields\RelationModelField;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
@@ -28,7 +30,7 @@ class SimpleSortingPlugin extends Plugin
 
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
-        if(!($field instanceof ModelField) || !$field->getIsList()) {
+        if(!($field instanceof AllModelField) && !($field instanceof RelationModelField)) {
             return;
         }
 
@@ -51,6 +53,17 @@ class SimpleSortingPlugin extends Plugin
 
     public function modifyRelationOptions($options, $source, $args, Field $field)
     {
-        // TODO
+        $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
+        $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
+
+        if($field !== null){
+
+            $order = isset($options['order']) && !empty($options['order']) ? $options['order'] . ', ' : '';
+            $order .= $field . ' ' . $direction;
+
+            $options['order'] = $order;
+        }
+
+        return $options;
     }
 }

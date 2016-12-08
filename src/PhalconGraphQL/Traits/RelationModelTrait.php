@@ -26,7 +26,7 @@ trait RelationModelTrait
         }
 
         $response = $this->_getRelationResponse($data, $source, $args, $field);
-        $this->_invokePlugins($field, 'modifyRelationResponse', [$response, $source, $args, $field]);
+        $response = $this->_invokePlugins($field, 'modifyRelationResponse', [$source, $args, $field], $response);
 
         $this->_invokePlugins($field, 'afterHandleRelation', [$data, $response, $source, $args, $field]);
         $this->_afterHandleRelation($data, $response, $source, $args, $field);
@@ -51,8 +51,12 @@ trait RelationModelTrait
 
         $options = [];
 
-        $this->_modifyRelationOptions($options, $source, $args, $field);
-        $this->_invokePlugins($field, 'modifyRelationOptions', [$options, $source, $args, $field]);
+        $modifyResult = $this->_modifyRelationOptions($options, $source, $args, $field);
+        if ($modifyResult && is_array($modifyResult)) {
+            $options = array_merge($options, $modifyResult);
+        }
+
+        $options = $this->_invokePlugins($field, 'modifyRelationOptions', [$source, $args, $field], $options);
 
         return $model->getRelated($fieldName, $options);
     }

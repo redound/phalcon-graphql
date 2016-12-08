@@ -35,19 +35,41 @@ trait ModelQueryTrait
     {
     }
 
-    protected function _invokePlugins(Field $field, $methodName, $arguments=[])
+    protected function _invokePlugins(Field $field, $methodName, $arguments=[], $input=null)
     {
-        $plugins = array_merge($this->schema->getPlugins(), $field->getPlugins());
-        $responses = [];
+        $plugins = $this->_getPlugins($field);
+        $response = $input !== null ? $input : [];
 
         foreach($plugins as $plugin){
 
             if($plugin instanceof \PhalconGraphQL\Plugins\ModelHandlerPluginInterface){
 
-                $responses[] = call_user_func_array([$plugin, $methodName], $arguments);
+                $args = $arguments;
+                if($input !== null){
+                    array_unshift($args, $input);
+                }
+
+                $responseItem = call_user_func_array([$plugin, $methodName], $args);
+
+                if ($input !== null && $responseItem && is_array($responseItem)) {
+                    $response = $responseItem;
+                }
+                else if($input === null){
+                    $response[] = $responseItem;
+                }
             }
         }
 
-        return $responses;
+        return $response;
+    }
+
+    /**
+     * @param Field $field
+     *
+     * @return \PhalconGraphQL\Plugins\PluginInterface[]
+     */
+    protected function _getPlugins(Field $field)
+    {
+        return array_merge($this->schema->getPlugins(), $field->getPlugins());
     }
 }

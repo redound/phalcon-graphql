@@ -4,8 +4,10 @@ namespace PhalconGraphQL\Plugins\Filtering;
 
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\EnumType;
+use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
+use PhalconGraphQL\Definition\Fields\RelationModelField;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\InputObjectType;
 use PhalconGraphQL\Definition\ObjectType;
@@ -20,7 +22,7 @@ class FilterPlugin extends Plugin
 
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
-        if(!($field instanceof ModelField) || !$field->getIsList()) {
+        if(!($field instanceof AllModelField) && !($field instanceof RelationModelField)) {
             return;
         }
 
@@ -80,6 +82,29 @@ class FilterPlugin extends Plugin
 
     public function modifyRelationOptions($options, $source, $args, Field $field)
     {
-        // TODO
+        $filter = isset($args['filter']) ? $args['filter'] : null;
+
+        if($filter === null || count(array_keys($filter)) == 0) {
+            return;
+        }
+
+        $conditions = isset($options['conditions']) && !empty($options['conditions']) ? $options['conditions'] . ' AND ' : '';
+        $bind = isset($options['bind']) && !empty($options['bind']) ? $options['bind'] : [];
+
+        $filterConditions = [];
+
+        foreach($filter as $field => $value) {
+
+            $varName = 'filter' . $field . 'Value';
+            $filterConditions[] = '[' . $field . '] = :' . $varName . ':';
+            $bind[$varName] = $value;
+        }
+
+        $conditions .= '(' . implode(' AND ', $filterConditions) . ')';
+
+        $options['conditions'] = $conditions;
+        $options['bind'] = $bind;
+
+        return $options;
     }
 }
