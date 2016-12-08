@@ -50,6 +50,11 @@ abstract class Plugin implements PluginInterface
 
     }
 
+    public function beforeResolve(Schema $schema, ObjectType $objectType, Field $field)
+    {
+
+    }
+
     public function beforeHandle($args, Field $field)
     {
 

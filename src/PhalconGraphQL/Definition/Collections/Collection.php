@@ -18,6 +18,10 @@ class Collection implements SchemaMountableInterface
     protected $_objectTypes = [];
     protected $_objectTypeGroups = [];
     protected $_inputObjectTypes = [];
+    protected $_allowedRoles = [];
+    protected $_deniedRoles = [];
+    protected $_allowedFieldRoles = [];
+    protected $_deniedFieldRoles = [];
     protected $_fields = [];
     protected $_fieldGroups = [];
 
@@ -101,6 +105,37 @@ class Collection implements SchemaMountableInterface
         return $this->_fieldGroups;
     }
 
+    public function allow($roles)
+    {
+        $this->_allowedRoles = array_merge($this->_allowedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function deny($roles)
+    {
+        $this->_deniedRoles = array_merge($this->_deniedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function allowField($fieldName, $roles)
+    {
+        $fieldRoles = array_key_exists($fieldName, $this->_allowedFieldRoles) ? $this->_allowedFieldRoles[$fieldName] : [];
+        $fieldRoles = array_merge($fieldRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_allowedFieldRoles[$fieldName] = $fieldRoles;
+
+        return $this;
+    }
+
+    public function denyField($fieldName, $roles)
+    {
+        $fieldRoles = array_key_exists($fieldName, $this->_deniedFieldRoles) ? $this->_deniedFieldRoles[$fieldName] : [];
+        $fieldRoles = array_merge($fieldRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_deniedFieldRoles[$fieldName] = $fieldRoles;
+
+        return $this;
+    }
+
+
     protected function initialize()
     {
 
@@ -108,7 +143,43 @@ class Collection implements SchemaMountableInterface
 
     public function build(Schema $schema, DiInterface $di)
     {
-        //
+        foreach($this->_fields as $objectTypeFields){
+
+            /** @var Field $field */
+            foreach($objectTypeFields as $field) {
+
+                $field->allow($this->_allowedRoles);
+                $field->deny($this->_deniedRoles);
+
+                $fieldName = $field->getName();
+
+                if (array_key_exists($fieldName, $this->_allowedFieldRoles)) {
+                    $field->allow($this->_allowedFieldRoles[$fieldName]);
+                }
+
+                if (array_key_exists($fieldName, $this->_deniedFieldRoles)) {
+                    $field->deny($this->_deniedFieldRoles[$fieldName]);
+                }
+            }
+        }
+
+        foreach($this->_fieldGroups as $objectTypeGroups){
+
+            /** @var Field $field */
+            foreach($objectTypeGroups as $field) {
+
+                $group->allow($this->_allowedRoles);
+                $group->deny($this->_deniedRoles);
+
+                foreach ($this->_allowedFieldRoles as $fieldName => $roles) {
+                    $group->allowField($fieldName, $roles);
+                }
+
+                foreach ($this->_deniedFieldRoles as $fieldName => $roles) {
+                    $group->denyField($fieldName, $roles);
+                }
+            }
+        }
     }
 
     public static function factory()

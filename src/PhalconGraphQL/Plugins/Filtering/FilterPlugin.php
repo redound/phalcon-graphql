@@ -6,7 +6,6 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
-use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\Fields\RelationModelField;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\InputObjectType;

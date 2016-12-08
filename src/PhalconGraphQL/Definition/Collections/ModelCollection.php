@@ -27,6 +27,12 @@ class ModelCollection extends Collection
     protected $_mutationFields = [];
     protected $_modelObjectType;
 
+    protected $_allowedQueryRoles = [];
+    protected $_deniedQueryRoles = [];
+
+    protected $_allowedMutationRoles = [];
+    protected $_deniedMutationRoles = [];
+
     public function __construct($modelClass=null)
     {
         $this->_modelClass = $modelClass;
@@ -67,6 +73,30 @@ class ModelCollection extends Collection
     public function handler($handler)
     {
         $this->_handler = $handler;
+        return $this;
+    }
+
+    public function allowQuery($roles)
+    {
+        $this->_allowedQueryRoles = array_merge($this->_allowedQueryRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function denyQuery($roles)
+    {
+        $this->_deniedQueryRoles = array_merge($this->_deniedQueryRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function allowMutation($roles)
+    {
+        $this->_allowedMutationRoles = array_merge($this->_allowedMutationRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function denyMutation($roles)
+    {
+        $this->_deniedMutationRoles = array_merge($this->_deniedMutationRoles, is_array($roles) ? $roles : [$roles]);
         return $this;
     }
 
@@ -171,21 +201,29 @@ class ModelCollection extends Collection
             $this->_modelObjectType->handler($this->_handler);
         }
 
-        if($this->_queryHandler){
+        /** @var ModelField $field */
+        foreach($this->_queryFields as $field){
 
-            /** @var ModelField $field */
-            foreach($this->_queryFields as $field){
+            if($this->_queryHandler) {
                 $field->handler($this->_queryHandler);
             }
+
+            $field->allow($this->_allowedQueryRoles);
+            $field->deny($this->_deniedQueryRoles);
         }
 
-        if($this->_mutationHandler){
+        /** @var ModelField $field */
+        foreach($this->_mutationFields as $field){
 
-            /** @var ModelField $field */
-            foreach($this->_mutationFields as $field){
+            if($this->_mutationHandler) {
                 $field->handler($this->_mutationHandler);
             }
+
+            $field->allow($this->_allowedMutationRoles);
+            $field->deny($this->_deniedMutationRoles);
         }
+
+        parent::build($schema, $di);
     }
 
 

@@ -10,6 +10,7 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\SchemaFactory;
 use PhalconGraphQL\Handlers\Handler;
+use PhalconGraphQL\Plugins\PluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
 
 class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
@@ -67,11 +68,16 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $handler;
     }
 
-    public function createResolver($schema, ObjectType $objectType, Field $field)
+    public function createResolver(Schema $schema, ObjectType $objectType, Field $field)
     {
         $dispatcher = $this;
 
         return function ($source, $args) use ($schema, $objectType, $field, $dispatcher) {
+
+            /** @var PluginInterface $plugin */
+            foreach($schema->getPlugins() as $plugin){
+                $plugin->beforeResolve($schema, $objectType, $field);
+            }
 
             $resolver = $field->getResolver();
             $fieldName = $field->getName();
@@ -88,8 +94,6 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
             else if (is_string($resolver)) {
 
                 $parts = explode('::', $resolver);
-
-                // TODO: Reuse resolver instances
 
                 if (count($parts) === 2) {
 
@@ -108,6 +112,8 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
                         if ($obj instanceof \Phalcon\Di\Injectable) {
                             $obj->setDI($this->di);
                         }
+
+                        $this->resolverCache[$resolver] = $obj;
                     }
 
                     $source = $obj->$methodName($source, $args, $field);
@@ -127,6 +133,8 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
                         if ($resolverObject instanceof \Phalcon\Di\Injectable) {
                             $resolverObject->setDI($this->di);
                         }
+
+                        $this->resolverCache[$resolver] = $resolverObject;
                     }
 
                     if($resolverObject instanceof Resolver){

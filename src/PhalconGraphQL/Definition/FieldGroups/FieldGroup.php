@@ -10,6 +10,10 @@ class FieldGroup implements FieldGroupInterface
 {
     protected $_fields = [];
     protected $_handler;
+    protected $_allowedRoles = [];
+    protected $_deniedRoles = [];
+    protected $_allowedFieldRoles = [];
+    protected $_deniedFieldRoles = [];
     protected $_build = false;
 
     public function __construct($handler=null)
@@ -43,6 +47,37 @@ class FieldGroup implements FieldGroupInterface
         return $this->_handler;
     }
 
+    public function allow($roles)
+    {
+        $this->_allowedRoles = array_merge($this->_allowedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function deny($roles)
+    {
+        $this->_deniedRoles = array_merge($this->_deniedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function allowField($fieldName, $roles)
+    {
+        $fieldRoles = array_key_exists($fieldName, $this->_allowedFieldRoles) ? $this->_allowedFieldRoles[$fieldName] : [];
+        $fieldRoles = array_merge($fieldRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_allowedFieldRoles[$fieldName] = $fieldRoles;
+
+        return $this;
+    }
+
+    public function denyField($fieldName, $roles)
+    {
+        $fieldRoles = array_key_exists($fieldName, $this->_deniedFieldRoles) ? $this->_deniedFieldRoles[$fieldName] : [];
+        $fieldRoles = array_merge($fieldRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_deniedFieldRoles[$fieldName] = $fieldRoles;
+
+        return $this;
+    }
+
+
     public function build(Schema $schema, DiInterface $di)
     {
         $fields = array_merge($this->_fields, $this->getDefaultFields($schema, $di));
@@ -52,6 +87,19 @@ class FieldGroup implements FieldGroupInterface
 
             if(!$field->getHandler()) {
                 $field->handler($this->_handler);
+            }
+
+            $field->allow($this->_allowedRoles);
+            $field->deny($this->_deniedRoles);
+
+            $fieldName = $field->getName();
+
+            if(array_key_exists($fieldName, $this->_allowedFieldRoles)){
+                $field->allow($this->_allowedFieldRoles[$fieldName]);
+            }
+
+            if(array_key_exists($fieldName, $this->_deniedFieldRoles)){
+                $field->deny($this->_deniedFieldRoles[$fieldName]);
             }
         }
 

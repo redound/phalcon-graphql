@@ -18,5 +18,13 @@ interface FieldGroupInterface
      */
     public function getHandler();
 
+    public function allow($roles);
+
+    public function deny($roles);
+
+    public function allowField($fieldName, $roles);
+
+    public function denyField($fieldName, $roles);
+
     public function build(Schema $schema, DiInterface $di);
 }

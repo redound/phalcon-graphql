@@ -22,6 +22,8 @@ class Field
     protected $_resolver = Resolver::class;
     protected $_handler;
     protected $_args = [];
+    protected $_allowedRoles = [];
+    protected $_deniedRoles = [];
     protected $_plugins = [];
     protected $_built = false;
 
@@ -154,6 +156,28 @@ class Field
     public function getArgs()
     {
         return $this->_args;
+    }
+
+    public function allow($roles)
+    {
+        $this->_allowedRoles = array_merge($this->_allowedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function deny($roles)
+    {
+        $this->_deniedRoles = array_merge($this->_deniedRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function getAllowedRoles()
+    {
+        return $this->_allowedRoles;
+    }
+
+    public function getDeniedRoles()
+    {
+        return $this->_deniedRoles;
     }
 
     public function build(Schema $schema, ObjectType $objectType, DiInterface $di)

@@ -9,6 +9,7 @@ use Phalcon\Mvc\Model\MetaData;
 use Phalcon\Mvc\Model\RelationInterface;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Core;
+use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\Fields\RelationModelField;
@@ -187,6 +188,38 @@ class ModelObjectType extends ObjectType
         }
 
         $this->_fields = array_merge($newFields, $originalFields);
+
+        /** @var Field $field */
+        foreach($this->_fields as $field){
+
+            $field->allow($this->_allowedRoles);
+            $field->deny($this->_deniedRoles);
+
+            $fieldName = $field->getName();
+
+            if(array_key_exists($fieldName, $this->_allowedFieldRoles)){
+                $field->allow($this->_allowedFieldRoles[$fieldName]);
+            }
+
+            if(array_key_exists($fieldName, $this->_deniedFieldRoles)){
+                $field->deny($this->_deniedFieldRoles[$fieldName]);
+            }
+        }
+
+        /** @var FieldGroupInterface $group */
+        foreach($this->_fieldGroups as $group){
+
+            $group->allow($this->_allowedRoles);
+            $group->deny($this->_deniedRoles);
+
+            foreach($this->_allowedFieldRoles as $fieldName => $roles){
+                $group->allowField($fieldName, $roles);
+            }
+
+            foreach($this->_deniedFieldRoles as $fieldName => $roles) {
+                $group->denyField($fieldName, $roles);
+            }
+        }
 
         $this->_built = true;
 

@@ -2,15 +2,14 @@
 
 namespace PhalconGraphQL\Definition;
 
+use Phalcon\Acl;
 use Phalcon\DiInterface;
-use PhalconApi\Constants\ErrorCodes;
-use PhalconApi\Exception;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Plugins\PluginInterface;
 
-class Schema
+class Schema implements \PhalconApi\Acl\MountableInterface
 {
     const EMBED_MODE_NONE = 0;
     const EMBED_MODE_LIST = 1;
@@ -266,6 +265,58 @@ class Schema
         }
 
         $this->_built = true;
+    }
+
+
+    public function getAclResources()
+    {
+        $response = [];
+
+        /** @var ObjectType $objectType */
+        foreach($this->_objectTypes as $objectType){
+
+            $fieldNames = [];
+
+            /** @var Field $field */
+            foreach($objectType->getFields() as $field){
+                $fieldNames[] = $field->getName();
+            }
+
+            $response[] = [$objectType->getName(), $fieldNames];
+        }
+
+        return $response;
+    }
+
+    public function getAclRules(array $roles)
+    {
+        $allowItems = [];
+        $denyItems = [];
+
+        /** @var ObjectType $objectType */
+        foreach($this->_objectTypes as $objectType){
+
+            $objectTypeName = $objectType->getName();
+
+            /** @var Field $field */
+            foreach($objectType->getFields() as $field){
+
+                $fieldName = $field->getName();
+
+                foreach($field->getAllowedRoles() as $role){
+                    $allowItems[] = [$role, $objectTypeName, $fieldName];
+                }
+
+                foreach($field->getDeniedRoles() as $role){
+                    $denyItems[] = [$role, $objectTypeName, $fieldName];
+                }
+            }
+        }
+
+        return [
+            Acl::ALLOW => $allowItems,
+            Acl::DENY => $denyItems
+        ];
     }
 
 
