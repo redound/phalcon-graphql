@@ -17,6 +17,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
     protected $defaultNamespace;
 
     protected $handlerCache = [];
+    protected $resolverCache = [];
 
     public function setDefaultNamespace($namespace)
     {
@@ -88,24 +89,44 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
                 $parts = explode('::', $resolver);
 
+                // TODO: Reuse resolver instances
+
                 if (count($parts) === 2) {
 
                     $className = $parts[0];
                     $methodName = $parts[1];
 
-                    $obj = new $className;
-                    if ($obj instanceof \Phalcon\Di\Injectable) {
-                        $obj->setDI($this->di);
+                    $obj = null;
+
+                    if(array_key_exists($resolver, $this->resolverCache)){
+
+                        $obj = $this->resolverCache[$resolver];
+                    }
+                    else {
+
+                        $obj = new $className;
+                        if ($obj instanceof \Phalcon\Di\Injectable) {
+                            $obj->setDI($this->di);
+                        }
                     }
 
                     $source = $obj->$methodName($source, $args, $field);
                 }
                 else if(class_exists($resolver, true) && method_exists($resolver, 'resolve')) {
 
-                    $resolverObject = new $resolver();
+                    $resolverObject = null;
 
-                    if ($resolverObject instanceof \Phalcon\Di\Injectable) {
-                        $resolverObject->setDI($this->di);
+                    if(array_key_exists($resolver, $this->resolverCache)){
+
+                        $resolverObject = $this->resolverCache[$resolver];
+                    }
+                    else {
+
+                        $resolverObject = new $resolver();
+
+                        if ($resolverObject instanceof \Phalcon\Di\Injectable) {
+                            $resolverObject->setDI($this->di);
+                        }
                     }
 
                     if($resolverObject instanceof Resolver){
@@ -115,10 +136,6 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
                     }
 
                     $source = $resolverObject->resolve($source, $args, $field);
-                }
-                else {
-
-                    $source = $handler->$resolver($source, $args, $field);
                 }
             }
 
