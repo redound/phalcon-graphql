@@ -26,6 +26,7 @@ class ModelCollection extends Collection
     protected $_queryFields = [];
     protected $_mutationFields = [];
     protected $_modelObjectType;
+    protected $_modelObjectTypeGroup;
 
     protected $_allowedQueryRoles = [];
     protected $_deniedQueryRoles = [];
@@ -49,6 +50,8 @@ class ModelCollection extends Collection
 
             $this->objectGroup($embeddedGroup);
             $this->_modelObjectType = $objectType;
+
+            $this->_modelObjectTypeGroup = $embeddedGroup;
         }
     }
 
@@ -234,6 +237,9 @@ class ModelCollection extends Collection
             $field->allow($this->_allowedMutationRoles);
             $field->deny($this->_deniedMutationRoles);
         }
+
+        $this->_modelObjectTypeGroup->allow($this->_allowedQueryRoles);
+        $this->_modelObjectTypeGroup->allow($this->_allowedMutationRoles);
 
         parent::build($schema, $di);
     }

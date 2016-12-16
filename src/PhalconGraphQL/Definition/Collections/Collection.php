@@ -22,6 +22,8 @@ class Collection implements SchemaMountableInterface
     protected $_deniedRoles = [];
     protected $_allowedFieldRoles = [];
     protected $_deniedFieldRoles = [];
+    protected $_allowedObjectRoles = [];
+    protected $_deniedObjectRoles = [];
     protected $_fields = [];
     protected $_fieldGroups = [];
 
@@ -135,6 +137,24 @@ class Collection implements SchemaMountableInterface
         return $this;
     }
 
+    public function allowObject($objectTypeName, $roles)
+    {
+        $objectRoles = array_key_exists($objectTypeName, $this->_allowedObjectRoles) ? $this->_allowedObjectRoles[$objectTypeName] : [];
+        $objectRoles = array_merge($objectRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_allowedObjectRoles[$objectTypeName] = $objectRoles;
+
+        return $this;
+    }
+
+    public function denyObject($objectTypeName, $roles)
+    {
+        $objectRoles = array_key_exists($objectTypeName, $this->_deniedObjectRoles) ? $this->_deniedObjectRoles[$objectTypeName] : [];
+        $objectRoles = array_merge($objectRoles, is_array($roles) ? $roles : [$roles]);
+        $this->_deniedObjectRoles[$objectTypeName] = $objectRoles;
+
+        return $this;
+    }
+
 
     protected function initialize()
     {
@@ -165,8 +185,8 @@ class Collection implements SchemaMountableInterface
 
         foreach($this->_fieldGroups as $objectTypeGroups){
 
-            /** @var Field $field */
-            foreach($objectTypeGroups as $field) {
+            /** @var FieldGroupInterface $group */
+            foreach($objectTypeGroups as $group) {
 
                 $group->allow($this->_allowedRoles);
                 $group->deny($this->_deniedRoles);
@@ -178,6 +198,38 @@ class Collection implements SchemaMountableInterface
                 foreach ($this->_deniedFieldRoles as $fieldName => $roles) {
                     $group->denyField($fieldName, $roles);
                 }
+            }
+        }
+
+        /** @var ObjectType $objectType */
+        foreach($this->_objectTypes as $objectType) {
+
+            $objectType->allow($this->_allowedRoles);
+            $objectType->deny($this->_deniedRoles);
+
+            $objectTypeName = $objectType->getName();
+
+            if (array_key_exists($objectTypeName, $this->_allowedObjectRoles)) {
+                $objectType->allow($this->_allowedObjectRoles[$objectTypeName]);
+            }
+
+            if (array_key_exists($objectTypeName, $this->_deniedObjectRoles)) {
+                $objectType->deny($this->_deniedObjectRoles[$objectTypeName]);
+            }
+        }
+
+        /** @var ObjectTypeGroupInterface $group */
+        foreach($this->_objectTypeGroups as $group) {
+
+            $group->allow($this->_allowedRoles);
+            $group->deny($this->_deniedRoles);
+
+            foreach ($this->_allowedObjectRoles as $objectName => $roles) {
+                $group->allowObject($objectName, $roles);
+            }
+
+            foreach ($this->_deniedObjectRoles as $objectName => $roles) {
+                $group->denyObject($objectName, $roles);
             }
         }
     }
