@@ -11,6 +11,9 @@ class Types
     const FLOAT = "Float";
     const BOOLEAN = "Boolean";
     const ID = "ID";
+    const DATE = "Date";
+    const DATE_TIME = "DateTime";
+    const JSON = "Json";
 
     const QUERY = "Query";
     const MUTATION = "Mutation";
@@ -90,13 +93,24 @@ class Types
                 break;
             }
 
-            // TODO: Implement?
-//            case Column::TYPE_DATE:
-//            case Column::TYPE_DATETIME: {
-//
-//                $responseType = self::TYPE_DATE;
-//                break;
-//            }
+            case Column::TYPE_DATE: {
+
+                $responseType = Types::DATE;
+                break;
+            }
+
+            case Column::TYPE_TIMESTAMP:
+            case Column::TYPE_DATETIME: {
+
+                $responseType = Types::DATE_TIME;
+                break;
+            }
+
+            case Column::TYPE_JSON: {
+
+                $responseType = Types::JSON;
+                break;
+            }
 
             default:
                 $responseType = Types::STRING;

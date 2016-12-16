@@ -2,6 +2,7 @@
 
 namespace PhalconGraphQL\Definition;
 
+use GraphQL\Type\Definition\ScalarType;
 use Phalcon\Acl;
 use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
@@ -17,6 +18,7 @@ class Schema implements \PhalconApi\Acl\MountableInterface
 
     protected $_embedMode = Schema::EMBED_MODE_NONE;
 
+    protected $_scalarTypes = [];
     protected $_enumTypes = [];
     protected $_objectTypes = [];
     protected $_objectTypesByName = [];
@@ -83,6 +85,17 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     public function getEnumTypes()
     {
         return $this->_enumTypes;
+    }
+
+    public function scalar(ScalarType $type)
+    {
+        $this->_scalarTypes[] = $type;
+        return $this;
+    }
+
+    public function getScalarTypes()
+    {
+        return $this->_scalarTypes;
     }
 
     public function object(ObjectType $objectType)

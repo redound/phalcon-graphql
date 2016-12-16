@@ -30,7 +30,7 @@ class SimpleSortingPlugin extends Plugin
 
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
-        if(!($field instanceof AllModelField) && !($field instanceof RelationModelField)) {
+        if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
             return;
         }
 
