@@ -104,6 +104,8 @@ class ModelCollection extends Collection
     public function all($objectType=Types::QUERY, $name=null, $description=null)
     {
         $field = AllModelField::factory($this->_modelClass, $name, null, $description);
+
+        $this->configureQueryField($field);
         $this->configureAllField($field);
 
         $this->field($objectType, $field);
@@ -115,6 +117,8 @@ class ModelCollection extends Collection
     public function find($objectType=Types::QUERY, $name=null, $description=null)
     {
         $field = FindModelField::factory($this->_modelClass, $name, null, $description);
+
+        $this->configureQueryField($field);
         $this->configureFindField($field);
 
         $this->field($objectType, $field);
@@ -131,6 +135,8 @@ class ModelCollection extends Collection
         $this->inputObject($inputObject);
 
         $field = CreateModelField::factory($this->_modelClass, $name, $returnType, null, $description);
+
+        $this->configureMutationField($field);
         $this->configureCreateField($field);
 
         $this->field($objectType, $field);
@@ -147,6 +153,8 @@ class ModelCollection extends Collection
         $this->inputObject($inputObject);
 
         $field = UpdateModelField::factory($this->_modelClass, $name, $returnType, null, $description);
+
+        $this->configureMutationField($field);
         $this->configureUpdateField($field);
 
         $this->field($objectType, $field);
@@ -158,6 +166,8 @@ class ModelCollection extends Collection
     public function delete($objectType=Types::MUTATION, $name=null, $description=null)
     {
         $field = DeleteModelField::factory($this->_modelClass, $name, null, $description);
+
+        $this->configureMutationField($field);
         $this->configureDeleteField($field);
 
         $this->field($objectType, $field);
@@ -186,10 +196,12 @@ class ModelCollection extends Collection
 
     protected function configureAllField(AllModelField $field){}
     protected function configureFindField(FindModelField $field){}
+    protected function configureQueryField(ModelField $field){}
 
     protected function configureCreateField(CreateModelField $field){}
     protected function configureUpdateField(UpdateModelField $field){}
     protected function configureDeleteField(DeleteModelField $field){}
+    protected function configureMutationField(ModelField $field){}
 
     protected function configureCreateInputObjectType(ModelInputObjectType $objectType){}
     protected function configureUpdateInputObjectType(ModelInputObjectType $objectType){}
