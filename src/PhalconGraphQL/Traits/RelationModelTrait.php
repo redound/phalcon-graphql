@@ -72,7 +72,20 @@ trait RelationModelTrait
 
     protected function _getRelationResponse($data, $source, $args, Field $field)
     {
-        return $data;
+        $returnType = $this->schema->findObjectType($field->getType());
+
+        if($returnType->getHandler() == \PhalconGraphQL\Handlers\ListEmbedHandler::class) {
+
+            $countFunction = 'count' . ucfirst($field->getName());
+
+            $count = $source->$countFunction();
+
+            return \PhalconGraphQL\Responses\ListEmbedResponse::factory($data, $count);
+        }
+        else {
+
+            return $data;
+        }
     }
 
     protected function _afterHandleRelation($data, $response, $source, $args, Field $field)

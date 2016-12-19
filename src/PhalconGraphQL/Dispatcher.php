@@ -37,16 +37,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         $handler = null;
 
         if ($handlerClassName) {
-
             $handler = new $handlerClassName;
-
-        } else {
-
-            $handlerClassName = $this->defaultNamespace . '\\' . $objectType->getName() . 'Handler';
-
-            if (class_exists($handlerClassName)) {
-                $handler = new $handlerClassName;
-            }
         }
 
         if($handler === null){
