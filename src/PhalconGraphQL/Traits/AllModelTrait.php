@@ -42,7 +42,7 @@ trait AllModelTrait
         $model = $this->getModel($field);
 
         $phqlBuilder = $modelsManager->createBuilder()
-            ->from($model);
+            ->from([\PhalconGraphQL\Core::getShortClass($model) => $model]);
 
         $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field]);
         $this->_modifyQuery($phqlBuilder, $args, $field);

@@ -3,6 +3,7 @@
 namespace PhalconGraphQL\Plugins\Filtering;
 
 use Phalcon\DiInterface;
+use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
@@ -67,6 +68,7 @@ class FilterPlugin extends Plugin
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
+        $model = Core::getShortClass($field->getModel());
         $filter = isset($args['filter']) ? $args['filter'] : null;
 
         if($filter === null) {
@@ -75,7 +77,7 @@ class FilterPlugin extends Plugin
 
         foreach($filter as $field => $value) {
 
-            $query->andWhere('[' . $field . '] = ?1', [1 => $value]);
+            $query->andWhere('[' . $model . '].[' . $field . '] = ?1', [1 => $value]);
         }
     }
 

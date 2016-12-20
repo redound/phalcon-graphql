@@ -21,10 +21,7 @@ class ModelQueryHandler extends ModelHandler
         /** @var Field $field */
         list($source, $args, $field) = $arguments;
 
-        if($field instanceof RelationModelField){
-            return $this->_relation($source, $args, $field);
-        }
-        else if($field instanceof AllModelField){
+        if($field instanceof AllModelField){
             return $this->_all($args, $field);
         }
         else if($field instanceof FindModelField){

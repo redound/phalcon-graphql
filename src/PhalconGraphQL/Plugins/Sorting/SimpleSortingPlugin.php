@@ -3,6 +3,7 @@
 namespace PhalconGraphQL\Plugins\Sorting;
 
 use Phalcon\DiInterface;
+use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
@@ -43,11 +44,12 @@ class SimpleSortingPlugin extends Plugin
 
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
+        $model = Core::getShortClass($field->getModel());
         $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
         if($field !== null){
-            $query->orderBy($field . ' ' . $direction);
+            $query->orderBy('[' . $model . '].[' . $field . '] ' . $direction);
         }
     }
 

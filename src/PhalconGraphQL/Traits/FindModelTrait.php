@@ -48,10 +48,11 @@ trait FindModelTrait
         /** @var \Phalcon\Mvc\Model\Manager $modelsManager */
         $modelsManager = $this->di->get(\PhalconGraphQL\Constants\Services::MODELS_MANAGER);
         $model = $this->getModel($field);
+        $modelAlias = \PhalconGraphQL\Core::getShortClass($model);
 
         $phqlBuilder = $modelsManager->createBuilder()
-            ->from($model)
-            ->andWhere('[' . $model . '].' . $this->_getModelPrimaryKey($field) . ' = :id:',
+            ->from([$modelAlias => $model])
+            ->andWhere('[' . $modelAlias . '].[' . $this->_getModelPrimaryKey($field) . '] = :id:',
                 ['id' => $id])
             ->limit(1);
 
