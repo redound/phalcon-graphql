@@ -46,7 +46,7 @@ trait ModelQueryTrait
 
                 $args = $arguments;
                 if($input !== null){
-                    array_unshift($args, $input);
+                    array_unshift($args, $response);
                 }
 
                 $responseItem = call_user_func_array([$plugin, $methodName], $args);
