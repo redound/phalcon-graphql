@@ -26,7 +26,10 @@ trait RelationModelTrait
         }
 
         $response = $this->_getRelationResponse($data, $source, $args, $field);
-        $response = $this->_invokePlugins($field, 'modifyRelationResponse', [$source, $args, $field], $response);
+
+        if($response !== null) {
+            $response = $this->_invokePlugins($field, 'modifyRelationResponse', [$source, $args, $field], $response);
+        }
 
         $this->_invokePlugins($field, 'afterHandleRelation', [$data, $response, $source, $args, $field]);
         $this->_afterHandleRelation($data, $response, $source, $args, $field);
@@ -58,7 +61,13 @@ trait RelationModelTrait
 
         $options = $this->_invokePlugins($field, 'modifyRelationOptions', [$source, $args, $field], $options);
 
-        return $model->getRelated($fieldName, $options);
+        $result = $model->getRelated($fieldName, $options);
+
+        if($result === false){
+            return null;
+        }
+
+        return $result;
     }
 
     protected function _modifyRelationOptions($options, $source, $args, Field $field)
