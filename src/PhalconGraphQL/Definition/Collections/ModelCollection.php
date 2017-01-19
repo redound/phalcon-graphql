@@ -6,6 +6,7 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\CreateModelField;
 use PhalconGraphQL\Definition\Fields\DeleteModelField;
+use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\FindModelField;
 use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\Fields\UpdateModelField;
@@ -104,6 +105,23 @@ class ModelCollection extends Collection
     }
 
 
+    public function queryField(Field $field, $objectType=Types::QUERY)
+    {
+        $this->field($objectType, $field);
+        $this->_queryFields[] = $field;
+
+        return $this;
+    }
+
+    public function mutationField(Field $field, $objectType=Types::MUTATION)
+    {
+        $this->field($objectType, $field);
+        $this->_mutationFields[] = $field;
+
+        return $this;
+    }
+
+
     public function all($objectType=Types::QUERY, $name=null, $description=null)
     {
         $field = AllModelField::factory($this->_modelClass, $name, null, $description);
@@ -111,8 +129,7 @@ class ModelCollection extends Collection
         $this->configureQueryField($field);
         $this->configureAllField($field);
 
-        $this->field($objectType, $field);
-        $this->_queryFields[] = $field;
+        $this->queryField($field, $objectType);
 
         return $this;
     }
@@ -124,8 +141,7 @@ class ModelCollection extends Collection
         $this->configureQueryField($field);
         $this->configureFindField($field);
 
-        $this->field($objectType, $field);
-        $this->_queryFields[] = $field;
+        $this->queryField($field, $objectType);
 
         return $this;
     }
@@ -142,8 +158,7 @@ class ModelCollection extends Collection
         $this->configureMutationField($field);
         $this->configureCreateField($field);
 
-        $this->field($objectType, $field);
-        $this->_mutationFields[] = $field;
+        $this->mutationField($field, $objectType);
 
         return $this;
     }
@@ -160,8 +175,7 @@ class ModelCollection extends Collection
         $this->configureMutationField($field);
         $this->configureUpdateField($field);
 
-        $this->field($objectType, $field);
-        $this->_mutationFields[] = $field;
+        $this->mutationField($field, $objectType);
 
         return $this;
     }
@@ -173,8 +187,7 @@ class ModelCollection extends Collection
         $this->configureMutationField($field);
         $this->configureDeleteField($field);
 
-        $this->field($objectType, $field);
-        $this->_mutationFields[] = $field;
+        $this->mutationField($field, $objectType);
 
         return $this;
     }
