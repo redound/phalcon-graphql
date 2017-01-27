@@ -216,6 +216,10 @@ class ObjectType
             if(array_key_exists($fieldName, $this->_deniedFieldRoles)){
                 $field->deny($this->_deniedFieldRoles[$fieldName]);
             }
+
+            foreach($this->_plugins as $plugin){
+                $field->plugin($plugin);
+            }
         }
 
         /** @var FieldGroupInterface $group */
@@ -230,6 +234,10 @@ class ObjectType
 
             foreach($this->_deniedFieldRoles as $fieldName => $roles) {
                 $group->denyField($fieldName, $roles);
+            }
+
+            foreach($this->_plugins as $plugin){
+                $group->plugin($plugin);
             }
         }
 

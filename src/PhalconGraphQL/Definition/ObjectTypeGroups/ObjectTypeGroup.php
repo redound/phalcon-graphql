@@ -14,6 +14,7 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
     protected $_deniedRoles = [];
     protected $_allowedObjectRoles = [];
     protected $_deniedObjectRoles = [];
+    protected $_plugins = [];
 
     protected $_built = false;
 
@@ -53,6 +54,12 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
         return $this;
     }
 
+    public function plugin($plugin)
+    {
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
     public function build(Schema $schema, DiInterface $di)
     {
         $objectTypes = array_merge($this->_objectTypes, $this->getDefaultObjectTypes($schema, $di));
@@ -71,6 +78,10 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
 
             if(array_key_exists($objectName, $this->_deniedObjectRoles)){
                 $objectType->deny($this->_deniedObjectRoles[$objectName]);
+            }
+
+            foreach($this->_plugins as $plugin){
+                $objectType->plugin($plugin);
             }
         }
 

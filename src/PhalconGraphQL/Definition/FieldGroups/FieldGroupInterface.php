@@ -26,5 +26,7 @@ interface FieldGroupInterface
 
     public function denyField($fieldName, $roles);
 
+    public function plugin($plugin);
+
     public function build(Schema $schema, DiInterface $di);
 }

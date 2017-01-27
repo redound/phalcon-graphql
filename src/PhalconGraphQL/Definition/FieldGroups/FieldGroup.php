@@ -14,6 +14,8 @@ class FieldGroup implements FieldGroupInterface
     protected $_deniedRoles = [];
     protected $_allowedFieldRoles = [];
     protected $_deniedFieldRoles = [];
+    protected $_plugins = [];
+
     protected $_build = false;
 
     public function __construct($handler=null)
@@ -77,6 +79,12 @@ class FieldGroup implements FieldGroupInterface
         return $this;
     }
 
+    public function plugin($plugin)
+    {
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
 
     public function build(Schema $schema, DiInterface $di)
     {
@@ -100,6 +108,10 @@ class FieldGroup implements FieldGroupInterface
 
             if(array_key_exists($fieldName, $this->_deniedFieldRoles)){
                 $field->deny($this->_deniedFieldRoles[$fieldName]);
+            }
+
+            foreach($this->_plugins as $plugin){
+                $field->plugin($plugin);
             }
         }
 

@@ -26,6 +26,7 @@ class Collection implements SchemaMountableInterface
     protected $_deniedObjectRoles = [];
     protected $_fields = [];
     protected $_fieldGroups = [];
+    protected $_plugins = [];
 
 
     public function __construct()
@@ -64,6 +65,17 @@ class Collection implements SchemaMountableInterface
     public function getInputObjectTypes()
     {
         return $this->_inputObjectTypes;
+    }
+
+    public function plugin($plugin)
+    {
+        $this->_plugins[] = $plugin;
+        return $this;
+    }
+
+    public function getPlugins()
+    {
+        return $this->_plugins;
     }
 
     public function objectGroup(ObjectTypeGroupInterface $objectTypeGroup)
@@ -180,6 +192,10 @@ class Collection implements SchemaMountableInterface
                 if (array_key_exists($fieldName, $this->_deniedFieldRoles)) {
                     $field->deny($this->_deniedFieldRoles[$fieldName]);
                 }
+
+                foreach($this->_plugins as $plugin){
+                    $field->plugin($plugin);
+                }
             }
         }
 
@@ -197,6 +213,10 @@ class Collection implements SchemaMountableInterface
 
                 foreach ($this->_deniedFieldRoles as $fieldName => $roles) {
                     $group->denyField($fieldName, $roles);
+                }
+
+                foreach($this->_plugins as $plugin){
+                    $group->plugin($plugin);
                 }
             }
         }
@@ -216,6 +236,10 @@ class Collection implements SchemaMountableInterface
             if (array_key_exists($objectTypeName, $this->_deniedObjectRoles)) {
                 $objectType->deny($this->_deniedObjectRoles[$objectTypeName]);
             }
+
+            foreach($this->_plugins as $plugin){
+                $objectType->plugin($plugin);
+            }
         }
 
         /** @var ObjectTypeGroupInterface $group */
@@ -230,6 +254,10 @@ class Collection implements SchemaMountableInterface
 
             foreach ($this->_deniedObjectRoles as $objectName => $roles) {
                 $group->denyObject($objectName, $roles);
+            }
+
+            foreach($this->_plugins as $plugin){
+                $group->plugin($plugin);
             }
         }
     }

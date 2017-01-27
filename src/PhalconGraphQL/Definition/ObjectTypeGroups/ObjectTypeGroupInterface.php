@@ -21,5 +21,7 @@ interface ObjectTypeGroupInterface
 
     public function denyObject($objectTypeName, $roles);
 
+    public function plugin($plugin);
+
     public function build(Schema $schema, DiInterface $di);
 }
