@@ -7,6 +7,7 @@ use PhalconApi\Exception;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Plugins\ObjectTypePluginInterface;
+use PhalconGraphQL\Plugins\Plugin;
 
 class ObjectType
 {
@@ -199,6 +200,11 @@ class ObjectType
             return;
         }
 
+        /** @var Plugin $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->setSchema($schema);
+        }
+
         $this->executeBeforeBuildPlugins($schema, $di);
 
         /** @var Field $field */
@@ -248,7 +254,7 @@ class ObjectType
 
     protected function executeBeforeBuildPlugins(Schema $schema, DiInterface $di)
     {
-        /** @var ObjectTypePluginInterface $plugin */
+        /** @var Plugin $plugin */
         foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
             $plugin->beforeBuildObjectType($this, $di);
         }
@@ -256,7 +262,7 @@ class ObjectType
 
     protected function executeAfterBuildPlugins(Schema $schema, DiInterface $di)
     {
-        /** @var ObjectTypePluginInterface $plugin */
+        /** @var Plugin $plugin */
         foreach(array_merge($schema->getPlugins(), $this->_plugins) as $plugin){
             $plugin->afterBuildObjectType($this, $di);
         }

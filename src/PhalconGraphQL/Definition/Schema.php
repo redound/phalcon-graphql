@@ -20,6 +20,7 @@ class Schema implements \PhalconApi\Acl\MountableInterface
 
     protected $_scalarTypes = [];
     protected $_enumTypes = [];
+    protected $_enumTypesByName = [];
     protected $_objectTypes = [];
     protected $_objectTypesByName = [];
     protected $_objectTypeGroups = [];
@@ -79,7 +80,14 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     public function enum(EnumType $enumType)
     {
         $this->_enumTypes[] = $enumType;
+        $this->_enumTypesByName[$enumType->getName()] = $enumType;
+
         return $this;
+    }
+
+    public function hasEnum($name)
+    {
+        return isset($this->_enumTypesByName[$name]);
     }
 
     public function getEnumTypes()

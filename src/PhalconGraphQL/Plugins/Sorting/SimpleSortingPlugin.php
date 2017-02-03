@@ -24,18 +24,18 @@ class SimpleSortingPlugin extends Plugin
 
     protected $_createdFieldEnums = [];
 
-    public function beforeBuildSchema(Schema $schema, DiInterface $di)
-    {
-        $schema->enum(EnumType::factory('SortDirection')
-            ->value(self::DIRECTION_ASC, self::DIRECTION_ASC, 'Sort ascending')
-            ->value(self::DIRECTION_DESC, self::DIRECTION_DESC, 'Sort descending')
-        );
-    }
-
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
             return;
+        }
+
+        if(!$this->schema->hasEnum('SortDirection')) {
+
+            $this->schema->enum(EnumType::factory('SortDirection')
+                ->value(self::DIRECTION_ASC, self::DIRECTION_ASC, 'Sort ascending')
+                ->value(self::DIRECTION_DESC, self::DIRECTION_DESC, 'Sort descending')
+            );
         }
 
         $type = $field->getType();
@@ -51,23 +51,7 @@ class SimpleSortingPlugin extends Plugin
 
             $enum = EnumType::factory($fieldEnumName);
 
-            $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
-            $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
-
-            /** @var EnumType $enumType */
-            foreach($this->schema->getEnumTypes() as $enumType){
-                $scalarTypes[] = $enumType->getName();
-            }
-
-            /** @var Field $typeField */
-            foreach($fieldObjectType->getFields() as $typeField){
-
-                if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
-                    continue;
-                }
-
-                $enum->value($typeField->getName(), $typeField->getName());
-            }
+            $this->createEnumValues($fieldObjectType->getFields(), $enum);
 
             $this->schema->enum($enum);
             $this->_createdFieldEnums[] = $enum;
@@ -83,26 +67,68 @@ class SimpleSortingPlugin extends Plugin
     public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
     {
         $model = Core::getShortClass($field->getModel());
-        $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
-        $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
+        $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
+        $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($field !== null){
-            $query->orderBy('[' . $model . '].[' . $field . '] ' . $direction);
+        if($sortField !== null){
+            $this->modifyAllQueryForSort($query, $sortField, $sortDirection, $model, $field);
         }
     }
 
     public function modifyRelationOptions($options, $source, $args, Field $field)
     {
-        $field = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
-        $direction = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
+        $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
+        $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($field !== null){
-
-            $order = isset($options['order']) && !empty($options['order']) ? $options['order'] . ', ' : '';
-            $order .= $field . ' ' . $direction;
-
-            $options['order'] = $order;
+        if($sortField !== null){
+            $options = $this->modifyRelationOptionsForSort($options, $sortField, $sortDirection, $field);
         }
+
+        return $options;
+    }
+
+
+    protected function createEnumValues($fields, EnumType $enum)
+    {
+        $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
+        $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
+
+        /** @var EnumType $enumType */
+        foreach($this->schema->getEnumTypes() as $enumType){
+            $scalarTypes[] = $enumType->getName();
+        }
+
+        /** @var Field $typeField */
+        foreach($fields as $typeField){
+
+            if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
+                continue;
+            }
+
+            $enum->value($typeField->getName(), $typeField->getName());
+        }
+
+        foreach($this->getExtraEnumValues($fields) as $value){
+            $enum->addValue($value);
+        }
+    }
+
+    protected function getExtraEnumValues($fields)
+    {
+        return [];
+    }
+
+    public function modifyAllQueryForSort(QueryBuilder $query, $sortField, $sortDirection, $modelName, Field $field)
+    {
+        $query->orderBy('[' . $modelName . '].[' . $sortField . '] ' . $sortDirection);
+    }
+
+    public function modifyRelationOptionsForSort($options, $sortField, $sortDirection, Field $field)
+    {
+        $order = isset($options['order']) && !empty($options['order']) ? $options['order'] . ', ' : '';
+        $order .= $sortField . ' ' . $sortDirection;
+
+        $options['order'] = $order;
 
         return $options;
     }

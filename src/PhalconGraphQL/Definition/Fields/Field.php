@@ -8,6 +8,7 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Plugins\FieldPluginInterface;
+use PhalconGraphQL\Plugins\Plugin;
 use PhalconGraphQL\Resolvers\EmptyResolver;
 use PhalconGraphQL\Resolvers\Resolver;
 
@@ -184,6 +185,11 @@ class Field
     {
         if($this->_built){
             return;
+        }
+
+        /** @var Plugin $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->setSchema($schema);
         }
 
         $this->executeBeforeBuildPlugins($schema, $objectType, $di);

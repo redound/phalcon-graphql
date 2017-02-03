@@ -13,6 +13,7 @@ use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\Fields\RelationModelField;
+use PhalconGraphQL\Plugins\Plugin;
 
 class ModelObjectType extends ObjectType
 {
@@ -84,6 +85,11 @@ class ModelObjectType extends ObjectType
     {
         if($this->_built){
             return;
+        }
+
+        /** @var Plugin $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->setSchema($schema);
         }
 
         $this->executeBeforeBuildPlugins($schema, $di);

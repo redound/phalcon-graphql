@@ -8,6 +8,7 @@ use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
+use PhalconGraphQL\Plugins\Plugin;
 use PhalconGraphQL\Resolvers\AllModelResolver;
 use PhalconGraphQL\Resolvers\FindModelResolver;
 
@@ -86,6 +87,11 @@ class ModelField extends Field
     {
         if($this->_built){
             return;
+        }
+
+        /** @var Plugin $plugin */
+        foreach($this->_plugins as $plugin){
+            $plugin->setSchema($schema);
         }
 
         $this->executeBeforeBuildPlugins($schema, $objectType, $di);
