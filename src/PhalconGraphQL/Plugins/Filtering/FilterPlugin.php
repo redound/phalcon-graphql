@@ -77,7 +77,8 @@ class FilterPlugin extends Plugin
 
         foreach($filter as $field => $value) {
 
-            $query->andWhere('[' . $model . '].[' . $field . '] = ?1', [1 => $value]);
+            $valueKey = 'filterValue_' . $field;
+            $query->andWhere('[' . $model . '].[' . $field . '] = :'.$valueKey.':', [$valueKey => $value]);
         }
     }
 
