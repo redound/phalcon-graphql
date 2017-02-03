@@ -12,6 +12,7 @@ use PhalconGraphQL\Definition\Fields\RelationModelField;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
@@ -20,6 +21,8 @@ class SimpleSortingPlugin extends Plugin
 {
     const DIRECTION_ASC = 'ASC';
     const DIRECTION_DESC = 'DESC';
+
+    protected $_createdFieldEnums = [];
 
     public function beforeBuildSchema(Schema $schema, DiInterface $di)
     {
@@ -35,8 +38,43 @@ class SimpleSortingPlugin extends Plugin
             return;
         }
 
+        $type = $field->getType();
+        $fieldEnumName = $type . 'SortField';
+
+        /** @var ObjectType $fieldObjectType */
+        $fieldObjectType = $this->schema->findObjectType($type);
+        if(!$fieldObjectType){
+            return;
+        }
+
+        if(!in_array($fieldEnumName, $this->_createdFieldEnums)) {
+
+            $enum = EnumType::factory($fieldEnumName);
+
+            $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
+            $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
+
+            /** @var EnumType $enumType */
+            foreach($this->schema->getEnumTypes() as $enumType){
+                $scalarTypes[] = $enumType->getName();
+            }
+
+            /** @var Field $typeField */
+            foreach($fieldObjectType->getFields() as $typeField){
+
+                if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
+                    continue;
+                }
+
+                $enum->value($typeField->getName(), $typeField->getName());
+            }
+
+            $this->schema->enum($enum);
+            $this->_createdFieldEnums[] = $enum;
+        }
+
         $field
-            ->arg(InputField::string('sortField'))
+            ->arg(InputField::factory('sortField', $fieldEnumName))
             ->arg(InputField::factory('sortDirection', 'SortDirection')
                 ->defaultValue(self::DIRECTION_ASC)
             );

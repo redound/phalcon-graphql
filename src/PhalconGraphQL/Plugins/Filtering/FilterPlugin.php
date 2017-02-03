@@ -39,7 +39,8 @@ class FilterPlugin extends Plugin
 
             $inputType = InputObjectType::factory($filterTypeName);
 
-            $scalarTypes = Types::scalars();
+            $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
+            $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
 
             /** @var EnumType $enumType */
             foreach($this->schema->getEnumTypes() as $enumType){
