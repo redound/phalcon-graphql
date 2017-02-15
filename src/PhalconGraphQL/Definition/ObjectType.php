@@ -21,6 +21,7 @@ class ObjectType
     protected $_allowedFieldRoles = [];
     protected $_deniedFieldRoles = [];
     protected $_plugins = [];
+    protected $_fieldPlugins = [];
     protected $_built = false;
 
     public function __construct($name=null, $description=null)
@@ -34,9 +35,14 @@ class ObjectType
         }
     }
 
-    public function plugin(ObjectTypePluginInterface $plugin)
+    public function plugin(ObjectTypePluginInterface $plugin, $addToFields=true)
     {
         $this->_plugins[] = $plugin;
+
+        if($addToFields){
+            $this->_fieldPlugins[] = $plugin;
+        }
+
         return $this;
     }
 
@@ -223,7 +229,7 @@ class ObjectType
                 $field->deny($this->_deniedFieldRoles[$fieldName]);
             }
 
-            foreach($this->_plugins as $plugin){
+            foreach($this->_fieldPlugins as $plugin){
                 $field->plugin($plugin);
             }
         }
@@ -242,7 +248,7 @@ class ObjectType
                 $group->denyField($fieldName, $roles);
             }
 
-            foreach($this->_plugins as $plugin){
+            foreach($this->_fieldPlugins as $plugin){
                 $group->plugin($plugin);
             }
         }

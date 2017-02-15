@@ -211,7 +211,7 @@ class ModelObjectType extends ObjectType
                 $field->deny($this->_deniedFieldRoles[$fieldName]);
             }
 
-            foreach($this->_plugins as $plugin){
+            foreach($this->_fieldPlugins as $plugin){
                 $field->plugin($plugin);
             }
         }
@@ -230,7 +230,7 @@ class ModelObjectType extends ObjectType
                 $group->denyField($fieldName, $roles);
             }
 
-            foreach($this->_plugins as $plugin){
+            foreach($this->_fieldPlugins as $plugin){
                 $group->plugin($plugin);
             }
         }
