@@ -25,4 +25,14 @@ class ListEmbedHandler
     {
         return $source instanceof ListEmbedResponse ? $source->getTotalCount() : null;
     }
+
+    /**
+     * @param ListEmbedResponse $source
+     *
+     * @return int
+     */
+    public function itemCount($source)
+    {
+        return $source instanceof ListEmbedResponse ? count($source->getItems()) : count($source);
+    }
 }
