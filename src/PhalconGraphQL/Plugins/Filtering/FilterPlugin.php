@@ -67,7 +67,7 @@ class FilterPlugin extends Plugin
             ->arg(InputField::factory('filter', $filterTypeName));
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
         $model = Core::getShortClass($field->getModel());
         $filter = isset($args['filter']) ? $args['filter'] : null;
@@ -83,7 +83,7 @@ class FilterPlugin extends Plugin
         }
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field)
+    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
     {
         $filter = isset($args['filter']) ? $args['filter'] : null;
 

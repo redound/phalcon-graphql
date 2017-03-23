@@ -56,8 +56,8 @@ trait FindModelTrait
                 ['id' => $id])
             ->limit(1);
 
-        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field]);
-        $this->_modifyQuery($phqlBuilder, $args, $field);
+        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field, false]);
+        $this->_modifyQuery($phqlBuilder, $args, $field, false);
 
         $this->_invokePlugins($field, 'modifyFindQuery', [$phqlBuilder, $id, $args, $field]);
         $this->_modifyFindQuery($phqlBuilder, $id, $args, $field);

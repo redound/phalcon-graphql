@@ -13,7 +13,7 @@ trait ModelQueryTrait
         throw new Exception(ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
-    protected function _modifyQuery(QueryBuilder $query, $args, Field $field)
+    protected function _modifyQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
     }
 

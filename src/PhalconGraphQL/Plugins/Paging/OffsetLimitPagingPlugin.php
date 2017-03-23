@@ -25,8 +25,12 @@ class OffsetLimitPagingPlugin extends Plugin
             ->arg(InputField::int('limit'));
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
+        if($isCount){
+            return;
+        }
+
         $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
         $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
 
@@ -39,8 +43,12 @@ class OffsetLimitPagingPlugin extends Plugin
         }
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field)
+    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
     {
+        if($isCount){
+            return $options;
+        }
+
         $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
         $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
 

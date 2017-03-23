@@ -54,12 +54,12 @@ trait RelationModelTrait
 
         $options = [];
 
-        $modifyResult = $this->_modifyRelationOptions($options, $source, $args, $field);
+        $modifyResult = $this->_modifyRelationOptions($options, $source, $args, $field, false);
         if ($modifyResult && is_array($modifyResult)) {
             $options = array_merge($options, $modifyResult);
         }
 
-        $options = $this->_invokePlugins($field, 'modifyRelationOptions', [$source, $args, $field], $options);
+        $options = $this->_invokePlugins($field, 'modifyRelationOptions', [$source, $args, $field, false], $options);
 
         $result = $model->getRelated($fieldName, $options);
 
@@ -70,7 +70,7 @@ trait RelationModelTrait
         return $result;
     }
 
-    protected function _modifyRelationOptions($options, $source, $args, Field $field)
+    protected function _modifyRelationOptions($options, $source, $args, Field $field, $isCount)
     {
     }
 

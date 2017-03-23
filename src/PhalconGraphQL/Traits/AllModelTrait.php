@@ -44,16 +44,38 @@ trait AllModelTrait
         $phqlBuilder = $modelsManager->createBuilder()
             ->from([\PhalconGraphQL\Core::getShortClass($model) => $model]);
 
-        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field]);
-        $this->_modifyQuery($phqlBuilder, $args, $field);
+        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field, false]);
+        $this->_modifyQuery($phqlBuilder, $args, $field, false);
 
-        $this->_invokePlugins($field, 'modifyAllQuery', [$phqlBuilder, $args, $field]);
+        $this->_invokePlugins($field, 'modifyAllQuery', [$phqlBuilder, $args, $field, false]);
         $this->_modifyAllQuery($phqlBuilder, $args, $field);
 
         return $phqlBuilder->getQuery()->execute();
     }
 
-    protected function _modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    protected function _getTotalCount($args, Field $field)
+    {
+        /** @var \Phalcon\Mvc\Model\Manager $modelsManager */
+        $modelsManager = $this->di->get(\PhalconGraphQL\Constants\Services::MODELS_MANAGER);
+        $model = $this->getModel($field);
+
+        $alias = \PhalconGraphQL\Core::getShortClass($model);
+
+        $phqlBuilder = $modelsManager->createBuilder()
+            ->columns('COUNT(['.$alias.'].[' . $this->_getModelPrimaryKey($field) . ']) as count')
+            ->from([$alias => $model]);
+
+        $this->_invokePlugins($field, 'modifyQuery', [$phqlBuilder, $args, $field, true]);
+        $this->_modifyQuery($phqlBuilder, $args, $field, true);
+
+        $this->_invokePlugins($field, 'modifyAllQuery', [$phqlBuilder, $args, $field, true]);
+        $this->_modifyAllQuery($phqlBuilder, $args, $field, true);
+
+        $results = $phqlBuilder->getQuery()->execute();
+        return count($results) > 0 ? $results[0]->count : 0;
+    }
+
+    protected function _modifyAllQuery(QueryBuilder $query, $args, Field $field, $count=false)
     {
     }
 
@@ -69,7 +91,7 @@ trait AllModelTrait
 
         if($returnType->getHandler() == \PhalconGraphQL\Handlers\ListEmbedHandler::class) {
 
-            return \PhalconGraphQL\Responses\ListEmbedResponse::factory($result, $model::count());
+            return \PhalconGraphQL\Responses\ListEmbedResponse::factory($result, $this->_getTotalCount($args, $field));
         }
         else {
 

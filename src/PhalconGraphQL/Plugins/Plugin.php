@@ -85,12 +85,12 @@ abstract class Plugin implements PluginInterface
 
     }
 
-    public function modifyQuery(QueryBuilder $query, $args, Field $field)
+    public function modifyQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
 
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field)
+    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
 
     }
@@ -120,7 +120,7 @@ abstract class Plugin implements PluginInterface
 
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field)
+    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
     {
 
     }
