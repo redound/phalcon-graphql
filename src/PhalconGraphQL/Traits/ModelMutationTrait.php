@@ -99,7 +99,7 @@ trait ModelMutationTrait
         return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance);
     }
 
-    private function _getMessages($messages)
+    protected function _getMessages($messages)
     {
         $messages = isset($messages) ? $messages : [];
 
