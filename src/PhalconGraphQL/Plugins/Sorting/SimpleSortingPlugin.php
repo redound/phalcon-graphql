@@ -5,6 +5,7 @@ namespace PhalconGraphQL\Plugins\Sorting;
 use Phalcon\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\EnumType;
+use PhalconGraphQL\Definition\EnumTypeValue;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
@@ -47,7 +48,7 @@ class SimpleSortingPlugin extends Plugin
             return;
         }
 
-        if(!in_array($fieldEnumName, $this->_createdFieldEnums)) {
+        if(!($field instanceof RelationModelField) && !in_array($fieldEnumName, $this->_createdFieldEnums)) {
 
             $enum = EnumType::factory($fieldEnumName);
 
