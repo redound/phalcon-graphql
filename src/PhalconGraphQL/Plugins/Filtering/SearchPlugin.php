@@ -15,6 +15,13 @@ use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 class SearchPlugin extends Plugin
 {
+    protected $_shouldStartWithQuery = true;
+
+    function __construct($shouldStartWithQuery = true)
+    {
+        $this->_shouldStartWithQuery = $shouldStartWithQuery;
+    }
+
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
@@ -38,11 +45,22 @@ class SearchPlugin extends Plugin
             return;
         }
 
+        $isFirst = true;
+        $orQuery = '';
+
         foreach ($searchFields as $searchField) {
 
-            $query->andWhere('[' . $modelShort . '].[' . $searchField . '] LIKE CONCAT(:searchQuery:, "%")',
-                ['searchQuery' => $search]);
+            if(!$isFirst) {
+                $orQuery .= ' OR ';
+            }
+
+            $concatParams = $this->_shouldStartWithQuery ? ':searchQuery:, "%"' : '"%", :searchQuery:, "%"';
+            $orQuery .= '[' . $modelShort . '].[' . $searchField . '] LIKE CONCAT(' . $concatParams . ')';
+
+            $isFirst = false;
         }
+
+        $query->andWhere('(' . $orQuery . ')', ['searchQuery' => $search]);
     }
 
     public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
