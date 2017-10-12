@@ -48,7 +48,7 @@ class SimpleSortingPlugin extends Plugin
             return;
         }
 
-        if(!($field instanceof RelationModelField) && !in_array($fieldEnumName, $this->_createdFieldEnums)) {
+        if(!in_array($fieldEnumName, $this->_createdFieldEnums)) {
 
             $enum = EnumType::factory($fieldEnumName);
 
