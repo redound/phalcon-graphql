@@ -76,11 +76,16 @@ class FilterPlugin extends Plugin
             return;
         }
 
-        foreach($filter as $field => $value) {
+        foreach($filter as $filterField => $filterValue) {
 
-            $valueKey = 'filterValue_' . $field;
-            $query->andWhere('[' . $model . '].[' . $field . '] = :'.$valueKey.':', [$valueKey => $value]);
+            $this->modifyAllQueryForFilter($query, $filterField, $filterValue, $model, $field, $isCount);
         }
+    }
+
+    protected function modifyAllQueryForFilter(QueryBuilder $query, $filterField, $filterValue, $modelName, Field $field, $isCount)
+    {
+        $valueKey = 'filterValue_' . $filterField;
+        $query->andWhere('[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':', [$valueKey => $filterValue]);
     }
 
     public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
