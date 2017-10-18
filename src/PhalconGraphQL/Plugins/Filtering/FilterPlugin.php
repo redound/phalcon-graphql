@@ -39,23 +39,7 @@ class FilterPlugin extends Plugin
 
             $inputType = InputObjectType::factory($filterTypeName);
 
-            $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
-            $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
-
-            /** @var EnumType $enumType */
-            foreach($this->schema->getEnumTypes() as $enumType){
-                $scalarTypes[] = $enumType->getName();
-            }
-
-            /** @var Field $typeField */
-            foreach($fieldObjectType->getFields() as $typeField){
-
-                if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
-                    continue;
-                }
-
-                $inputType->field(InputField::factory($typeField->getName(), $typeField->getType()));
-            }
+            $this->configureFilterInputObjectType($fieldObjectType, $inputType);
 
             $this->schema->inputObject($inputType);
             $inputType->build($this->schema, $di);
@@ -80,6 +64,36 @@ class FilterPlugin extends Plugin
 
             $this->modifyAllQueryForFilter($query, $filterField, $filterValue, $model, $field, $isCount);
         }
+    }
+
+    protected function configureFilterInputObjectType(ObjectType $fieldObjectType, InputObjectType $inputType)
+    {
+        $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
+        $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
+
+        /** @var EnumType $enumType */
+        foreach($this->schema->getEnumTypes() as $enumType){
+            $scalarTypes[] = $enumType->getName();
+        }
+
+        /** @var Field $typeField */
+        foreach($fieldObjectType->getFields() as $typeField){
+
+            if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
+                continue;
+            }
+
+            $inputType->field(InputField::factory($typeField->getName(), $typeField->getType()));
+        }
+
+        foreach($this->getExtraInputObjectTypeFields() as $field){
+            $inputType->field($field);
+        }
+    }
+
+    protected function getExtraInputObjectTypeFields()
+    {
+        return [];
     }
 
     protected function modifyAllQueryForFilter(QueryBuilder $query, $filterField, $filterValue, $modelName, Field $field, $isCount)
