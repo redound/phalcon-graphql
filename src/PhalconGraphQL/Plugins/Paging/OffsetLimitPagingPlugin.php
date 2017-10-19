@@ -11,6 +11,7 @@ use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
+use PhalconGraphQL\Responses\ListEmbedResponse;
 
 class OffsetLimitPagingPlugin extends Plugin
 {
@@ -61,5 +62,27 @@ class OffsetLimitPagingPlugin extends Plugin
         }
 
         return $options;
+    }
+
+    public function modifyAllResponse($response, $args, Field $field)
+    {
+        $this->_addOffsetLimitToResponse($response, $args);
+    }
+
+    public function modifyRelationResponse($response, $source, $args, Field $field)
+    {
+        $this->_addOffsetLimitToResponse($response, $args);
+    }
+
+    protected function _addOffsetLimitToResponse($response, $args){
+
+        if($response instanceof ListEmbedResponse){
+
+            $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
+            $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
+
+            $response->setOffset($offset);
+            $response->setLimit($limit);
+        }
     }
 }

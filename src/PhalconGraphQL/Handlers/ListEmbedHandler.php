@@ -35,4 +35,24 @@ class ListEmbedHandler
     {
         return $source instanceof ListEmbedResponse ? count($source->getItems()) : count($source);
     }
+
+    /**
+     * @param ListEmbedResponse $source
+     *
+     * @return int
+     */
+    public function offset($source)
+    {
+        return $source instanceof ListEmbedResponse ? $source->getOffset() : null;
+    }
+
+    /**
+     * @param ListEmbedResponse $source
+     *
+     * @return int
+     */
+    public function limit($source)
+    {
+        return $source instanceof ListEmbedResponse ? $source->getLimit() : null;
+    }
 }
