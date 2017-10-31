@@ -23,8 +23,6 @@ class SimpleSortingPlugin extends Plugin
     const DIRECTION_ASC = 'ASC';
     const DIRECTION_DESC = 'DESC';
 
-    protected $_createdFieldEnums = [];
-
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
@@ -48,14 +46,13 @@ class SimpleSortingPlugin extends Plugin
             return;
         }
 
-        if(!in_array($fieldEnumName, $this->_createdFieldEnums)) {
+        if(!$this->schema->hasEnum($fieldEnumName)) {
 
             $enum = EnumType::factory($fieldEnumName);
 
             $this->createEnumValues($fieldObjectType->getFields(), $enum);
 
             $this->schema->enum($enum);
-            $this->_createdFieldEnums[] = $enum;
         }
 
         $field
@@ -110,6 +107,7 @@ class SimpleSortingPlugin extends Plugin
         }
 
         foreach($this->getExtraEnumValues($fields) as $value){
+
             $enum->addValue($value);
         }
     }
