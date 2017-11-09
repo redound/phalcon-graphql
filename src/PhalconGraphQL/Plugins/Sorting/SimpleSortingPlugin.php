@@ -68,7 +68,7 @@ class SimpleSortingPlugin extends Plugin
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($sortField !== null){
+        if($sortField !== null && !$isCount){
             $this->modifyAllQueryForSort($query, $sortField, $sortDirection, $model, $field);
         }
     }
@@ -78,7 +78,7 @@ class SimpleSortingPlugin extends Plugin
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($sortField !== null){
+        if($sortField !== null && !$isCount){
             $options = $this->modifyRelationOptionsForSort($options, $sortField, $sortDirection, $field);
         }
 
