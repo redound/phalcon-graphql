@@ -23,6 +23,18 @@ class UnionTypeFactory
                 }
 
                 return $types;
+            },
+            'resolveType' => function($value) use ($typeRegistry) {
+
+                if($value === null){
+                    return null;
+                }
+
+                if(!isset($value['__typename'])){
+                    throw new \Exception('Key __typename needs to be present in response');
+                }
+
+                return $typeRegistry->resolve($value['__typename']);
             }
         ]);
     }
