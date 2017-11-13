@@ -23,8 +23,6 @@ class SimpleSortingPlugin extends Plugin
     const DIRECTION_ASC = 'ASC';
     const DIRECTION_DESC = 'DESC';
 
-    protected $_createdFieldEnums = [];
-
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
@@ -48,14 +46,13 @@ class SimpleSortingPlugin extends Plugin
             return;
         }
 
-        if(!in_array($fieldEnumName, $this->_createdFieldEnums)) {
+        if(!$this->schema->hasEnum($fieldEnumName)) {
 
             $enum = EnumType::factory($fieldEnumName);
 
             $this->createEnumValues($fieldObjectType->getFields(), $enum);
 
             $this->schema->enum($enum);
-            $this->_createdFieldEnums[] = $enum;
         }
 
         $field
@@ -71,7 +68,7 @@ class SimpleSortingPlugin extends Plugin
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($sortField !== null){
+        if($sortField !== null && !$isCount){
             $this->modifyAllQueryForSort($query, $sortField, $sortDirection, $model, $field);
         }
     }
@@ -81,7 +78,7 @@ class SimpleSortingPlugin extends Plugin
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;
 
-        if($sortField !== null){
+        if($sortField !== null && !$isCount){
             $options = $this->modifyRelationOptionsForSort($options, $sortField, $sortDirection, $field);
         }
 
@@ -110,6 +107,7 @@ class SimpleSortingPlugin extends Plugin
         }
 
         foreach($this->getExtraEnumValues($fields) as $value){
+
             $enum->addValue($value);
         }
     }

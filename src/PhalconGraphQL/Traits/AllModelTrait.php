@@ -72,7 +72,7 @@ trait AllModelTrait
         $this->_modifyAllQuery($phqlBuilder, $args, $field, true);
 
         $results = $phqlBuilder->getQuery()->execute();
-        return count($results) > 0 ? $results[0]->count : 0;
+        return count($results) > 0 ? (int)$results[0]->count : 0;
     }
 
     protected function _modifyAllQuery(QueryBuilder $query, $args, Field $field, $count=false)

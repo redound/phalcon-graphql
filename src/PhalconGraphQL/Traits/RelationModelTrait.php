@@ -87,7 +87,7 @@ trait RelationModelTrait
 
             $countFunction = 'count' . ucfirst($field->getName());
 
-            $count = $source->$countFunction();
+            $count = (int)$source->$countFunction();
 
             return \PhalconGraphQL\Responses\ListEmbedResponse::factory($data, $count);
         }
