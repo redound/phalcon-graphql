@@ -10,6 +10,8 @@ interface SchemaMountableInterface
 
     public function getObjectTypes();
 
+    public function getUnionTypes();
+
     public function getInputObjectTypes();
 
     public function getObjectTypeGroups();

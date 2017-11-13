@@ -14,6 +14,7 @@ use PhalconGraphQL\Definition\ScalarTypes\DateTimeScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
+use PhalconGraphQL\Definition\UnionType;
 use PhalconGraphQL\Dispatcher;
 
 class SchemaFactory
@@ -56,6 +57,11 @@ class SchemaFactory
         /** @var ObjectType $objectType */
         foreach ($objectTypes as $objectType) {
             $typeRegistry->register($objectType->getName(), ObjectTypeFactory::build($dispatcher, $schema, $objectType, $typeRegistry));
+        }
+
+        /** @var UnionType $unionType */
+        foreach ($schema->getUnionTypes() as $unionType) {
+            $typeRegistry->register($unionType->getName(), UnionTypeFactory::build($dispatcher, $schema, $unionType, $typeRegistry));
         }
 
         /** @var InputObjectType $inputObjectType */

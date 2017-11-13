@@ -7,6 +7,7 @@ use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
+use PhalconGraphQL\Definition\UnionType;
 
 abstract class Plugin implements PluginInterface
 {
@@ -36,6 +37,16 @@ abstract class Plugin implements PluginInterface
     }
 
     public function afterBuildObjectType(ObjectType $objectType, DiInterface $di)
+    {
+
+    }
+
+    public function beforeBuildUnionType(UnionType $unionType, DiInterface $di)
+    {
+
+    }
+
+    public function afterBuildUnionType(UnionType $unionType, DiInterface $di)
     {
 
     }
