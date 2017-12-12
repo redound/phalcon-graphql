@@ -24,7 +24,7 @@ trait ModelQueryTrait
         /** @var Model $modelInstance */
         $modelInstance = new $modelClass();
 
-        return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance);
+        return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance) ?: 'id';
     }
 
     protected function _beforeHandle($args, Field $field)
