@@ -15,6 +15,7 @@ class ObjectType
     protected $_description;
     protected $_handler;
     protected $_fields = [];
+    protected $_fieldByName = [];
     protected $_fieldGroups = [];
     protected $_allowedRoles = [];
     protected $_deniedRoles = [];
@@ -110,6 +111,8 @@ class ObjectType
         $this->removeField($field->getName());
 
         $this->_fields[] = $field;
+        $this->_fieldByName[$field->getName()] = $field;
+
         $this->_built = false;
 
         return $this;
@@ -117,19 +120,16 @@ class ObjectType
 
     public function removeField($fieldName)
     {
-        $foundIndex = null;
+        $field = $this->findField($fieldName);
 
-        foreach($this->_fields as $index => $field){
+        if($field){
 
-            if($field->getName() == $fieldName){
+            $fieldIndex = array_search($field, $this->_fields);
+            if($fieldIndex !== false){
 
-                $foundIndex = $index;
-                break;
+                array_splice($this->_fields, $foundIndex, 1);
+                unset($this->_fieldByName[$fieldName]);
             }
-        }
-
-        if($foundIndex !== null) {
-            array_splice($this->_fields, $foundIndex, 1);
         }
 
         return $this;
@@ -137,14 +137,12 @@ class ObjectType
 
     public function fieldExists($fieldName)
     {
-        foreach($this->_fields as $index => $field){
+        return array_key_exists($fieldName, $this->_fieldByName);
+    }
 
-            if($field->getName() == $fieldName){
-                return true;
-            }
-        }
-
-        return false;
+    public function findField($fieldName)
+    {
+        return array_key_exists($fieldName, $this->_fieldByName) ? $this->_fieldByName[$fieldName] : null;
     }
 
     public function getFields()

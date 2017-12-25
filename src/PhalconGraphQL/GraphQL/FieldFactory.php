@@ -2,6 +2,9 @@
 
 namespace PhalconGraphQL\GraphQL;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\NameNode;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\InputField;
@@ -11,7 +14,7 @@ use PhalconGraphQL\Dispatcher;
 
 class FieldFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, ObjectType $objectType, Field $field, TypeRegistry $typeRegistry)
+    public static function build(Dispatcher $dispatcher, Schema $schema, ObjectType $objectType, Field $field)
     {
         $type = $field->getType();
         $nonNull = $field->getNonNull();
@@ -22,14 +25,14 @@ class FieldFactory
 
         /** @var InputField $inputField */
         foreach ($field->getArgs() as $inputField) {
-            $args[$inputField->getName()] = InputFieldFactory::build($inputField, $typeRegistry);
+            $args[] = InputFieldFactory::build($inputField);
         }
 
-        return [
+        return new FieldDefinitionNode([
+            'name' => new NameNode(['value' => $field->getName()]),
             'description' => $field->getDescription(),
-            'type' => $typeRegistry->resolve($type, $nonNull, $isList, $isNonNullList),
-            'args' => $args,
-            'resolve' => $dispatcher->createResolver($schema, $objectType, $field)
-        ];
+            'type' => TypeUtils::node($type, $nonNull, $isList, $isNonNullList),
+            'arguments' => $args
+        ]);
     }
 }

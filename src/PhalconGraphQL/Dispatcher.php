@@ -2,13 +2,16 @@
 
 namespace PhalconGraphQL;
 
+use GraphQL\Error\Debug;
+use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
+use GraphQL\Utils\BuildSchema;
 use Phalcon\Http\Request;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
-use PhalconGraphQL\GraphQL\SchemaFactory;
+use PhalconGraphQL\GraphQL\DocumentFactory;
 use PhalconGraphQL\Handlers\Handler;
 use PhalconGraphQL\Plugins\PluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
@@ -59,11 +62,18 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $handler;
     }
 
-    public function createResolver(Schema $schema, ObjectType $objectType, Field $field)
+    public function createDefaultFieldResolver(Schema $schema)
     {
         $dispatcher = $this;
 
-        return function ($source, $args) use ($schema, $objectType, $field, $dispatcher) {
+        return function ($source, $args, $context, \GraphQL\Type\Definition\ResolveInfo $info) use ($schema, $dispatcher) {
+
+            $objectType = $info->parentType ? $schema->findObjectType($info->parentType->name) : null;
+            $field = $objectType ? $objectType->findField($info->fieldName) : null;
+
+            if(!$objectType || !$field){
+                return Executor::defaultFieldResolver($source, $args, $context, $info);
+            }
 
             /** @var PluginInterface $plugin */
             foreach($schema->getPlugins() as $plugin){
@@ -142,9 +152,20 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         };
     }
 
+    public function createTypeConfigDecorator(Schema $schema)
+    {
+        return function($typeConfig, $typeDefinitionNode) {
+
+            $name = $typeConfig['name'];
+
+            return $typeConfig;
+        };
+    }
+
     public function dispatch(Schema $schema, Request $request = null)
     {
-        $graphqlSchema = SchemaFactory::build($this, $schema, $this->getDI());
+        $document = DocumentFactory::build($this, $schema, $this->getDI());
+        $graphqlSchema = BuildSchema::build($document, $this->createTypeConfigDecorator($schema));
 
         if(!$request) {
             $request = $this->di->get(Services::REQUEST);
@@ -158,15 +179,18 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
         $variableValues = is_string($variableValuesRaw) ? json_decode($variableValuesRaw, true) : $variableValuesRaw;
 
-        $result = GraphQL::execute(
+        $result = GraphQL::executeQuery(
             $graphqlSchema,
             $requestString,
             null, // rootValue
             null, // context
             $variableValues,
-            $operationName
+            $operationName,
+            $this->createDefaultFieldResolver($schema)
         );
 
-        return $result;
+        $debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
+
+        return $result->toArray($debug);
     }
 }

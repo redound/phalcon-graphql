@@ -2,6 +2,11 @@
 
 namespace PhalconGraphQL\GraphQL;
 
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaDefinitionNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Phalcon\DiInterface;
@@ -17,13 +22,13 @@ use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Definition\UnionType;
 use PhalconGraphQL\Dispatcher;
 
-class SchemaFactory
+class DocumentFactory
 {
     public static function build(Dispatcher $dispatcher, Schema $schema, DiInterface $di)
     {
         $schema->build($di);
 
-        $typeRegistry = new TypeRegistry();
+        $definitions = [];
 
         $defaultScalarTypes = [
 
@@ -38,47 +43,34 @@ class SchemaFactory
             Types::JSON => new JsonScalarType
         ];
 
-        foreach ($defaultScalarTypes as $name => $type) {
-            $typeRegistry->register($name, $type);
-        }
+        $scalarTypes = array_merge($defaultScalarTypes, $schema->getScalarTypes());
 
-        /** @var ScalarType $scalarType */
-        foreach($schema->getScalarTypes() as $scalarType) {
-            $typeRegistry->register($scalarType->name, $scalarType);
+        foreach ($scalarTypes as $name => $type) {
+            $definitions[] = new ScalarTypeDefinitionNode(['name' => new NameNode(['value' => $name])]);
         }
 
         /** @var EnumType $enumType */
         foreach ($schema->getEnumTypes() as $enumType) {
-            $typeRegistry->register($enumType->getName(), EnumTypeFactory::build($enumType));
+            $definitions[] = EnumTypeFactory::build($enumType);
         }
 
-        $objectTypes = $schema->getObjectTypes();
-
         /** @var ObjectType $objectType */
-        foreach ($objectTypes as $objectType) {
-            $typeRegistry->register($objectType->getName(), ObjectTypeFactory::build($dispatcher, $schema, $objectType, $typeRegistry));
+        foreach ($schema->getObjectTypes() as $objectType) {
+            $definitions[] = ObjectTypeFactory::build($dispatcher, $schema, $objectType);
         }
 
         /** @var UnionType $unionType */
         foreach ($schema->getUnionTypes() as $unionType) {
-            $typeRegistry->register($unionType->getName(), UnionTypeFactory::build($dispatcher, $schema, $unionType, $typeRegistry));
+            $definitions[] = UnionTypeFactory::build($dispatcher, $schema, $unionType);
         }
 
         /** @var InputObjectType $inputObjectType */
         foreach ($schema->getInputObjectTypes() as $inputObjectType) {
-            $typeRegistry->register($inputObjectType->getName(), InputObjectTypeFactory::build($inputObjectType, $typeRegistry));
+            $definitions[] = InputObjectTypeFactory::build($inputObjectType);
         }
 
-        $schemaFields = [];
-
-        if ($typeRegistry->hasType(Types::QUERY)) {
-            $schemaFields['query'] = $typeRegistry->resolve(Types::QUERY);
-        }
-
-        if ($typeRegistry->hasType(Types::MUTATION)) {
-            $schemaFields['mutation'] = $typeRegistry->resolve(Types::MUTATION);
-        }
-
-        return new \GraphQL\Schema($schemaFields);
+        return new DocumentNode([
+            'definitions' => $definitions
+        ]);
     }
 }
