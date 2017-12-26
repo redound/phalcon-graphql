@@ -13,13 +13,13 @@ use PhalconGraphQL\Dispatcher;
 
 class ObjectTypeFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, SchemaObjectType $objectType)
+    public static function build(Schema $schema, SchemaObjectType $objectType)
     {
         $fields = [];
 
         /** @var Field $field */
         foreach ($objectType->getFields() as $field) {
-            $fields[] = FieldFactory::build($dispatcher, $schema, $objectType, $field);
+            $fields[] = FieldFactory::build($schema, $objectType, $field);
         }
 
         return new ObjectTypeDefinitionNode([

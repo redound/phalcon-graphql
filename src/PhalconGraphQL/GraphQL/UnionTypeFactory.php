@@ -11,7 +11,7 @@ use PhalconGraphQL\Dispatcher;
 
 class UnionTypeFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, SchemaUnionType $unionType)
+    public static function build(Schema $schema, SchemaUnionType $unionType)
     {
         $types = [];
 

@@ -17,15 +17,4 @@ class DateTimeScalarType extends DateScalarType
     {
         parent::__construct($format);
     }
-
-    public function parseValue($value)
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $date = $this->getDateTime($value);
-
-        return $date->format("Y-m-d H:i:s");
-    }
 }

@@ -20,33 +20,16 @@ use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Definition\UnionType;
-use PhalconGraphQL\Dispatcher;
 
 class DocumentFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, DiInterface $di)
+    public static function build(Schema $schema)
     {
-        $schema->build($di);
-
         $definitions = [];
 
-        $defaultScalarTypes = [
-
-            Types::STRING => Type::string(),
-            Types::INT => Type::int(),
-            Types::FLOAT => Type::float(),
-            Types::BOOLEAN => Type::boolean(),
-            Types::ID => Type::id(),
-
-            Types::DATE => new DateScalarType,
-            Types::DATE_TIME => new DateTimeScalarType,
-            Types::JSON => new JsonScalarType
-        ];
-
-        $scalarTypes = array_merge($defaultScalarTypes, $schema->getScalarTypes());
-
-        foreach ($scalarTypes as $name => $type) {
-            $definitions[] = new ScalarTypeDefinitionNode(['name' => new NameNode(['value' => $name])]);
+        /** @var ScalarType $scalarType */
+        foreach ($schema->getScalarTypes() as $scalarType) {
+            $definitions[] = new ScalarTypeDefinitionNode(['name' => new NameNode(['value' => $scalarType->name])]);
         }
 
         /** @var EnumType $enumType */
@@ -56,12 +39,12 @@ class DocumentFactory
 
         /** @var ObjectType $objectType */
         foreach ($schema->getObjectTypes() as $objectType) {
-            $definitions[] = ObjectTypeFactory::build($dispatcher, $schema, $objectType);
+            $definitions[] = ObjectTypeFactory::build($schema, $objectType);
         }
 
         /** @var UnionType $unionType */
         foreach ($schema->getUnionTypes() as $unionType) {
-            $definitions[] = UnionTypeFactory::build($dispatcher, $schema, $unionType);
+            $definitions[] = UnionTypeFactory::build($schema, $unionType);
         }
 
         /** @var InputObjectType $inputObjectType */

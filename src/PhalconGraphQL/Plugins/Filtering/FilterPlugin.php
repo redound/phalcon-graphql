@@ -18,8 +18,6 @@ use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 class FilterPlugin extends Plugin
 {
-    protected $_createdFilterTypes = [];
-
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
@@ -35,7 +33,7 @@ class FilterPlugin extends Plugin
             return;
         }
 
-        if(!in_array($filterTypeName, $this->_createdFilterTypes)) {
+        if(!$this->schema->hasType($filterTypeName)) {
 
             $inputType = InputObjectType::factory($filterTypeName);
 
@@ -43,8 +41,6 @@ class FilterPlugin extends Plugin
 
             $this->schema->inputObject($inputType);
             $inputType->build($this->schema, $di);
-
-            $this->_createdFilterTypes[] = $inputType;
         }
 
         $field

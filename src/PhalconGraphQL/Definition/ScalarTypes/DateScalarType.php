@@ -47,8 +47,9 @@ class DateScalarType extends ScalarType
     public function parseLiteral($ast)
     {
         if ($ast instanceof \StringValue || $ast instanceof \IntValue) {
-            return $ast->value;
+            return $this->parseValue($ast->value);
         }
+
         return null;
     }
 
