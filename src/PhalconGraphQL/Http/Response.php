@@ -4,7 +4,7 @@ namespace PhalconGraphQL\Http;
 
 use PhalconApi\Http\Request;
 use PhalconGraphQL\Constants\Services;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 
 class Response extends \PhalconApi\Http\Response
 {

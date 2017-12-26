@@ -105,7 +105,7 @@ class ModelCollection extends Collection
     }
 
 
-    public function queryField(Field $field, $objectType=Types::QUERY)
+    public function queryField(Field $field, $objectType=Types::VIEWER)
     {
         $this->field($objectType, $field);
         $this->_queryFields[] = $field;
@@ -122,7 +122,7 @@ class ModelCollection extends Collection
     }
 
 
-    public function all($objectType=Types::QUERY, $name=null, $description=null)
+    public function all($objectType=Types::VIEWER, $name=null, $description=null)
     {
         $field = AllModelField::factory($this->_modelClass, $name, null, $description);
 
@@ -134,7 +134,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function find($objectType=Types::QUERY, $name=null, $description=null)
+    public function find($objectType=Types::VIEWER, $name=null, $description=null)
     {
         $field = FindModelField::factory($this->_modelClass, $name, null, $description);
 
@@ -192,7 +192,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function crud($queryObjectType = Types::QUERY, $mutationObjectType = Types::MUTATION)
+    public function crud($queryObjectType = Types::VIEWER, $mutationObjectType = Types::MUTATION)
     {
         $this
             ->all($queryObjectType)

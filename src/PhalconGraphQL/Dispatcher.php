@@ -3,6 +3,8 @@
 namespace PhalconGraphQL;
 
 use GraphQL\Error\Debug;
+use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
 use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ScalarType;
@@ -67,7 +69,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $handler;
     }
 
-    public function createDefaultFieldResolver(Schema $schema)
+    protected function createDefaultFieldResolver(Schema $schema)
     {
         $dispatcher = $this;
 
@@ -157,12 +159,27 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         };
     }
 
-    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, Request $request = null)
+    protected function formatError(Error $error, $debug=false)
     {
-        if(!$request) {
-            $request = $this->di->get(Services::REQUEST);
+        $formatted = FormattedError::createFromException($error);
+        $previous = $error->getPrevious();
+
+        if($previous instanceof \PhalconGraphQL\Exception){
+
+            $formatted['code'] = $previous->getCode();
+            $formatted['userInfo'] = $previous->getUserInfo();
+
+            if($debug){
+                $formatted['developerInfo'] = $previous->getDeveloperInfo();
+            }
         }
 
+        return $formatted;
+    }
+
+    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, $debugMode=false)
+    {
+        $request = $this->di->get(Services::REQUEST);
         $data = $request->getPostedData();
 
         $requestString = isset($data['query']) && !empty($data['query']) ? $data['query'] : null;
@@ -181,8 +198,10 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
             $this->createDefaultFieldResolver($schema)
         );
 
-        $debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE;
+        $flags = $debugMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : null;
 
-        return $result->toArray($debug);
+        return $result
+            ->setErrorFormatter(function($error) use ($debugMode) { return $this->formatError($error, $debugMode); })
+            ->toArray($flags);
     }
 }

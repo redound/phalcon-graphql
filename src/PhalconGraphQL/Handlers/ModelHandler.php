@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Handlers;
 
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
 use PhalconGraphQL\Definition\Fields\RelationModelField;

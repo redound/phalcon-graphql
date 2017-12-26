@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Definition;
 
 use Phalcon\DiInterface;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 
 class InputObjectType
 {

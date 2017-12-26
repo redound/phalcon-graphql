@@ -6,7 +6,7 @@ use Phalcon\Di;
 use Phalcon\DiInterface;
 use PhalconApi\Acl\MountingEnabledAdapterInterface as MountingEnabledAclAdapterInterface;
 use PhalconApi\Constants\ErrorCodes;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
