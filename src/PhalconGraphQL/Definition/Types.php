@@ -13,7 +13,7 @@ class Types
     const ID = "ID";
     const DATE = "Date";
     const DATE_TIME = "DateTime";
-    const JSON = "Json";
+    const JSON = "JSON";
 
     const QUERY = "Query";
     const MUTATION = "Mutation";

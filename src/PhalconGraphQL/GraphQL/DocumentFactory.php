@@ -20,6 +20,7 @@ use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Definition\UnionType;
+use GraphQL\Type\Schema as GraphQLSchema;
 
 class DocumentFactory
 {
@@ -57,9 +58,9 @@ class DocumentFactory
         ]);
     }
 
-    public static function createTypeConfigDecorator(Schema $schema)
+    public static function createTypeConfigDecorator(Schema $schema, \Closure $graphqlSchemaProvider)
     {
-        return function($typeConfig, $typeDefinitionNode) use ($schema) {
+        return function($typeConfig, $typeDefinitionNode) use ($schema, $graphqlSchemaProvider) {
 
             $name = $typeConfig['name'];
             $type = $schema->findType($name);
@@ -89,8 +90,29 @@ class DocumentFactory
                 $typeConfig['parseValue'] = [$type, 'parseValue'];
                 $typeConfig['parseLiteral'] = [$type, 'parseLiteral'];
             }
+            else if($type instanceof UnionType){
+
+                $typeConfig['resolveType'] = self::createResolveType($graphqlSchemaProvider);
+            }
 
             return $typeConfig;
+        };
+    }
+
+    public static function createResolveType(\Closure $graphqlSchemaProvider)
+    {
+        return function($value) use ($graphqlSchemaProvider) {
+
+            if($value === null){
+                return null;
+            }
+
+            if(!isset($value['__typename'])){
+                throw new \Exception('Key __typename needs to be present in response');
+            }
+
+            $graphqlSchema = $graphqlSchemaProvider();
+            return $graphqlSchema->getType($value['__typename']);
         };
     }
 }
