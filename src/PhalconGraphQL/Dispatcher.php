@@ -19,6 +19,7 @@ use PhalconGraphQL\GraphQL\DocumentFactory;
 use PhalconGraphQL\Handlers\Handler;
 use PhalconGraphQL\Plugins\PluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
+use GraphQL\Type\Schema as GraphQLSchema;
 
 class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 {
@@ -156,50 +157,8 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         };
     }
 
-    public function createTypeConfigDecorator(Schema $schema)
+    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, Request $request = null)
     {
-        return function($typeConfig, $typeDefinitionNode) use ($schema) {
-
-            $name = $typeConfig['name'];
-            $type = $schema->findType($name);
-            if(!$type){
-                return $typeConfig;
-            }
-
-            if($type instanceof EnumType){
-
-                $valueConfigs = $typeConfig['values'];
-
-                // Add enum values
-                foreach($type->getValues() as $value){
-
-                    $config = $valueConfigs[$value->getName()];
-                    $config['value'] = $value->getValue();
-
-                    $valueConfigs[$value->getName()] = $config;
-                }
-
-                $typeConfig['values'] = $valueConfigs;
-            }
-            else if($type instanceof ScalarType){
-
-                // Add scalar methods
-                $typeConfig['serialize'] = [$type, 'serialize'];
-                $typeConfig['parseValue'] = [$type, 'parseValue'];
-                $typeConfig['parseLiteral'] = [$type, 'parseLiteral'];
-            }
-
-            return $typeConfig;
-        };
-    }
-
-    public function dispatch(Schema $schema, Request $request = null)
-    {
-        $schema->build($this->getDI());
-
-        $document = DocumentFactory::build($schema);
-        $graphqlSchema = BuildSchema::build($document, $this->createTypeConfigDecorator($schema));
-
         if(!$request) {
             $request = $this->di->get(Services::REQUEST);
         }

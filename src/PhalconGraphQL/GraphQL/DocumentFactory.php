@@ -56,4 +56,41 @@ class DocumentFactory
             'definitions' => $definitions
         ]);
     }
+
+    public static function createTypeConfigDecorator(Schema $schema)
+    {
+        return function($typeConfig, $typeDefinitionNode) use ($schema) {
+
+            $name = $typeConfig['name'];
+            $type = $schema->findType($name);
+            if(!$type){
+                return $typeConfig;
+            }
+
+            if($type instanceof EnumType){
+
+                $valueConfigs = $typeConfig['values'];
+
+                // Add enum values
+                foreach($type->getValues() as $value){
+
+                    $config = $valueConfigs[$value->getName()];
+                    $config['value'] = $value->getValue();
+
+                    $valueConfigs[$value->getName()] = $config;
+                }
+
+                $typeConfig['values'] = $valueConfigs;
+            }
+            else if($type instanceof ScalarType){
+
+                // Add scalar methods
+                $typeConfig['serialize'] = [$type, 'serialize'];
+                $typeConfig['parseValue'] = [$type, 'parseValue'];
+                $typeConfig['parseLiteral'] = [$type, 'parseLiteral'];
+            }
+
+            return $typeConfig;
+        };
+    }
 }
