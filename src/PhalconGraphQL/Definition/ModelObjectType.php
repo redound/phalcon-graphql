@@ -193,7 +193,10 @@ class ModelObjectType extends ObjectType
         }
 
         foreach($newFields as $field){
-            $this->field($field);
+
+            if(!$this->fieldExists($field->getName())) {
+                $this->field($field);
+            }
         }
 
         /** @var Field $field */
