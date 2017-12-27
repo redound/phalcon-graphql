@@ -127,7 +127,7 @@ class ObjectType
             $fieldIndex = array_search($field, $this->_fields);
             if($fieldIndex !== false){
 
-                array_splice($this->_fields, $foundIndex, 1);
+                array_splice($this->_fields, $fieldIndex, 1);
                 unset($this->_fieldByName[$fieldName]);
             }
         }
