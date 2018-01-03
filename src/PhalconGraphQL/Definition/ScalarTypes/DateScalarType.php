@@ -13,6 +13,8 @@ class DateScalarType extends ScalarType
     public $name = 'Date';
     public $description = 'The `Date` scalar type represents a date';
 
+    protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d"];
+
     protected $format;
 
     public function __construct($format = self::DEFAULT_DATE_FORMAT)
@@ -58,12 +60,30 @@ class DateScalarType extends ScalarType
         $date = false;
 
         try {
-            $date = new \DateTime(is_numeric($value) ? '@' . $value : $value);
+
+            if(is_numeric($value)){
+                $date = new \DateTime('@' . $value);
+            }
+            else {
+                $date = \DateTime::createFromFormat($this->format, $value);
+            }
+
+            if($date === false){
+
+                foreach($this->fallbackFormats as $format){
+
+                    $date = \DateTime::createFromFormat($format, $value);
+
+                    if($date !== false){
+                        break;
+                    }
+                }
+            }
         }
         catch(\Exception $e){}
 
         if($date === false){
-            throw new \Exception('Invalid date: ' . $value);
+            throw new \Exception('Invalid datetttt: ' . $value);
         }
 
         return $date;
