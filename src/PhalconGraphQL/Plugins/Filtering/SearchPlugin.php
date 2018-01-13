@@ -48,14 +48,18 @@ class SearchPlugin extends Plugin
         $isFirst = true;
         $orQuery = '';
 
+        $concatParams = $this->_shouldStartWithQuery ? ':searchQuery:, "%"' : '"%", :searchQuery:, "%"';
+        $clauseValue = 'CONCAT(' . $concatParams . ')';
+
         foreach ($searchFields as $searchField) {
 
             if(!$isFirst) {
                 $orQuery .= ' OR ';
             }
 
-            $concatParams = $this->_shouldStartWithQuery ? ':searchQuery:, "%"' : '"%", :searchQuery:, "%"';
-            $orQuery .= '[' . $modelShort . '].[' . $searchField . '] LIKE CONCAT(' . $concatParams . ')';
+            $this->_modifyAllQueryForSearchField($query, $searchField, $modelShort);
+
+            $orQuery .= $this->_getOrClause($searchField, $clauseValue, $modelShort);
 
             $isFirst = false;
         }
@@ -90,6 +94,16 @@ class SearchPlugin extends Plugin
         $options['bind'] = $bind;
 
         return $options;
+    }
+
+    protected function _modifyAllQueryForSearchField(QueryBuilder $query, $searchField, $modelShort){
+
+
+    }
+
+    protected function _getOrClause($searchField, $value, $modelShort){
+
+        return '[' . $modelShort . '].[' . $searchField . '] LIKE ' . $value;
     }
 
     protected function _getModelSearchFields($model){
