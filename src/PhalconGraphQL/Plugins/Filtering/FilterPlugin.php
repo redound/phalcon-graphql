@@ -18,8 +18,6 @@ use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 class FilterPlugin extends Plugin
 {
-    protected $_createdFilterTypes = [];
-
     public function beforeBuildField(Field $field, ObjectType $objectType, DiInterface $di)
     {
         if(!($field instanceof AllModelField) && !($field instanceof RelationModelField && $field->getIsList())) {
@@ -35,32 +33,14 @@ class FilterPlugin extends Plugin
             return;
         }
 
-        if(!in_array($filterTypeName, $this->_createdFilterTypes)) {
+        if(!$this->schema->hasType($filterTypeName)) {
 
             $inputType = InputObjectType::factory($filterTypeName);
 
-            $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
-            $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
-
-            /** @var EnumType $enumType */
-            foreach($this->schema->getEnumTypes() as $enumType){
-                $scalarTypes[] = $enumType->getName();
-            }
-
-            /** @var Field $typeField */
-            foreach($fieldObjectType->getFields() as $typeField){
-
-                if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
-                    continue;
-                }
-
-                $inputType->field(InputField::factory($typeField->getName(), $typeField->getType()));
-            }
+            $this->configureFilterInputObjectType($fieldObjectType, $inputType);
 
             $this->schema->inputObject($inputType);
             $inputType->build($this->schema, $di);
-
-            $this->_createdFilterTypes[] = $inputType;
         }
 
         $field
@@ -76,11 +56,46 @@ class FilterPlugin extends Plugin
             return;
         }
 
-        foreach($filter as $field => $value) {
+        foreach($filter as $filterField => $filterValue) {
 
-            $valueKey = 'filterValue_' . $field;
-            $query->andWhere('[' . $model . '].[' . $field . '] = :'.$valueKey.':', [$valueKey => $value]);
+            $this->modifyAllQueryForFilter($query, $filterField, $filterValue, $model, $field);
         }
+    }
+
+    protected function configureFilterInputObjectType(ObjectType $fieldObjectType, InputObjectType $inputType)
+    {
+        $schemaScalars = array_map(function($type){ return $type->name; }, $this->schema->getScalarTypes());
+        $scalarTypes = array_merge(Types::scalars(), $schemaScalars);
+
+        /** @var EnumType $enumType */
+        foreach($this->schema->getEnumTypes() as $enumType){
+            $scalarTypes[] = $enumType->getName();
+        }
+
+        /** @var Field $typeField */
+        foreach($fieldObjectType->getFields() as $typeField){
+
+            if($typeField->getIsList() || !in_array($typeField->getType(), $scalarTypes)){
+                continue;
+            }
+
+            $inputType->field(InputField::factory($typeField->getName(), $typeField->getType()));
+        }
+
+        foreach($this->getExtraInputObjectTypeFields() as $field){
+            $inputType->field($field);
+        }
+    }
+
+    protected function getExtraInputObjectTypeFields()
+    {
+        return [];
+    }
+
+    protected function modifyAllQueryForFilter(QueryBuilder $query, $filterField, $filterValue, $modelName, Field $field)
+    {
+        $valueKey = 'filterValue_' . $filterField;
+        $query->andWhere('[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':', [$valueKey => $filterValue]);
     }
 
     public function modifyRelationOptions($options, $source, $args, Field $field)
