@@ -13,7 +13,7 @@ class DateScalarType extends ScalarType
     public $name = 'Date';
     public $description = 'The `Date` scalar type represents a date';
 
-    protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d"];
+    protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d", \DateTime::ISO8601, 'Y-m-d\TH:i:s.uP'];
 
     protected $format;
 
@@ -83,7 +83,7 @@ class DateScalarType extends ScalarType
         catch(\Exception $e){}
 
         if($date === false){
-            throw new \Exception('Invalid datetttt: ' . $value);
+            throw new \Exception('Invalid date: ' . $value);
         }
 
         return $date;

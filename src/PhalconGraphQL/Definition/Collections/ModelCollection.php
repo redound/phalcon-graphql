@@ -35,6 +35,9 @@ class ModelCollection extends Collection
     protected $_allowedMutationRoles = [];
     protected $_deniedMutationRoles = [];
 
+    protected $_allowedModelObjectRoles = [];
+    protected $_deniedModelObjectRoles = [];
+
     public function __construct($modelClass=null)
     {
         $this->_modelClass = $modelClass;
@@ -101,6 +104,18 @@ class ModelCollection extends Collection
     public function denyMutation($roles)
     {
         $this->_deniedMutationRoles = array_merge($this->_deniedMutationRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function allowModelObject($roles)
+    {
+        $this->_allowedModelObjectRoles = array_merge($this->_allowedModelObjectRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function denyModelObject($roles)
+    {
+        $this->_deniedModelObjectRoles = array_merge($this->_deniedModelObjectRoles, is_array($roles) ? $roles : [$roles]);
         return $this;
     }
 
@@ -253,6 +268,9 @@ class ModelCollection extends Collection
 
         $this->_modelObjectTypeGroup->allow($this->_allowedQueryRoles);
         $this->_modelObjectTypeGroup->allow($this->_allowedMutationRoles);
+
+        $this->_modelObjectTypeGroup->allow($this->_allowedModelObjectRoles);
+        $this->_modelObjectTypeGroup->deny($this->_deniedModelObjectRoles);
 
         parent::build($schema, $di);
     }

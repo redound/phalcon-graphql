@@ -21,19 +21,20 @@ class JsonScalarType extends ScalarType
             return null;
         }
 
-        return json_decode($value);
+        return is_string($value) ? json_decode($value) : $value;
     }
 
     public function parseValue($value)
     {
-        return $value;
+        return is_string($value) ? json_decode($value) : $value;
     }
 
     public function parseLiteral($ast)
     {
         if ($ast instanceof StringValue) {
-            return $ast->value;
+            return $this->parseValue($ast->value);
         }
+
         return null;
     }
 }
