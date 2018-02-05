@@ -17,11 +17,7 @@ class AclAuthorizationPlugin extends Plugin
 {
     public function afterBuildSchema(Schema $schema, DiInterface $di)
     {
-        $acl = $di->get(Services::ACL);
-
-        if($acl instanceof MountingEnabledAclAdapterInterface){
-            $acl->mount($schema);
-        }
+        self::mountSchema($schema, $di);
     }
 
     public function beforeResolve(Schema $schema, ObjectType $objectType, Field $field)
@@ -34,6 +30,15 @@ class AclAuthorizationPlugin extends Plugin
 
         if (!$allowed) {
             throw new Exception(ErrorCodes::ACCESS_DENIED, 'No access to field "' . $field->getName() . '" on object "' . $objectType->getName() . '"');
+        }
+    }
+
+    public static function mountSchema(Schema $schema, DiInterface $di)
+    {
+        $acl = $di->get(Services::ACL);
+
+        if($acl instanceof MountingEnabledAclAdapterInterface){
+            $acl->mount($schema);
         }
     }
 }
