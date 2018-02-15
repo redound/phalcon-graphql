@@ -2,6 +2,8 @@
 
 namespace PhalconGraphQL\GraphQL;
 
+use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
@@ -11,22 +13,19 @@ use PhalconGraphQL\Dispatcher;
 
 class ObjectTypeFactory
 {
-    public static function build(Dispatcher $dispatcher, Schema $schema, SchemaObjectType $objectType, TypeRegistry $typeRegistry)
+    public static function build(Schema $schema, SchemaObjectType $objectType)
     {
-        return new ObjectType([
-            'name' => $objectType->getName(),
+        $fields = [];
+
+        /** @var Field $field */
+        foreach ($objectType->getFields() as $field) {
+            $fields[] = FieldFactory::build($schema, $objectType, $field);
+        }
+
+        return new ObjectTypeDefinitionNode([
+            'name' => new NameNode(['value' => $objectType->getName()]),
             'description' => $objectType->getDescription(),
-            'fields' => function() use ($objectType, $dispatcher, $schema, $typeRegistry){
-
-                $fields = [];
-
-                /** @var Field $field */
-                foreach ($objectType->getFields() as $field) {
-                    $fields[$field->getName()] = FieldFactory::build($dispatcher, $schema, $objectType, $field, $typeRegistry);
-                }
-
-                return $fields;
-            }
+            'fields' => $fields
         ]);
     }
 }

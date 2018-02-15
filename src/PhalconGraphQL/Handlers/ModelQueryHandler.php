@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Handlers;
 
 use PhalconApi\Constants\ErrorCodes;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\FindModelField;

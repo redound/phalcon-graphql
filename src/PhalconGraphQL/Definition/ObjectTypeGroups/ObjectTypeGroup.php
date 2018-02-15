@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
 
 use Phalcon\DiInterface;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 

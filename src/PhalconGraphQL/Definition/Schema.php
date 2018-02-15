@@ -8,6 +8,9 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
+use PhalconGraphQL\Definition\ScalarTypes\DateScalarType;
+use PhalconGraphQL\Definition\ScalarTypes\DateTimeScalarType;
+use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
 use PhalconGraphQL\Plugins\PluginInterface;
 
 class Schema implements \PhalconApi\Acl\MountableInterface
@@ -46,6 +49,12 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         if($embedMode !== null){
             $this->_embedMode = $embedMode;
         }
+
+        // Add default scalar types
+        $this
+            ->scalar(new DateScalarType())
+            ->scalar(new DateTimeScalarType())
+            ->scalar(new JsonScalarType());
     }
 
     public function plugin(PluginInterface $plugin){
@@ -144,6 +153,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         $this->_unionTypes[] = $unionType;
         $this->_unionTypesByName[$unionType->getName()] = $unionType;
 
+        $this->_typesByName[$unionType->getName()] = $unionType;
+
         return $this;
     }
 
@@ -203,7 +214,7 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         return $this->_mountables;
     }
 
-    public function build(DiInterface $di){
+    public function build(DiInterface $di, $buildTypes=true){
 
         if($this->_built){
             return;
@@ -302,39 +313,38 @@ class Schema implements \PhalconApi\Acl\MountableInterface
             }
         }
 
+        if($buildTypes) {
 
-        /*** OBJECT TYPES ***/
+            /*** OBJECT TYPES ***/
 
-        /** @var ObjectType $objectType */
-        foreach($this->_objectTypes as $objectType){
-            $objectType->build($this, $di);
-        }
-
-
-        /*** UNION TYPES ***/
-
-        /** @var UnionType $unionType */
-        foreach($this->_unionTypes as $unionType){
-            $unionType->build($this, $di);
-        }
-
-
-        /*** FIELDS ***/
-        /** @var ObjectType $objectType */
-        foreach($this->_objectTypes as $objectType){
-
-            /** @var Field $field */
-            foreach($objectType->getFields() as $field){
-                $field->build($this, $objectType, $di);
+            /** @var ObjectType $objectType */
+            foreach ($this->_objectTypes as $objectType) {
+                $objectType->build($this, $di);
             }
-        }
 
+            /*** UNION TYPES ***/
 
-        /*** INPUT OBJECT TYPES ***/
+            /** @var UnionType $unionType */
+            foreach ($this->_unionTypes as $unionType) {
+                $unionType->build($this, $di);
+            }
 
-        /** @var InputObjectType $inputObjectType */
-        foreach($this->_inputObjectTypes as $objectType){
-            $objectType->build($this, $di);
+            /*** FIELDS ***/
+            /** @var ObjectType $objectType */
+            foreach ($this->_objectTypes as $objectType) {
+
+                /** @var Field $field */
+                foreach ($objectType->getFields() as $field) {
+                    $field->build($this, $objectType, $di);
+                }
+            }
+
+            /*** INPUT OBJECT TYPES ***/
+
+            /** @var InputObjectType $inputObjectType */
+            foreach ($this->_inputObjectTypes as $objectType) {
+                $objectType->build($this, $di);
+            }
         }
 
 

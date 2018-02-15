@@ -2,7 +2,7 @@
 
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 use PhalconGraphQL\Definition\Fields\Field;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconApi\Constants\ErrorCodes;
 
 trait FindModelTrait

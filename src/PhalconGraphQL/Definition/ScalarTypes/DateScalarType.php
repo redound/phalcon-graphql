@@ -13,6 +13,8 @@ class DateScalarType extends ScalarType
     public $name = 'Date';
     public $description = 'The `Date` scalar type represents a date';
 
+    protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d", \DateTime::ISO8601, 'Y-m-d\TH:i:s.uP'];
+
     protected $format;
 
     public function __construct($format = self::DEFAULT_DATE_FORMAT)
@@ -47,8 +49,9 @@ class DateScalarType extends ScalarType
     public function parseLiteral($ast)
     {
         if ($ast instanceof \StringValue || $ast instanceof \IntValue) {
-            return $ast->value;
+            return $this->parseValue($ast->value);
         }
+
         return null;
     }
 
@@ -57,7 +60,25 @@ class DateScalarType extends ScalarType
         $date = false;
 
         try {
-            $date = new \DateTime(is_numeric($value) ? '@' . $value : $value);
+
+            if(is_numeric($value)){
+                $date = new \DateTime('@' . $value);
+            }
+            else {
+                $date = \DateTime::createFromFormat($this->format, $value);
+            }
+
+            if($date === false){
+
+                foreach($this->fallbackFormats as $format){
+
+                    $date = \DateTime::createFromFormat($format, $value);
+
+                    if($date !== false){
+                        break;
+                    }
+                }
+            }
         }
         catch(\Exception $e){}
 

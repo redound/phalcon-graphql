@@ -109,7 +109,6 @@ class ModelObjectType extends ObjectType
         $modelClass = $this->_modelClass;
         $model = new $modelClass();
 
-        $originalFields = $this->_fields;
         $newFields = [];
 
         // Attributes
@@ -193,7 +192,12 @@ class ModelObjectType extends ObjectType
             }
         }
 
-        $this->_fields = array_merge($newFields, $originalFields);
+        foreach($newFields as $field){
+
+            if(!$this->fieldExists($field->getName())) {
+                $this->field($field);
+            }
+        }
 
         /** @var Field $field */
         foreach($this->_fields as $field){

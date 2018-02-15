@@ -72,6 +72,11 @@ trait AllModelTrait
         $this->_modifyAllQuery($phqlBuilder, $args, $field, true);
 
         $results = $phqlBuilder->getQuery()->execute();
+        return $this->_getTotalCountResponse($results, $args, $field);
+    }
+
+    protected function _getTotalCountResponse($results, $args, Field $field){
+
         return count($results) > 0 ? (int)$results[0]->count : 0;
     }
 

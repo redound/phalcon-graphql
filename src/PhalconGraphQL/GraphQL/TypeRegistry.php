@@ -19,6 +19,11 @@ class TypeRegistry
         return isset($this->_types[$name]);
     }
 
+    public function getTypes()
+    {
+        return $this->_types;
+    }
+
     public function resolve($name, $nonNull = false, $isList = false, $isNonNullList = false)
     {
         $type = isset($this->_types[$name]) ? $this->_types[$name] : null;
