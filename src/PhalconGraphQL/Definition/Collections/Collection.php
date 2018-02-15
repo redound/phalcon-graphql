@@ -11,10 +11,12 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\SchemaMountableInterface;
+use PhalconGraphQL\Definition\UnionType;
 
 class Collection implements SchemaMountableInterface
 {
     protected $_enumTypes = [];
+    protected $_unionTypes = [];
     protected $_objectTypes = [];
     protected $_objectTypeGroups = [];
     protected $_inputObjectTypes = [];
@@ -54,6 +56,17 @@ class Collection implements SchemaMountableInterface
     public function getObjectTypes()
     {
         return $this->_objectTypes;
+    }
+
+    public function union(UnionType $unionType)
+    {
+        $this->_unionTypes[] = $unionType;
+        return $this;
+    }
+
+    public function getUnionTypes()
+    {
+        return $this->_unionTypes;
     }
 
     public function inputObject(InputObjectType $objectType)
@@ -236,6 +249,17 @@ class Collection implements SchemaMountableInterface
             if (array_key_exists($objectTypeName, $this->_deniedObjectRoles)) {
                 $objectType->deny($this->_deniedObjectRoles[$objectTypeName]);
             }
+
+            foreach($this->_plugins as $plugin){
+                $objectType->plugin($plugin);
+            }
+        }
+
+        /** @var UnionType $unionType */
+        foreach($this->_unionTypes as $unionType) {
+
+            $unionType->allow($this->_allowedRoles);
+            $unionType->deny($this->_deniedRoles);
 
             foreach($this->_plugins as $plugin){
                 $objectType->plugin($plugin);

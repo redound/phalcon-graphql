@@ -121,7 +121,9 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
                     ->nonNull()
                 )
                 ->field(Field::int('itemCount'))
-                ->field(Field::int('totalCount'));
+                ->field(Field::int('totalCount'))
+                ->field(Field::int('offset'))
+                ->field(Field::int('limit'));
 
             foreach ($this->_collectionFields as $field) {
                 $listType->field($field);

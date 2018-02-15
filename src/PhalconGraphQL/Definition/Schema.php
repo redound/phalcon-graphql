@@ -19,11 +19,16 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     protected $_embedMode = Schema::EMBED_MODE_NONE;
 
     protected $_scalarTypes = [];
+
     protected $_enumTypes = [];
     protected $_enumTypesByName = [];
+
     protected $_objectTypes = [];
     protected $_objectTypesByName = [];
     protected $_objectTypeGroups = [];
+
+    protected $_unionTypes = [];
+    protected $_unionTypesByName = [];
 
     protected $_inputObjectTypes = [];
 
@@ -106,6 +111,7 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         return $this->_scalarTypes;
     }
 
+
     public function object(ObjectType $objectType)
     {
         $this->_objectTypes[] = $objectType;
@@ -123,6 +129,26 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     {
         return array_key_exists($name, $this->_objectTypesByName) ? $this->_objectTypesByName[$name] : null;
     }
+
+
+    public function union(UnionType $unionType)
+    {
+        $this->_unionTypes[] = $unionType;
+        $this->_unionTypesByName[$unionType->getName()] = $unionType;
+
+        return $this;
+    }
+
+    public function getUnionTypes()
+    {
+        return $this->_unionTypes;
+    }
+
+    public function findUnionType($name)
+    {
+        return array_key_exists($name, $this->_unionTypesByName) ? $this->_unionTypesByName[$name] : null;
+    }
+
 
     public function inputObject(InputObjectType $objectType)
     {
@@ -182,6 +208,10 @@ class Schema implements \PhalconApi\Acl\MountableInterface
 
             foreach($mountable->getObjectTypes() as $objectType){
                 $this->object($objectType);
+            }
+
+            foreach($mountable->getUnionTypes() as $unionType){
+                $this->union($unionType);
             }
 
             foreach($mountable->getInputObjectTypes() as $inputObjectType){
@@ -258,6 +288,14 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         /** @var ObjectType $objectType */
         foreach($this->_objectTypes as $objectType){
             $objectType->build($this, $di);
+        }
+
+
+        /*** UNION TYPES ***/
+
+        /** @var UnionType $unionType */
+        foreach($this->_unionTypes as $unionType){
+            $unionType->build($this, $di);
         }
 
 

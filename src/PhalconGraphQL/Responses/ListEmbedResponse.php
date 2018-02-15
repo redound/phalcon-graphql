@@ -5,13 +5,16 @@ namespace PhalconGraphQL\Responses;
 class ListEmbedResponse
 {
     protected $_items;
-
     protected $_totalCount;
+    protected $_offset;
+    protected $_limit;
 
-    public function __construct($items=[], $totalCount=null)
+    public function __construct($items=[], $totalCount=null, $offset=null, $limit=null)
     {
         $this->_items = $items;
         $this->_totalCount = $totalCount;
+        $this->_offset = $offset;
+        $this->_limit = $limit;
     }
 
     public function items($items)
@@ -34,9 +37,29 @@ class ListEmbedResponse
         return $this->_totalCount;
     }
 
-
-    public static function factory($items=[], $totalCount=null)
+    public function getOffset()
     {
-        return new ListEmbedResponse($items, $totalCount);
+        return $this->_offset;
+    }
+
+    public function getLimit()
+    {
+        return $this->_limit;
+    }
+
+    public function setOffset($offset)
+    {
+        $this->_offset = $offset;
+    }
+
+    public function setLimit($limit)
+    {
+        $this->_limit = $limit;
+    }
+
+
+    public static function factory($items=[], $totalCount=null, $offset=null, $limit=null)
+    {
+        return new ListEmbedResponse($items, $totalCount, $offset, $limit);
     }
 }

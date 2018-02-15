@@ -13,7 +13,7 @@ trait ModelQueryTrait
         throw new Exception(ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
-    protected function _modifyQuery(QueryBuilder $query, $args, Field $field)
+    protected function _modifyQuery(QueryBuilder $query, $args, Field $field, $isCount)
     {
     }
 
@@ -24,7 +24,7 @@ trait ModelQueryTrait
         /** @var Model $modelInstance */
         $modelInstance = new $modelClass();
 
-        return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance);
+        return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance) ?: 'id';
     }
 
     protected function _beforeHandle($args, Field $field)
