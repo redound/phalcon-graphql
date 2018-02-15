@@ -32,6 +32,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
 
     protected $_inputObjectTypes = [];
 
+    protected $_typesByName = [];
+
     protected $_mountables = [];
 
     protected $_plugins = [];
@@ -87,6 +89,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         $this->_enumTypes[] = $enumType;
         $this->_enumTypesByName[$enumType->getName()] = $enumType;
 
+        $this->_typesByName[$enumType->getName()] = $enumType;
+
         return $this;
     }
 
@@ -103,6 +107,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     public function scalar(ScalarType $type)
     {
         $this->_scalarTypes[] = $type;
+        $this->_typesByName[$type->name] = $type;
+
         return $this;
     }
 
@@ -116,6 +122,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     {
         $this->_objectTypes[] = $objectType;
         $this->_objectTypesByName[$objectType->getName()] = $objectType;
+
+        $this->_typesByName[$objectType->getName()] = $objectType;
 
         return $this;
     }
@@ -153,6 +161,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     public function inputObject(InputObjectType $objectType)
     {
         $this->_inputObjectTypes[] = $objectType;
+        $this->_typesByName[$objectType->getName()] = $objectType;
+
         return $this;
     }
 
@@ -170,6 +180,16 @@ class Schema implements \PhalconApi\Acl\MountableInterface
     public function getObjectTypeGroups(){
 
         return $this->_objectTypeGroups;
+    }
+
+    public function findType($name)
+    {
+        return array_key_exists($name, $this->_typesByName) ? $this->_typesByName[$name] : null;
+    }
+
+    public function hasType($name)
+    {
+        return array_key_exists($name, $this->_typesByName);
     }
 
     public function mount(SchemaMountableInterface $mountable) {
