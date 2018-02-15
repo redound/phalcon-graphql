@@ -95,6 +95,17 @@ class ModelInputObjectType extends InputObjectType
             $typeMap = $model->typeMap();
         }
 
+        $relationFields = [];
+
+        /** @var RelationInterface $relation */
+        foreach ($modelsManager->getRelations($modelClass) as $relation) {
+
+            $fieldsRaw = $relation->getFields();
+            $fields = is_array($fieldsRaw) ? $fieldsRaw : [$fieldsRaw];
+
+            $relationFields = array_merge($relationFields, $fields);
+        }
+
         $mappedDataTypes = [];
         $mappedNonNullAttributes = [];
 
@@ -110,7 +121,7 @@ class ModelInputObjectType extends InputObjectType
             if(array_key_exists($mappedAttributeName, $typeMap)){
                 $type = $typeMap[$mappedAttributeName];
             }
-            else if($attributeName == $identityField){
+            else if($attributeName == $identityField || in_array($mappedAttributeName, $relationFields)){
                 $type = Types::ID;
             }
             else {
