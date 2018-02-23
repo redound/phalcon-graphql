@@ -3,7 +3,7 @@
 namespace PhalconGraphQL\Definition;
 
 use Phalcon\DiInterface;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Plugins\ObjectTypePluginInterface;

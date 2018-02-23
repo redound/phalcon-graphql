@@ -2,16 +2,26 @@
 
 namespace PhalconGraphQL;
 
+use GraphQL\Error\Debug;
+use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
+use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Utils\BuildSchema;
 use Phalcon\Http\Request;
 use PhalconGraphQL\Constants\Services;
+use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
+use PhalconGraphQL\Definition\ScalarTypes\DateScalarType;
+use PhalconGraphQL\Definition\ScalarTypes\DateTimeScalarType;
 use PhalconGraphQL\Definition\Schema;
-use PhalconGraphQL\GraphQL\SchemaFactory;
+use PhalconGraphQL\GraphQL\DocumentFactory;
 use PhalconGraphQL\Handlers\Handler;
 use PhalconGraphQL\Plugins\PluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
+use GraphQL\Type\Schema as GraphQLSchema;
 
 class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 {
@@ -59,11 +69,18 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $handler;
     }
 
-    public function createResolver(Schema $schema, ObjectType $objectType, Field $field)
+    protected function createDefaultFieldResolver(Schema $schema)
     {
         $dispatcher = $this;
 
-        return function ($source, $args) use ($schema, $objectType, $field, $dispatcher) {
+        return function ($source, $args, $context, \GraphQL\Type\Definition\ResolveInfo $info) use ($schema, $dispatcher) {
+
+            $objectType = $info->parentType ? $schema->findObjectType($info->parentType->name) : null;
+            $field = $objectType ? $objectType->findField($info->fieldName) : null;
+
+            if(!$objectType || !$field){
+                return Executor::defaultFieldResolver($source, $args, $context, $info);
+            }
 
             /** @var PluginInterface $plugin */
             foreach($schema->getPlugins() as $plugin){
@@ -142,14 +159,27 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         };
     }
 
-    public function dispatch(Schema $schema, Request $request = null)
+    protected function formatError(Error $error, $debug=false)
     {
-        $graphqlSchema = SchemaFactory::build($this, $schema, $this->getDI());
+        $formatted = FormattedError::createFromException($error);
+        $previous = $error->getPrevious();
 
-        if(!$request) {
-            $request = $this->di->get(Services::REQUEST);
+        if($previous instanceof \PhalconGraphQL\Exception){
+
+            $formatted['code'] = $previous->getCode();
+            $formatted['userInfo'] = $previous->getUserInfo();
+
+            if($debug){
+                $formatted['developerInfo'] = $previous->getDeveloperInfo();
+            }
         }
 
+        return $formatted;
+    }
+
+    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, $debugMode=false)
+    {
+        $request = $this->di->get(Services::REQUEST);
         $data = $request->getPostedData();
 
         $requestString = isset($data['query']) && !empty($data['query']) ? $data['query'] : null;
@@ -158,15 +188,20 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
 
         $variableValues = is_string($variableValuesRaw) ? json_decode($variableValuesRaw, true) : $variableValuesRaw;
 
-        $result = GraphQL::execute(
+        $result = GraphQL::executeQuery(
             $graphqlSchema,
             $requestString,
             null, // rootValue
             null, // context
             $variableValues,
-            $operationName
+            $operationName,
+            $this->createDefaultFieldResolver($schema)
         );
 
-        return $result;
+        $flags = $debugMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : null;
+
+        return $result
+            ->setErrorFormatter(function($error) use ($debugMode) { return $this->formatError($error, $debugMode); })
+            ->toArray($flags);
     }
 }

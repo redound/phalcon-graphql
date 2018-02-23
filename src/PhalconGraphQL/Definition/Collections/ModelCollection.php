@@ -35,6 +35,9 @@ class ModelCollection extends Collection
     protected $_allowedMutationRoles = [];
     protected $_deniedMutationRoles = [];
 
+    protected $_allowedModelObjectRoles = [];
+    protected $_deniedModelObjectRoles = [];
+
     public function __construct($modelClass=null)
     {
         $this->_modelClass = $modelClass;
@@ -104,8 +107,20 @@ class ModelCollection extends Collection
         return $this;
     }
 
+    public function allowModelObject($roles)
+    {
+        $this->_allowedModelObjectRoles = array_merge($this->_allowedModelObjectRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
 
-    public function queryField(Field $field, $objectType=Types::QUERY)
+    public function denyModelObject($roles)
+    {
+        $this->_deniedModelObjectRoles = array_merge($this->_deniedModelObjectRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+
+    public function queryField(Field $field, $objectType=Types::VIEWER)
     {
         $this->field($objectType, $field);
         $this->_queryFields[] = $field;
@@ -122,7 +137,7 @@ class ModelCollection extends Collection
     }
 
 
-    public function all($objectType=Types::QUERY, $name=null, $description=null)
+    public function all($objectType=Types::VIEWER, $name=null, $description=null)
     {
         $field = AllModelField::factory($this->_modelClass, $name, null, $description);
 
@@ -134,7 +149,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function find($objectType=Types::QUERY, $name=null, $description=null)
+    public function find($objectType=Types::VIEWER, $name=null, $description=null)
     {
         $field = FindModelField::factory($this->_modelClass, $name, null, $description);
 
@@ -192,7 +207,7 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function crud($queryObjectType = Types::QUERY, $mutationObjectType = Types::MUTATION)
+    public function crud($queryObjectType = Types::VIEWER, $mutationObjectType = Types::MUTATION)
     {
         $this
             ->all($queryObjectType)
@@ -253,6 +268,9 @@ class ModelCollection extends Collection
 
         $this->_modelObjectTypeGroup->allow($this->_allowedQueryRoles);
         $this->_modelObjectTypeGroup->allow($this->_allowedMutationRoles);
+
+        $this->_modelObjectTypeGroup->allow($this->_allowedModelObjectRoles);
+        $this->_modelObjectTypeGroup->deny($this->_deniedModelObjectRoles);
 
         parent::build($schema, $di);
     }

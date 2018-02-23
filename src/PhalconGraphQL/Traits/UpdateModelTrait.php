@@ -2,7 +2,7 @@
 
 use PhalconGraphQL\Definition\Fields\Field;
 use Phalcon\Mvc\Model;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use PhalconApi\Constants\ErrorCodes;
 
 trait UpdateModelTrait

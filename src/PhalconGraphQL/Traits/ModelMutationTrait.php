@@ -2,7 +2,7 @@
 
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconApi\Constants\ErrorCodes;
-use PhalconApi\Exception;
+use PhalconGraphQL\Exception;
 use Phalcon\Mvc\Model;
 
 trait ModelMutationTrait

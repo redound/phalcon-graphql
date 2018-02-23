@@ -109,7 +109,6 @@ class ModelObjectType extends ObjectType
         $modelClass = $this->_modelClass;
         $model = new $modelClass();
 
-        $originalFields = $this->_fields;
         $newFields = [];
 
         // Attributes
@@ -136,12 +135,40 @@ class ModelObjectType extends ObjectType
         $mappedDataTypes = [];
         $mappedNonNullAttributes = [];
 
+        $relationFields = [];
+
+        // Relations
+        if(!$this->_excludeRelations) {
+
+            /** @var RelationInterface $relation */
+            foreach ($modelsManager->getRelations($modelClass) as $relation) {
+
+                $referencedModelClass = Core::getShortClass($relation->getReferencedModel());
+
+                $fieldsRaw = $relation->getFields();
+                $fields = is_array($fieldsRaw) ? $fieldsRaw : [$fieldsRaw];
+
+                $relationFields = array_merge($relationFields, $fields);
+
+                $options = $relation->getOptions();
+                $relationName = is_array($options) && array_key_exists('alias', $options) ? $options['alias'] : $referencedModelClass;
+                $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
+
+                $field = RelationModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
+                    ->isList($isList)
+                    ->embedMode($relationEmbedMode);
+
+                $newFields[] = $field;
+            }
+        }
+
+        // Attributes
         foreach ($dataTypes as $attributeName => $dataType) {
 
             $mappedAttributeName = is_array($columnMap) && array_key_exists($attributeName, $columnMap) ? $columnMap[$attributeName] : $attributeName;
 
             $type = null;
-            if($attributeName == $identityField){
+            if($attributeName == $identityField || in_array($mappedAttributeName, $relationFields)){
                 $type = Types::ID;
             }
             else if(array_key_exists($mappedAttributeName, $typeMap)){
@@ -172,28 +199,12 @@ class ModelObjectType extends ObjectType
             $newFields[] = $field;
         }
 
-        // Relations
-        if(!$this->_excludeRelations) {
+        foreach($newFields as $field){
 
-            /** @var RelationInterface $relation */
-            foreach ($modelsManager->getRelations($modelClass) as $relation) {
-
-                $referencedModelClass = Core::getShortClass($relation->getReferencedModel());
-
-                $options = $relation->getOptions();
-                $relationName = is_array($options) && array_key_exists('alias',
-                    $options) ? $options['alias'] : $referencedModelClass;
-                $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
-
-                $field = RelationModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
-                    ->isList($isList)
-                    ->embedMode($relationEmbedMode);
-
-                $newFields[] = $field;
+            if(!$this->fieldExists($field->getName())) {
+                $this->field($field);
             }
         }
-
-        $this->_fields = array_merge($newFields, $originalFields);
 
         /** @var Field $field */
         foreach($this->_fields as $field){
