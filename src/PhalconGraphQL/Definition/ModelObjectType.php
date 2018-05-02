@@ -152,9 +152,15 @@ class ModelObjectType extends ObjectType
 
                 $options = $relation->getOptions();
                 $relationName = is_array($options) && array_key_exists('alias', $options) ? $options['alias'] : $referencedModelClass;
+                $relationFieldName = lcfirst($relationName);
+
+                if(in_array($relationFieldName, $skip)){
+                    continue;
+                }
+
                 $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
 
-                $field = RelationModelField::factory($relation->getReferencedModel(), lcfirst($relationName), $referencedModelClass)
+                $field = RelationModelField::factory($relation->getReferencedModel(), $relationFieldName, $referencedModelClass)
                     ->isList($isList)
                     ->embedMode($relationEmbedMode);
 
