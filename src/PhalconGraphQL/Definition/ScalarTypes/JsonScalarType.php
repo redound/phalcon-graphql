@@ -26,7 +26,7 @@ class JsonScalarType extends ScalarType
 
     public function parseValue($value)
     {
-        return is_string($value) ? json_decode($value) : $value;
+        return !is_string($value) ? json_encode($value) : $value;
     }
 
     public function parseLiteral($ast)
