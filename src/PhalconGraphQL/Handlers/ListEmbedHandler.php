@@ -55,4 +55,19 @@ class ListEmbedHandler
     {
         return $source instanceof ListEmbedResponse ? $source->getLimit() : null;
     }
+
+    public function __call($name, $arguments)
+    {
+        list($source, $args, $field) = $arguments;
+
+        $functionName = 'get' . ucfirst($name);
+
+        if(method_exists($source, $functionName)){
+            return $source->$functionName($source);
+        }
+        else {
+
+            throw new \Exception('Field ' . $name . ' not supported for list embed handler');
+        }
+    }
 }
