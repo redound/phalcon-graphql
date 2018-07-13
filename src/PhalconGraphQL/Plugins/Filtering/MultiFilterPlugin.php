@@ -101,13 +101,23 @@ class MultiFilterPlugin extends Plugin
         foreach($filterValues as $value){
 
             $valueKey = 'filterValue_' . $filterField . '_' . $counter;
-            $clauses[] = '[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':';
+            $clauses[] = $this->getAllQueryClauseForFilterValue($query, $filterField, $valueKey, $modelName, $field, $isCount);
 
             $binds[$valueKey] = $value;
             $counter++;
         }
 
         $query->andWhere(implode(' OR ', $clauses), $binds);
+    }
+
+    protected function getAllQueryClauseForFilterValue(QueryBuilder $query, $filterField, $valueKey, $modelName, Field $field, $isCount)
+    {
+        return '[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':';
+    }
+
+    protected function getRelationClauseForFilterValue($filterField, $valueKey, Field $field, $isCount){
+
+        return '[' . $filterField . '] = :' . $valueKey . ':';
     }
 
     public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
@@ -123,17 +133,17 @@ class MultiFilterPlugin extends Plugin
 
         $filterConditions = [];
 
-        foreach($filter as $field => $values) {
+        foreach($filter as $filterField => $values) {
 
             $counter = 1;
             $fieldConditions = [];
 
             foreach($values as $val){
 
-                $varName = 'filter' . $field . 'Value' . $counter;
-                $fieldConditions[] = '[' . $field . '] = :' . $varName . ':';
+                $valueKey = 'filter' . $filterField . 'Value' . $counter;
+                $fieldConditions[] = $this->getRelationClauseForFilterValue($filterField, $valueKey, $field, $isCount);
 
-                $bind[$varName] = $val;
+                $bind[$valueKey] = $val;
 
                 $counter++;
             }
