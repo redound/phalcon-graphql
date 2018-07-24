@@ -115,7 +115,7 @@ class MultiFilterPlugin extends Plugin
         return '[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':';
     }
 
-    protected function getRelationClauseForFilterValue($filterField, $valueKey, Field $field, $isCount){
+    protected function getRelationClauseForFilterValue($filterField, $valueKey, $value, Field $field, $isCount){
 
         return '[' . $filterField . '] = :' . $valueKey . ':';
     }
@@ -141,7 +141,7 @@ class MultiFilterPlugin extends Plugin
             foreach($values as $val){
 
                 $valueKey = 'filter' . $filterField . 'Value' . $counter;
-                $fieldConditions[] = $this->getRelationClauseForFilterValue($filterField, $valueKey, $field, $isCount);
+                $fieldConditions[] = $this->getRelationClauseForFilterValue($filterField, $valueKey, $val, $field, $isCount);
 
                 $bind[$valueKey] = $val;
 
