@@ -11,6 +11,7 @@ use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Definition\ScalarTypes\DateScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\DateTimeScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
+use PhalconGraphQL\Definition\ScalarTypes\TimeScalarType;
 use PhalconGraphQL\Plugins\PluginInterface;
 
 class Schema implements \PhalconApi\Acl\MountableInterface
@@ -54,6 +55,7 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         $this
             ->scalar(new DateScalarType())
             ->scalar(new DateTimeScalarType())
+            ->scalar(new TimeScalarType())
             ->scalar(new JsonScalarType());
     }
 

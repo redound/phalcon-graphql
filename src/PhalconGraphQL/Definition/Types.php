@@ -13,6 +13,7 @@ class Types
     const ID = "ID";
     const DATE = "Date";
     const DATE_TIME = "DateTime";
+    const TIME = "Time";
     const JSON = "JSON";
 
     const QUERY = "Query";
@@ -22,7 +23,7 @@ class Types
 
     public static function scalars(){
 
-        return [self::STRING, self::INT, self::FLOAT, self::BOOLEAN, self::ID, self::DATE, self::DATE_TIME, self::JSON];
+        return [self::STRING, self::INT, self::FLOAT, self::BOOLEAN, self::ID, self::DATE, self::DATE_TIME, self::TIME, self::JSON];
     }
 
     public static function addConnection($name){
