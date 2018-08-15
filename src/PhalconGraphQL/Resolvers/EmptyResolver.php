@@ -6,7 +6,7 @@ use PhalconGraphQL\Definition\Fields\Field;
 
 class EmptyResolver implements ResolverInterface
 {
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         return [];
     }

@@ -7,14 +7,14 @@ use PhalconApi\Constants\ErrorCodes;
 
 trait CreateModelTrait
 {
-    protected function _create($args, Field $field)
+    protected function _create(array $args, Field $field)
     {
         $data = $args['input'];
 
         $this->_beforeHandle($args, $field);
         $this->_beforeHandleCreate($args, $field);
 
-        if (!$this->_dataValid($data, false, $args, $field)) {
+        if (!$this->_dataValid($data, $args, $field) || !$this->_createDataValid($data, $args, $field)) {
             return $this->_onDataInvalid($data, $args, $field);
         }
 
@@ -43,20 +43,29 @@ trait CreateModelTrait
         return $response;
     }
 
-    protected function _beforeHandleCreate($args, Field $field)
-    {
-    }
-
-    protected function _createAllowed($data, $args, Field $field)
+    protected function _createDataValid(array $data, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _createItem(Model $item, $data, $args, Field $field)
+    protected function _beforeHandleCreate(array $args, Field $field)
+    {
+    }
+
+    protected function _createAllowed(array $data, array $args, Field $field)
+    {
+        return true;
+    }
+
+    protected function _createItem($item, array $data, array $args, Field $field)
     {
         $this->_beforeAssignData($item, $data, $args, $field);
+        $this->_beforeAssignCreateData($item, $data, $args, $field);
+
         $item->assign($data);
+
         $this->_afterAssignData($item, $data, $args, $field);
+        $this->_afterAssignCreateData($item, $data, $args, $field);
 
         $this->_beforeSave($item, $args, $field);
         $this->_beforeCreate($item, $args, $field);
@@ -72,15 +81,23 @@ trait CreateModelTrait
         return $success ? $item : null;
     }
 
-    protected function _beforeCreate(Model $item, $args, Field $field)
+    protected function _beforeAssignCreateData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterCreate(Model $item, $args, Field $field)
+    protected function _afterAssignCreateData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _onCreateFailed(Model $item, $data, $args, Field $field)
+    protected function _beforeCreate($item, array $args, Field $field)
+    {
+    }
+
+    protected function _afterCreate($item, array $args, Field $field)
+    {
+    }
+
+    protected function _onCreateFailed($item, array $data, array $args, Field $field)
     {
         throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to create item', [
             'messages' => $this->_getMessages($item->getMessages()),
@@ -89,12 +106,12 @@ trait CreateModelTrait
         ]);
     }
 
-    protected function _getCreateResponse($createdItem, $data, $args, Field $field)
+    protected function _getCreateResponse($createdItem, array $data, array $args, Field $field)
     {
         return $createdItem;
     }
 
-    protected function _afterHandleCreate(Model $createdItem, $data, $response, $args, Field $field)
+    protected function _afterHandleCreate($createdItem, array $data, $response, array $args, Field $field)
     {
     }
 }

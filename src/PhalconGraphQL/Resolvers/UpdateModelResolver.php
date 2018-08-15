@@ -9,7 +9,7 @@ class UpdateModelResolver extends ModelResolver
     use \ModelMutationTrait;
     use \UpdateModelTrait;
 
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         return $this->_update($args, $field);
     }

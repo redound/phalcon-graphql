@@ -62,7 +62,7 @@ class SimpleSortingPlugin extends Plugin
             );
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         $model = Core::getShortClass($field->getModel());
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
@@ -73,7 +73,7 @@ class SimpleSortingPlugin extends Plugin
         }
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
         $sortField = isset($args['sortField']) && !empty($args['sortField']) ? $args['sortField'] : null;
         $sortDirection = isset($args['sortDirection']) && !empty($args['sortDirection']) ? $args['sortDirection'] : self::DIRECTION_ASC;

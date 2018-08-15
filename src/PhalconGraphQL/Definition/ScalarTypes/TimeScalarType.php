@@ -46,10 +46,10 @@ class TimeScalarType extends ScalarType
         return $date->format($this->format);
     }
 
-    public function parseLiteral($ast)
+    public function parseLiteral($valueNode, array $variables = null)
     {
-        if ($ast instanceof \StringValue || $ast instanceof \IntValue) {
-            return $this->parseValue($ast->value);
+        if ($valueNode instanceof \StringValue || $valueNode instanceof \IntValue) {
+            return $this->parseValue($valueNode->value);
         }
 
         return null;

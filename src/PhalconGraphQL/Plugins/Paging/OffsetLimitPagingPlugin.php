@@ -26,7 +26,7 @@ class OffsetLimitPagingPlugin extends Plugin
             ->arg(InputField::int('limit'));
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         if($isCount){
             return;
@@ -44,7 +44,7 @@ class OffsetLimitPagingPlugin extends Plugin
         }
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
         if($isCount){
             return $options;
@@ -64,17 +64,17 @@ class OffsetLimitPagingPlugin extends Plugin
         return $options;
     }
 
-    public function modifyAllResponse($response, $args, Field $field)
+    public function modifyAllResponse($response, array $args, Field $field)
     {
         $this->_addOffsetLimitToResponse($response, $args);
     }
 
-    public function modifyRelationResponse($response, $source, $args, Field $field)
+    public function modifyRelationResponse($response, $source, array $args, Field $field)
     {
         $this->_addOffsetLimitToResponse($response, $args);
     }
 
-    protected function _addOffsetLimitToResponse($response, $args){
+    protected function _addOffsetLimitToResponse($response, array $args){
 
         if($response instanceof ListEmbedResponse){
 

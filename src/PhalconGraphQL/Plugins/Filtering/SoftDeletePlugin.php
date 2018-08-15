@@ -18,14 +18,14 @@ class SoftDeletePlugin extends Plugin
         $this->deletedValue = $deletedValue;
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         $model = Core::getShortClass($field->getModel());
 
         $query->andWhere('[' . $model . '].[' . $this->deletedField . '] != ?1', [1 => $this->deletedValue]);
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
         $conditions = isset($options['conditions']) && !empty($options['conditions']) ? $options['conditions'] . ' AND ' : '';
         $bind = isset($options['bind']) && !empty($options['bind']) ? $options['bind'] : [];

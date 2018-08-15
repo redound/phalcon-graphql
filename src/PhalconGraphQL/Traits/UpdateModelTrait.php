@@ -7,7 +7,7 @@ use PhalconApi\Constants\ErrorCodes;
 
 trait UpdateModelTrait
 {
-    protected function _update($args, Field $field)
+    protected function _update(array $args, Field $field)
     {
         $data = $args['input'];
 
@@ -26,7 +26,7 @@ trait UpdateModelTrait
             return $this->_onItemNotFound($id, $args, $field);
         }
 
-        if (!$this->_dataValid($data, true, $args, $field)) {
+        if (!$this->_dataValid($data, $args, $field) || !$this->_updateDataValid($data, $args, $field)) {
             return $this->_onDataInvalid($data, $args, $field);
         }
 
@@ -52,21 +52,30 @@ trait UpdateModelTrait
         return $response;
     }
 
-    protected function _beforeHandleUpdate($id, $args, Field $field)
+    protected function _updateDataValid(array $data, array $args, Field $field)
+    {
+        return true;
+    }
+
+    protected function _beforeHandleUpdate($id, array $args, Field $field)
     {
     }
 
-    protected function _updateAllowed(Model $item, $data, $args, Field $field)
+    protected function _updateAllowed($item, array $data, array $args, Field $field)
     {
         return true;
     }
 
 
-    protected function _updateItem(Model $item, $data, $args, Field $field)
+    protected function _updateItem($item, array $data, array $args, Field $field)
     {
         $this->_beforeAssignData($item, $data, $args, $field);
+        $this->_beforeAssignUpdateData($item, $data, $args, $field);
+
         $item->assign($data, null);
+
         $this->_afterAssignData($item, $data, $args, $field);
+        $this->_afterAssignUpdateData($item, $data, $args, $field);
 
         $this->_beforeSave($item, $args, $field);
         $this->_beforeUpdate($item, $args, $field);
@@ -82,15 +91,23 @@ trait UpdateModelTrait
         return $success ? $item : null;
     }
 
-    protected function _beforeUpdate(Model $item, $args, Field $field)
+    protected function _beforeAssignUpdateData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterUpdate(Model $item, $args, Field $field)
+    protected function _afterAssignUpdateData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _onUpdateFailed(Model $item, $data, $args, Field $field)
+    protected function _beforeUpdate($item, array $args, Field $field)
+    {
+    }
+
+    protected function _afterUpdate($item, array $args, Field $field)
+    {
+    }
+
+    protected function _onUpdateFailed($item, array $data, array $args, Field $field)
     {
         throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to update item', [
             'messages' => $this->_getMessages($item->getMessages()),
@@ -99,12 +116,12 @@ trait UpdateModelTrait
         ]);
     }
 
-    protected function _getUpdateResponse($updatedItem, $data, $args, Field $field)
+    protected function _getUpdateResponse($updatedItem, array $data, array $args, Field $field)
     {
         return $updatedItem;
     }
 
-    protected function _afterHandleUpdate(Model $updatedItem, $data, $response, $args, Field $field)
+    protected function _afterHandleUpdate($updatedItem, array $data, $response, array $args, Field $field)
     {
     }
 }

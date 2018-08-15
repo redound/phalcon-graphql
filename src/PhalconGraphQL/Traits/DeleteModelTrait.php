@@ -7,7 +7,7 @@ use PhalconApi\Constants\ErrorCodes;
 
 trait DeleteModelTrait
 {
-    protected function _delete($args, Field $field)
+    protected function _delete(array $args, Field $field)
     {
         $id = $args['id'];
 
@@ -38,16 +38,16 @@ trait DeleteModelTrait
         return $response;
     }
 
-    protected function _beforeHandleDelete($id, $args, Field $field)
+    protected function _beforeHandleDelete($id, array $args, Field $field)
     {
     }
 
-    protected function _deleteAllowed(Model $item, $args, Field $field)
+    protected function _deleteAllowed($item, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _deleteItem(Model $item, $args, Field $field)
+    protected function _deleteItem($item, array $args, Field $field)
     {
         $this->_beforeDelete($item, $args, $field);
 
@@ -60,15 +60,15 @@ trait DeleteModelTrait
         return $success;
     }
 
-    protected function _beforeDelete(Model $item, $args, Field $field)
+    protected function _beforeDelete($item, array $args, Field $field)
     {
     }
 
-    protected function _afterDelete(Model $item, $args, Field $field)
+    protected function _afterDelete($item, array $args, Field $field)
     {
     }
 
-    protected function _onDeleteFailed(Model $item, $args, Field $field)
+    protected function _onDeleteFailed($item, array $args, Field $field)
     {
         throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to delete item', [
             'messages' => $this->_getMessages($item->getMessages()),
@@ -76,12 +76,12 @@ trait DeleteModelTrait
         ]);
     }
 
-    protected function _getDeleteResponse(Model $deletedItem, $args, Field $field)
+    protected function _getDeleteResponse($deletedItem, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _afterHandleDelete(Model $deletedItem, $response, $args, Field $field)
+    protected function _afterHandleDelete($deletedItem, $response, array $args, Field $field)
     {
     }
 }

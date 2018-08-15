@@ -5,7 +5,7 @@ use PhalconGraphQL\Definition\Fields\Field;
 
 trait AllModelTrait
 {
-    protected function _all($args, Field $field)
+    protected function _all(array $args, Field $field)
     {
         $this->_invokePlugins($field, 'beforeHandle', [$args, $field]);
         $this->_beforeHandle($args, $field);
@@ -31,11 +31,11 @@ trait AllModelTrait
         return $response;
     }
 
-    protected function _beforeHandleAll($args, Field $field)
+    protected function _beforeHandleAll(array $args, Field $field)
     {
     }
 
-    protected function _getAllData($args, Field $field)
+    protected function _getAllData(array $args, Field $field)
     {
         /** @var \Phalcon\Mvc\Model\Manager $modelsManager */
         $modelsManager = $this->di->get(\PhalconGraphQL\Constants\Services::MODELS_MANAGER);
@@ -53,7 +53,7 @@ trait AllModelTrait
         return $phqlBuilder->getQuery()->execute();
     }
 
-    protected function _getTotalCount($args, Field $field)
+    protected function _getTotalCount(array $args, Field $field)
     {
         /** @var \Phalcon\Mvc\Model\Manager $modelsManager */
         $modelsManager = $this->di->get(\PhalconGraphQL\Constants\Services::MODELS_MANAGER);
@@ -75,21 +75,21 @@ trait AllModelTrait
         return $this->_getTotalCountResponse($results, $args, $field);
     }
 
-    protected function _getTotalCountResponse($results, $args, Field $field){
+    protected function _getTotalCountResponse($results, array $args, Field $field){
 
         return count($results) > 0 ? (int)$results[0]->count : 0;
     }
 
-    protected function _modifyAllQuery(QueryBuilder $query, $args, Field $field, $count=false)
+    protected function _modifyAllQuery(QueryBuilder $query, array $args, Field $field, $count=false)
     {
     }
 
-    protected function _allAllowed($data, $args, Field $field)
+    protected function _allAllowed($data, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _getAllResponse($result, $args, Field $field)
+    protected function _getAllResponse($result, array $args, Field $field)
     {
         $model = $this->getModel($field);
         $returnType = $this->schema->findObjectType($field->getType());
@@ -104,7 +104,7 @@ trait AllModelTrait
         }
     }
 
-    protected function _afterHandleAll($data, $response, $args, Field $field)
+    protected function _afterHandleAll($data, $response, array $args, Field $field)
     {
     }
 }

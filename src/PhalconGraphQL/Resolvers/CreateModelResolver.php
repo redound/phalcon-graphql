@@ -9,7 +9,7 @@ class CreateModelResolver extends ModelResolver
     use \ModelMutationTrait;
     use \CreateModelTrait;
 
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         return $this->_create($args, $field);
     }

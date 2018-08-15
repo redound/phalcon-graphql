@@ -9,7 +9,7 @@ class AllModelResolver extends ModelResolver
     use \ModelQueryTrait;
     use \AllModelTrait;
 
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         return $this->_all($args, $field);
     }

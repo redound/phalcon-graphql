@@ -29,10 +29,10 @@ class JsonScalarType extends ScalarType
         return !is_string($value) ? json_encode($value) : $value;
     }
 
-    public function parseLiteral($ast)
+    public function parseLiteral($valueNode, array $variables = null)
     {
-        if ($ast instanceof StringValue) {
-            return $this->parseValue($ast->value);
+        if ($valueNode instanceof StringValue) {
+            return $this->parseValue($valueNode->value);
         }
 
         return null;

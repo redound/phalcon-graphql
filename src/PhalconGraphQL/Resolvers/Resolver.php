@@ -31,7 +31,7 @@ class Resolver extends Plugin implements ResolverInterface
         $this->objectType = $objectType;
     }
 
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         $fieldName = $field->getName();
         $property = null;

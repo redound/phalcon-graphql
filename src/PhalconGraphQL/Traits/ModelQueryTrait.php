@@ -8,12 +8,12 @@ use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
 trait ModelQueryTrait
 {
-    protected function _onNotAllowed($args, Field $field)
+    protected function _onNotAllowed(array $args, Field $field)
     {
         throw new Exception(ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
-    protected function _modifyQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    protected function _modifyQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
     }
 
@@ -27,15 +27,15 @@ trait ModelQueryTrait
         return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance) ?: 'id';
     }
 
-    protected function _beforeHandle($args, Field $field)
+    protected function _beforeHandle(array $args, Field $field)
     {
     }
 
-    protected function _afterHandle($args, Field $field)
+    protected function _afterHandle(array $args, Field $field)
     {
     }
 
-    protected function _invokePlugins(Field $field, $methodName, $arguments=[], $input=null)
+    protected function _invokePlugins(Field $field, $methodName, array $arguments=[], $input=null)
     {
         $plugins = $this->_getPlugins($field);
         $response = $input !== null ? $input : [];

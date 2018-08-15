@@ -66,77 +66,77 @@ abstract class Plugin implements PluginInterface
 
     }
 
-    public function beforeHandle($args, Field $field)
+    public function beforeHandle(array $args, Field $field)
     {
 
     }
 
-    public function beforeHandleAll($args, Field $field)
+    public function beforeHandleAll(array $args, Field $field)
     {
 
     }
 
-    public function beforeHandleFind($args, Field $field)
+    public function beforeHandleFind(array $args, Field $field)
     {
 
     }
 
-    public function afterHandle($args, Field $field)
+    public function afterHandle(array $args, Field $field)
     {
 
     }
 
-    public function afterHandleAll($data, $response, $args, Field $field)
+    public function afterHandleAll($data, $response, array $args, Field $field)
     {
 
     }
 
-    public function afterHandleFind($item, $response, $args, Field $field)
+    public function afterHandleFind($item, $response, array $args, Field $field)
     {
 
     }
 
-    public function modifyQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
 
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
 
     }
 
-    public function modifyFindQuery(QueryBuilder $query, $id, $args, Field $field)
+    public function modifyFindQuery(QueryBuilder $query, $id, array $args, Field $field)
     {
 
     }
 
-    public function modifyAllResponse($response, $args, Field $field)
+    public function modifyAllResponse($response, array $args, Field $field)
     {
 
     }
 
-    public function modifyFindResponse($response, $args, Field $field)
+    public function modifyFindResponse($response, array $args, Field $field)
     {
 
     }
 
-    public function beforeHandleRelation($source, $args, Field $field)
+    public function beforeHandleRelation($source, array $args, Field $field)
     {
 
     }
 
-    public function afterHandleRelation($data, $response, $source, $args, Field $field)
+    public function afterHandleRelation($data, $response, $source, array $args, Field $field)
     {
 
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
 
     }
 
-    public function modifyRelationResponse($response, $source, $args, Field $field)
+    public function modifyRelationResponse($response, $source, array $args, Field $field)
     {
 
     }
