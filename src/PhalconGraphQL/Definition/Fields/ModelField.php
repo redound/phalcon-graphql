@@ -18,15 +18,14 @@ class ModelField extends Field
 
     protected $_model;
 
-    public function __construct($model=null, $name=null, $type=null, $description=null, $embedMode=null)
+    public function __construct($model=null, $name=null, $type=null)
     {
         if($type === null){
             $type = Core::getShortClass($model);
         }
 
-        parent::__construct($name, $type, $description);
+        parent::__construct($name, $type);
 
-        $this->_embedMode = $embedMode;
         $this->_model = $model;
     }
 
@@ -125,18 +124,16 @@ class ModelField extends Field
     /**
      * @param string $model
      * @param string $name
-     * @param string $type
-     * @param string $description
      *
      * @return static
      */
-    public static function factory($model=null, $name=null, $type=null, $description=null)
+    public static function factory($model=null, $name=null)
     {
-        return new ModelField($model, $name, $type, $description);
+        return new static($model, $name);
     }
 
-    public static function listFactory($model=null, $name=null, $type=null, $description=null)
+    public static function listFactory($model=null, $name=null)
     {
-        return self::factory($model, $name, $type, $description)->isList();
+        return self::factory($model, $name)->isList();
     }
 }

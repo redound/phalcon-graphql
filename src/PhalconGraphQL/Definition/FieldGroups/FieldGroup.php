@@ -18,13 +18,9 @@ class FieldGroup implements FieldGroupInterface
 
     protected $_build = false;
 
-    public function __construct($handler=null)
+    public function __construct()
     {
-        if($handler === null){
-            $handler = $this->getDefaultHandler();
-        }
-
-        $this->_handler = $handler;
+        $this->_handler = $this->getDefaultHandler();
     }
 
     public function add(Field $field){
@@ -141,8 +137,8 @@ class FieldGroup implements FieldGroupInterface
     /**
      * @return static
      */
-    public static function factory($handler=null){
+    public static function factory($arg=null){
 
-        return new FieldGroup($handler);
+        return new static();
     }
 }

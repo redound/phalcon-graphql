@@ -24,12 +24,4 @@ class ModelMutationFieldGroup extends ModelFieldGroup
             DeleteModelField::factory($this->_modelClass)
         ];
     }
-
-    /**
-     * @return static
-     */
-    public static function factory($modelClass, $handler=null){
-
-        return new ModelMutationFieldGroup($modelClass, $handler);
-    }
 }

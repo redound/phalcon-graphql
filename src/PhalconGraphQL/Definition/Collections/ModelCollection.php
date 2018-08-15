@@ -137,9 +137,9 @@ class ModelCollection extends Collection
     }
 
 
-    public function all($objectType=Types::VIEWER, $name=null, $description=null)
+    public function all($objectType=Types::VIEWER, $name=null)
     {
-        $field = AllModelField::factory($this->_modelClass, $name, null, $description);
+        $field = AllModelField::factory($this->_modelClass, $name);
 
         $this->configureQueryField($field);
         $this->configureAllField($field);
@@ -149,9 +149,9 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function find($objectType=Types::VIEWER, $name=null, $description=null)
+    public function find($objectType=Types::VIEWER, $name=null)
     {
-        $field = FindModelField::factory($this->_modelClass, $name, null, $description);
+        $field = FindModelField::factory($this->_modelClass, $name);
 
         $this->configureQueryField($field);
         $this->configureFindField($field);
@@ -161,14 +161,14 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function create($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
+    public function create($objectType=Types::MUTATION, $name=null, $returnType=null)
     {
         $inputObject = ModelInputObjectType::create($this->_modelClass);
         $this->configureCreateInputObjectType($inputObject);
 
         $this->inputObject($inputObject);
 
-        $field = CreateModelField::factory($this->_modelClass, $name, $returnType, null, $description);
+        $field = new CreateModelField($this->_modelClass, $name, $returnType);
 
         $this->configureMutationField($field);
         $this->configureCreateField($field);
@@ -178,14 +178,14 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function update($objectType=Types::MUTATION, $name=null, $returnType=null, $description=null)
+    public function update($objectType=Types::MUTATION, $name=null, $returnType=null)
     {
         $inputObject = ModelInputObjectType::update($this->_modelClass);
         $this->configureUpdateInputObjectType($inputObject);
 
         $this->inputObject($inputObject);
 
-        $field = UpdateModelField::factory($this->_modelClass, $name, $returnType, null, $description);
+        $field = new UpdateModelField($this->_modelClass, $name, $returnType);
 
         $this->configureMutationField($field);
         $this->configureUpdateField($field);
@@ -195,9 +195,9 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function delete($objectType=Types::MUTATION, $name=null, $description=null)
+    public function delete($objectType=Types::MUTATION, $name=null)
     {
-        $field = DeleteModelField::factory($this->_modelClass, $name, null, $description);
+        $field = new DeleteModelField($this->_modelClass, $name);
 
         $this->configureMutationField($field);
         $this->configureDeleteField($field);
@@ -278,6 +278,6 @@ class ModelCollection extends Collection
 
     public static function factory($modelClass=null)
     {
-        return new ModelCollection($modelClass);
+        return new static($modelClass);
     }
 }

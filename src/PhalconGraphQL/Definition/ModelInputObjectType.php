@@ -20,14 +20,14 @@ class ModelInputObjectType extends InputObjectType
     protected $_excludeIdentity = false;
     protected $_fieldsOptional = false;
 
-    public function __construct($modelClass, $name=null, $description=null)
+    public function __construct($modelClass, $name=null)
     {
         // Use class name if name not provided
         if($name === null) {
             $this->_name = Types::addInput(Core::getShortClass($modelClass));
         }
 
-        parent::__construct($name, $description);
+        parent::__construct($name);
 
         $this->_modelClass = $modelClass;
     }
@@ -159,28 +159,28 @@ class ModelInputObjectType extends InputObjectType
     /**
      * @return static
      */
-    public static function factory($modelClass, $name=null, $description=null)
+    public static function factory($modelClass)
     {
-        return new ModelInputObjectType($modelClass, $name, $description);
+        return new static($modelClass);
     }
 
-    public static function create($modelClass, $name=null, $description=null){
+    public static function create($modelClass){
 
-        if($name === null){
-            $name = Types::addCreateInput(Core::getShortClass($modelClass));
-        }
+        $name = Types::addCreateInput(Core::getShortClass($modelClass));
 
-        return self::factory($modelClass, $name, $description)
-            ->excludeIdentity();
+        $result = new static($modelClass, $name);
+        $result->excludeIdentity();
+
+        return $result;
     }
 
-    public static function update($modelClass, $name=null, $description=null){
+    public static function update($modelClass){
 
-        if($name === null){
-            $name = Types::addUpdateInput(Core::getShortClass($modelClass));
-        }
+        $name = Types::addUpdateInput(Core::getShortClass($modelClass));
 
-        return self::factory($modelClass, $name, $description)
-            ->fieldsOptional();
+        $result = new static($modelClass, $name);
+        $result->fieldsOptional();
+
+        return $result;
     }
 }

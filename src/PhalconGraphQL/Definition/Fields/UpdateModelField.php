@@ -9,7 +9,7 @@ use PhalconGraphQL\Resolvers\UpdateModelResolver;
 
 class UpdateModelField extends ModelField
 {
-    public function __construct($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
+    public function __construct($model=null, $name=null, $returnType=null, $inputType=null)
     {
         $modelName = ucfirst(Core::getShortClass($model));
 
@@ -21,15 +21,10 @@ class UpdateModelField extends ModelField
             $inputType = Types::addUpdateInput($modelName);
         }
 
-        parent::__construct($model, $name, $returnType, $description);
+        parent::__construct($model, $name, $returnType);
 
         $this
             ->resolver(UpdateModelResolver::class)
             ->arg(InputField::factory('input', $inputType)->nonNull());
-    }
-
-    public static function factory($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
-    {
-        return new UpdateModelField($model, $name, $returnType, $inputType, $description);
     }
 }

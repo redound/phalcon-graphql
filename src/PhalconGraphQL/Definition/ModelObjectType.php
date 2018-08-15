@@ -23,14 +23,14 @@ class ModelObjectType extends ObjectType
     protected $_excludeRelations = false;
     protected $_relationEmbedMode;
 
-    public function __construct($modelClass, $name=null, $description=null)
+    public function __construct($modelClass, $name=null)
     {
         // Use class name if name not provided
         if($name === null) {
             $name = Core::getShortClass($modelClass);
         }
 
-        parent::__construct($name, $description);
+        parent::__construct($name);
 
         $this->_modelClass = $modelClass;
     }
@@ -160,9 +160,8 @@ class ModelObjectType extends ObjectType
 
                 $isList = in_array($relation->getType(), [Model\Relation::HAS_MANY, Model\Relation::HAS_MANY_THROUGH]);
 
-                $field = RelationModelField::factory($relation->getReferencedModel(), $relationFieldName, $referencedModelClass)
-                    ->isList($isList)
-                    ->embedMode($relationEmbedMode);
+                $field = new RelationModelField($relation->getReferencedModel(), $relationFieldName, $referencedModelClass);
+                $field->isList($isList)->embedMode($relationEmbedMode);
 
                 $newFields[] = $field;
             }
@@ -260,8 +259,8 @@ class ModelObjectType extends ObjectType
     /**
      * @return static
      */
-    public static function factory($modelClass, $name=null, $description=null)
+    public static function factory($modelClass)
     {
-        return new ModelObjectType($modelClass, $name, $description);
+        return new static($modelClass);
     }
 }

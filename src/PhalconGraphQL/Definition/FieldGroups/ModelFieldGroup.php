@@ -6,11 +6,11 @@ class ModelFieldGroup extends FieldGroup
 {
     protected $_modelClass;
 
-    public function __construct($modelClass, $handler=null)
+    public function __construct($modelClass)
     {
         $this->_modelClass = $modelClass;
 
-        parent::__construct($handler);
+        parent::__construct();
     }
 
     /**
@@ -34,8 +34,8 @@ class ModelFieldGroup extends FieldGroup
     /**
      * @return static
      */
-    public static function factory($modelClass, $handler=null){
+    public static function factory($modelClass=null){
 
-        return new ModelFieldGroup($modelClass, $handler);
+        return new static($modelClass);
     }
 }

@@ -22,12 +22,4 @@ class ModelQueryFieldGroup extends ModelFieldGroup
             FindModelField::factory($this->_modelClass)
         ];
     }
-
-    /**
-     * @return static
-     */
-    public static function factory($modelClass, $handler=null){
-
-        return new ModelQueryFieldGroup($modelClass, $handler=null);
-    }
 }
