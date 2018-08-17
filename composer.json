@@ -1,7 +1,7 @@
 {
     "name": "redound/phalcon-graphql",
     "description": "Phalcon GraphQL Library",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "require": {
         "php": ">=5.4",
         "ext-phalcon": ">=1.3.2",
