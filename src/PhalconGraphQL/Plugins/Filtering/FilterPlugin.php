@@ -47,7 +47,7 @@ class FilterPlugin extends Plugin
             ->arg(InputField::factory('filter', $filterTypeName));
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         $model = Core::getShortClass($field->getModel());
         $filter = isset($args['filter']) ? $args['filter'] : null;

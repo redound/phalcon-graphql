@@ -16,7 +16,7 @@ class InputField
 
     protected $_built = false;
 
-    public function __construct($name=null, $type=null, $description=null)
+    public function __construct($name=null, $type=null)
     {
         if($name !== null){
             $this->_name = $name;
@@ -24,10 +24,6 @@ class InputField
 
         if($type !== null){
             $this->_type = $type;
-        }
-
-        if($description !== null){
-            $this->_description = $description;
         }
     }
 
@@ -116,33 +112,33 @@ class InputField
     }
 
 
-    public static function factory($name=null, $type=null, $description=null)
+    public static function factory($name, $type)
     {
-        return new InputField($name, $type, $description);
+        return new static($name, $type);
     }
 
-    public static function string($name=null, $description=null)
+    public static function string($name)
     {
-        return self::factory($name, Types::STRING, $description);
+        return self::factory($name, Types::STRING);
     }
 
-    public static function int($name=null, $description=null)
+    public static function int($name)
     {
-        return self::factory($name, Types::INT, $description);
+        return self::factory($name, Types::INT);
     }
 
-    public static function float($name=null, $description=null)
+    public static function float($name)
     {
-        return self::factory($name, Types::FLOAT, $description);
+        return self::factory($name, Types::FLOAT);
     }
 
-    public static function boolean($name=null, $description=null)
+    public static function boolean($name)
     {
-        return self::factory($name, Types::BOOLEAN, $description);
+        return self::factory($name, Types::BOOLEAN);
     }
 
-    public static function id($name=null, $description=null)
+    public static function id($name)
     {
-        return self::factory($name, Types::ID, $description);
+        return self::factory($name, Types::ID);
     }
 }

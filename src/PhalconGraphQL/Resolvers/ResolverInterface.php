@@ -6,5 +6,5 @@ use PhalconGraphQL\Definition\Fields\Field;
 
 interface ResolverInterface
 {
-    public function resolve($source, $args, Field $field);
+    public function resolve($source, array $args, Field $field);
 }

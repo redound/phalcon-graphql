@@ -8,7 +8,7 @@ class EnumTypeValue
     protected $_description;
     protected $_value;
 
-    public function __construct($name=null, $value=null, $description=null)
+    public function __construct($name=null, $value=null)
     {
         if($name != null){
             $this->_name = $name;
@@ -16,10 +16,6 @@ class EnumTypeValue
 
         if($value !== null){
             $this->_value = $value;
-        }
-
-        if($description !== null){
-            $this->_description = $description;
         }
     }
 
@@ -56,8 +52,8 @@ class EnumTypeValue
         return $this->_value;
     }
 
-    public static function factory($name=null, $value=null, $description=null)
+    public static function factory($name, $value)
     {
-        return new EnumTypeValue($name, $value, $description);
+        return new static($name, $value);
     }
 }

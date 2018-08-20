@@ -7,7 +7,7 @@ use \PhalconApi\Constants\ErrorCodes;
 
 trait RelationModelTrait
 {
-    protected function _relation($source, $args, Field $field)
+    protected function _relation($source, array $args, Field $field)
     {
         if(!($source instanceof Model)){
             throw new Exception(ErrorCodes::GENERAL_SYSTEM, "Source for relation should be instance of Model");
@@ -40,12 +40,12 @@ trait RelationModelTrait
         return $response;
     }
 
-    protected function _beforeHandleRelation($source, $args, Field $field)
+    protected function _beforeHandleRelation($source, array $args, Field $field)
     {
 
     }
 
-    protected function _getRelationData($source, $args, Field $field)
+    protected function _getRelationData($source, array $args, Field $field)
     {
         $fieldName = $field->getName();
 
@@ -70,16 +70,16 @@ trait RelationModelTrait
         return $result;
     }
 
-    protected function _modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    protected function _modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
     }
 
-    protected function _relationAllowed($data, $source, $args, Field $field)
+    protected function _relationAllowed($data, $source, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _getRelationResponse($data, $source, $args, Field $field)
+    protected function _getRelationResponse($data, $source, array $args, Field $field)
     {
         $returnType = $this->schema->findObjectType($field->getType());
 
@@ -97,7 +97,7 @@ trait RelationModelTrait
         }
     }
 
-    protected function _afterHandleRelation($data, $response, $source, $args, Field $field)
+    protected function _afterHandleRelation($data, $response, $source, array $args, Field $field)
     {
 
     }

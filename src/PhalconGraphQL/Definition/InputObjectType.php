@@ -14,10 +14,9 @@ class InputObjectType
 
     protected $_built = false;
 
-    public function __construct($name=null, $description=null)
+    public function __construct($name=null)
     {
         $this->_name = $name;
-        $this->_description = $description;
     }
 
     public function name($name)
@@ -108,8 +107,8 @@ class InputObjectType
         $this->_built = true;
     }
 
-    public static function factory($name=null)
+    public static function factory($name)
     {
-        return new InputObjectType($name);
+        return new static($name);
     }
 }

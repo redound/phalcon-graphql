@@ -9,7 +9,7 @@ class DeleteModelResolver extends ModelResolver
     use \ModelMutationTrait;
     use \DeleteModelTrait;
 
-    public function resolve($source, $args, Field $field)
+    public function resolve($source, array $args, Field $field)
     {
         return $this->_delete($args, $field);
     }

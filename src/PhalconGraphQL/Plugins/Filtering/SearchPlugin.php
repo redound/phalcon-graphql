@@ -33,7 +33,7 @@ class SearchPlugin extends Plugin
         }
     }
 
-    public function modifyAllQuery(QueryBuilder $query, $args, Field $field, $isCount)
+    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         $model = $field->getModel();
         $modelShort = Core::getShortClass($model);
@@ -67,7 +67,7 @@ class SearchPlugin extends Plugin
         $query->andWhere('(' . $orQuery . ')', ['searchQuery' => $search]);
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
         $model = $field->getModel();
 

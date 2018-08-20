@@ -413,6 +413,6 @@ class Schema implements \PhalconApi\Acl\MountableInterface
 
     public static function factory($embedMode = null)
     {
-        return new Schema($embedMode);
+        return new static($embedMode);
     }
 }

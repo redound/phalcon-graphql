@@ -60,6 +60,6 @@ class ListEmbedResponse
 
     public static function factory($items=[], $totalCount=null, $offset=null, $limit=null)
     {
-        return new ListEmbedResponse($items, $totalCount, $offset, $limit);
+        return new static($items, $totalCount, $offset, $limit);
     }
 }

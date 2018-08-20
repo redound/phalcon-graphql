@@ -22,10 +22,9 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
     protected $_itemFields = [];
 
 
-    public function __construct(ObjectType $mainObjectType, $embedMode = null)
+    public function __construct(ObjectType $mainObjectType)
     {
         $this->_mainObjectType = $mainObjectType;
-        $this->_embedMode = $embedMode;
     }
 
     public function embedList(){
@@ -135,14 +134,8 @@ class EmbeddedObjectTypeGroup extends ObjectTypeGroup
         return $objectTypes;
     }
 
-    /**
-     * @param ObjectType $mainObjectType
-     * @param int $embedMode
-     *
-     * @return static
-     */
-    public static function factory(ObjectType $mainObjectType, $embedMode = null){
+    public static function factory($mainObjectType=null){
 
-        return new EmbeddedObjectTypeGroup($mainObjectType, $embedMode);
+        return new static($mainObjectType);
     }
 }

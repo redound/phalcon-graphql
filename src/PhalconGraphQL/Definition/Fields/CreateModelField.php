@@ -9,7 +9,7 @@ use PhalconGraphQL\Resolvers\CreateModelResolver;
 
 class CreateModelField extends ModelField
 {
-    public function __construct($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
+    public function __construct($model=null, $name=null, $returnType=null, $inputType=null)
     {
         $modelName = ucfirst(Core::getShortClass($model));
 
@@ -21,15 +21,10 @@ class CreateModelField extends ModelField
             $inputType = Types::addCreateInput($modelName);
         }
 
-        parent::__construct($model, $name, $returnType, $description);
+        parent::__construct($model, $name, $returnType);
 
         $this
             ->resolver(CreateModelResolver::class)
             ->arg(InputField::factory('input', $inputType)->nonNull());
-    }
-
-    public static function factory($model=null, $name=null, $returnType=null, $inputType=null, $description=null)
-    {
-        return new CreateModelField($model, $name, $returnType, $inputType, $description);
     }
 }

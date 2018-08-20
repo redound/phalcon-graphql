@@ -286,8 +286,8 @@ class Collection implements SchemaMountableInterface
         }
     }
 
-    public static function factory()
+    public static function factory($arg = null)
     {
-        return new Collection();
+        return new static();
     }
 }

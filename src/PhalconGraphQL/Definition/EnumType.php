@@ -8,14 +8,10 @@ class EnumType
     protected $_description;
     protected $_values = [];
 
-    public function __construct($name=null, $description=null)
+    public function __construct($name=null)
     {
         if($name !== null){
             $this->_name = $name;
-        }
-
-        if($description !== null){
-            $this->_description = $description;
         }
     }
 
@@ -47,9 +43,9 @@ class EnumType
         return $this;
     }
 
-    public function value($name, $value, $description=null)
+    public function value($name, $value)
     {
-        $this->addValue(EnumTypeValue::factory($name, $value, $description));
+        $this->addValue(EnumTypeValue::factory($name, $value));
         return $this;
     }
 
@@ -58,8 +54,8 @@ class EnumType
         return $this->_values;
     }
 
-    public static function factory($name = null, $description=null)
+    public static function factory($name)
     {
-        return new EnumType($name, $description);
+        return new static($name);
     }
 }

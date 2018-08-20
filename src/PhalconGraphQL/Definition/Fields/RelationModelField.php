@@ -6,15 +6,10 @@ use PhalconGraphQL\Resolvers\RelationModelResolver;
 
 class RelationModelField extends ModelField
 {
-    public function __construct($model=null, $name=null, $type=null, $description=null, $embedMode=null)
+    public function __construct($model=null, $name=null, $type=null)
     {
-        parent::__construct($model, $name, $type, $description, $embedMode);
+        parent::__construct($model, $name, $type);
 
         $this->resolver(RelationModelResolver::class);
-    }
-
-    public static function factory($model=null, $name=null, $type=null, $description=null)
-    {
-        return new RelationModelField($model, $name, $type, $description);
     }
 }

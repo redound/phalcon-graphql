@@ -20,14 +20,10 @@ class UnionType
     protected $_plugins = [];
     protected $_built = false;
 
-    public function __construct($name=null, $description=null)
+    public function __construct($name=null)
     {
         if($name !== null){
             $this->_name = $name;
-        }
-
-        if($description !== null){
-            $this->_description = $description;
         }
     }
 
@@ -174,23 +170,23 @@ class UnionType
     /**
      * @return static
      */
-    public static function factory($name=null, $description=null)
+    public static function factory($name)
     {
-        return new UnionType($name, $description);
+        return new static($name);
     }
 
-    public static function query($description=null)
+    public static function query()
     {
-        return self::factory(Types::QUERY, $description);
+        return self::factory(Types::QUERY);
     }
 
-    public static function mutation($description=null)
+    public static function mutation()
     {
-        return self::factory(Types::MUTATION, $description);
+        return self::factory(Types::MUTATION);
     }
 
-    public static function viewer($description=null)
+    public static function viewer()
     {
-        return self::factory(Types::VIEWER, $description);
+        return self::factory(Types::VIEWER);
     }
 }

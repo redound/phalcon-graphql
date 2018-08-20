@@ -7,59 +7,59 @@ use Phalcon\Mvc\Model;
 
 trait ModelMutationTrait
 {
-    protected function _onNotAllowed($args, Field $field)
+    protected function _onNotAllowed(array $args, Field $field)
     {
         throw new Exception(ErrorCodes::ACCESS_DENIED, 'Operation is not allowed');
     }
 
-    protected function _onDataInvalid($data, $args, Field $field)
+    protected function _onDataInvalid(array $data, array $args, Field $field)
     {
         throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', ['data' => $data]);
     }
 
-    protected function _onItemNotFound($id, $args, Field $field)
+    protected function _onItemNotFound($id, array $args, Field $field)
     {
         throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
     }
 
-    protected function _beforeAssignData(Model $item, $data, $args, Field $field)
+    protected function _beforeAssignData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterAssignData(Model $item, $data, $args, Field $field)
+    protected function _afterAssignData($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _beforeSave(Model $item, $args, Field $field)
+    protected function _beforeSave($item, array $args, Field $field)
     {
     }
 
-    protected function _afterSave(Model $item, $args, Field $field)
+    protected function _afterSave($item, array $args, Field $field)
     {
     }
 
-    protected function _beforeHandle($args, Field $field)
+    protected function _beforeHandle(array $args, Field $field)
     {
     }
 
-    protected function _afterHandle($args, Field $field)
+    protected function _afterHandle(array $args, Field $field)
     {
     }
 
 
     /*** GENERAL HOOKS ***/
 
-    protected function _dataValid($data, $isUpdate, $args, Field $field)
+    protected function _dataValid(array $data, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _saveAllowed($data, $args, Field $field)
+    protected function _saveAllowed(array $data, array $args, Field $field)
     {
         return true;
     }
 
-    protected function _transformPostData($data, $args, Field $field)
+    protected function _transformPostData(array $data, array $args, Field $field)
     {
         $result = [];
 
@@ -70,7 +70,7 @@ trait ModelMutationTrait
         return $result;
     }
 
-    protected function _transformPostDataValue($key, $value, $data)
+    protected function _transformPostDataValue($key, $value, array $data)
     {
         return $value;
     }

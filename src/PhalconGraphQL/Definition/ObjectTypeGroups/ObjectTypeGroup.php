@@ -111,8 +111,8 @@ class ObjectTypeGroup implements ObjectTypeGroupInterface
     /**
      * @return static
      */
-    public static function factory(){
+    public static function factory($arg=null){
 
-        return new ObjectTypeGroup();
+        return new static();
     }
 }
