@@ -98,7 +98,7 @@ class FilterPlugin extends Plugin
         $query->andWhere('[' . $modelName . '].[' . $filterField . '] = :'.$valueKey.':', [$valueKey => $filterValue]);
     }
 
-    public function modifyRelationOptions($options, $source, $args, Field $field, $isCount)
+    public function modifyRelationOptions($options, $source, array $args, Field $field, $isCount)
     {
         $filter = isset($args['filter']) ? $args['filter'] : null;
 
