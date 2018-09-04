@@ -18,7 +18,7 @@ class SoftDeletePlugin extends Plugin
         $this->deletedValue = $deletedValue;
     }
 
-    public function modifyAllQuery(QueryBuilder $query, array $args, Field $field, $isCount)
+    public function modifyQuery(QueryBuilder $query, array $args, Field $field, $isCount)
     {
         $model = Core::getShortClass($field->getModel());
 
