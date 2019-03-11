@@ -15,13 +15,15 @@ class DateScalarType extends ScalarType
 
     protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d", \DateTime::ISO8601, 'Y-m-d\TH:i:s.uP'];
 
-    protected $format;
+    protected $externalFormat;
+    protected $internalFormat;
 
-    public function __construct($format = self::DEFAULT_DATE_FORMAT)
+    public function __construct($externalFormat=self::DEFAULT_DATE_FORMAT, $internalFormat=self::DEFAULT_DATE_FORMAT)
     {
         parent::__construct();
 
-        $this->format = $format;
+        $this->externalFormat = $externalFormat;
+        $this->internalFormat = $internalFormat;
     }
 
     public function serialize($value)
@@ -32,7 +34,7 @@ class DateScalarType extends ScalarType
 
         $date = $this->getDateTime($value);
 
-        return $date->format($this->format);
+        return $date->format($this->externalFormat);
     }
 
     public function parseValue($value)
@@ -43,7 +45,7 @@ class DateScalarType extends ScalarType
 
         $date = $this->getDateTime($value);
 
-        return $date->format($this->format);
+        return $date->format($this->internalFormat);
     }
 
     public function parseLiteral($valueNode, array $variables = null)
@@ -65,7 +67,7 @@ class DateScalarType extends ScalarType
                 $date = new \DateTime('@' . $value);
             }
             else {
-                $date = \DateTime::createFromFormat($this->format, $value);
+                $date = \DateTime::createFromFormat($this->externalFormat, $value);
             }
 
             if($date === false){
