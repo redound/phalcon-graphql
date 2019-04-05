@@ -30,11 +30,11 @@ trait ModelMutationTrait
     {
     }
 
-    protected function _beforeSave($item, array $args, Field $field)
+    protected function _beforeSave($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterSave($item, array $args, Field $field)
+    protected function _afterSave($item, array $data, array $args, Field $field)
     {
     }
 

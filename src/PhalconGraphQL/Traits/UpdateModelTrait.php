@@ -35,6 +35,7 @@ trait UpdateModelTrait
         }
 
         $data = $this->_transformPostData($data, $args, $field);
+        $data = $this->_transformUpdatePostData($data, $args, $field);
 
         $newItem = $this->_updateItem($item, $data, $args, $field);
 
@@ -66,6 +67,11 @@ trait UpdateModelTrait
         return true;
     }
 
+    protected function _transformUpdatePostData(array $data, array $args, Field $field)
+    {
+        return $data;
+    }
+
 
     protected function _updateItem($item, array $data, array $args, Field $field)
     {
@@ -77,15 +83,15 @@ trait UpdateModelTrait
         $this->_afterAssignData($item, $data, $args, $field);
         $this->_afterAssignUpdateData($item, $data, $args, $field);
 
-        $this->_beforeSave($item, $args, $field);
-        $this->_beforeUpdate($item, $args, $field);
+        $this->_beforeSave($item, $data, $args, $field);
+        $this->_beforeUpdate($item, $data, $args, $field);
 
         $success = $item->update();
 
         if ($success) {
 
-            $this->_afterUpdate($item, $args, $field);
-            $this->_afterSave($item, $args, $field);
+            $this->_afterUpdate($item, $data, $args, $field);
+            $this->_afterSave($item, $data, $args, $field);
         }
 
         return $success ? $item : null;
@@ -99,11 +105,11 @@ trait UpdateModelTrait
     {
     }
 
-    protected function _beforeUpdate($item, array $args, Field $field)
+    protected function _beforeUpdate($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterUpdate($item, array $args, Field $field)
+    protected function _afterUpdate($item, array $data, array $args, Field $field)
     {
     }
 

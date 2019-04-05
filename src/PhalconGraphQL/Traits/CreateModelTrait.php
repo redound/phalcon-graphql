@@ -23,6 +23,7 @@ trait CreateModelTrait
         }
 
         $data = $this->_transformPostData($data, $args, $field);
+        $data = $this->_transformCreatePostData($data, $args, $field);
 
         $item = $this->_createModelInstance($field);
 
@@ -57,6 +58,11 @@ trait CreateModelTrait
         return true;
     }
 
+    protected function _transformCreatePostData(array $data, array $args, Field $field)
+    {
+        return $data;
+    }
+
     protected function _createItem($item, array $data, array $args, Field $field)
     {
         $this->_beforeAssignData($item, $data, $args, $field);
@@ -67,15 +73,15 @@ trait CreateModelTrait
         $this->_afterAssignData($item, $data, $args, $field);
         $this->_afterAssignCreateData($item, $data, $args, $field);
 
-        $this->_beforeSave($item, $args, $field);
-        $this->_beforeCreate($item, $args, $field);
+        $this->_beforeSave($item, $data, $args, $field);
+        $this->_beforeCreate($item, $data, $args, $field);
 
         $success = $item->create();
 
         if ($success) {
 
-            $this->_afterCreate($item, $args, $field);
-            $this->_afterSave($item, $args, $field);
+            $this->_afterCreate($item, $data, $args, $field);
+            $this->_afterSave($item, $data, $args, $field);
         }
 
         return $success ? $item : null;
@@ -89,11 +95,11 @@ trait CreateModelTrait
     {
     }
 
-    protected function _beforeCreate($item, array $args, Field $field)
+    protected function _beforeCreate($item, array $data, array $args, Field $field)
     {
     }
 
-    protected function _afterCreate($item, array $args, Field $field)
+    protected function _afterCreate($item, array $data, array $args, Field $field)
     {
     }
 
