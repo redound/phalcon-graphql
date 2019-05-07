@@ -49,12 +49,29 @@ trait DeleteModelTrait
 
     protected function _deleteItem($item, array $args, Field $field)
     {
-        $this->_beforeDelete($item, $args, $field);
+        $success = false;
+        $this->db->begin();
 
-        $success = $item->delete();
+        try {
 
-        if ($success) {
-            $this->_afterDelete($item, $args, $field);
+            $this->_beforeDelete($item, $args, $field);
+
+            $success = $item->delete();
+
+            if ($success) {
+
+                $this->_afterDelete($item, $args, $field);
+                $this->db->commit();
+            }
+            else {
+
+                $this->db->rollback();
+            }
+        }
+        catch(\Exception $e){
+
+            $this->db->rollback();
+            throw $e;
         }
 
         return $success;

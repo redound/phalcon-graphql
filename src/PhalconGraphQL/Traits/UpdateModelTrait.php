@@ -75,23 +75,40 @@ trait UpdateModelTrait
 
     protected function _updateItem($item, array $data, array $args, Field $field)
     {
-        $this->_beforeAssignData($item, $data, $args, $field);
-        $this->_beforeAssignUpdateData($item, $data, $args, $field);
+        $success = false;
+        $this->db->begin();
 
-        $item->assign($data, null);
+        try {
 
-        $this->_afterAssignData($item, $data, $args, $field);
-        $this->_afterAssignUpdateData($item, $data, $args, $field);
+            $this->_beforeAssignData($item, $data, $args, $field);
+            $this->_beforeAssignUpdateData($item, $data, $args, $field);
 
-        $this->_beforeSave($item, $data, $args, $field);
-        $this->_beforeUpdate($item, $data, $args, $field);
+            $item->assign($data, null);
 
-        $success = $item->update();
+            $this->_afterAssignData($item, $data, $args, $field);
+            $this->_afterAssignUpdateData($item, $data, $args, $field);
 
-        if ($success) {
+            $this->_beforeSave($item, $data, $args, $field);
+            $this->_beforeUpdate($item, $data, $args, $field);
 
-            $this->_afterUpdate($item, $data, $args, $field);
-            $this->_afterSave($item, $data, $args, $field);
+            $success = $item->update();
+
+            if ($success) {
+
+                $this->_afterUpdate($item, $data, $args, $field);
+                $this->_afterSave($item, $data, $args, $field);
+
+                $this->db->commit();
+            }
+            else {
+
+                $this->db->rollback();
+            }
+        }
+        catch(\Exception $e){
+
+            $this->db->rollback();
+            throw $e;
         }
 
         return $success ? $item : null;

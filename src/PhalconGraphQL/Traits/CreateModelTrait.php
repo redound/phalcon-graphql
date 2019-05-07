@@ -65,23 +65,40 @@ trait CreateModelTrait
 
     protected function _createItem($item, array $data, array $args, Field $field)
     {
-        $this->_beforeAssignData($item, $data, $args, $field);
-        $this->_beforeAssignCreateData($item, $data, $args, $field);
+        $success = false;
+        $this->db->begin();
 
-        $item->assign($data);
+        try {
 
-        $this->_afterAssignData($item, $data, $args, $field);
-        $this->_afterAssignCreateData($item, $data, $args, $field);
+            $this->_beforeAssignData($item, $data, $args, $field);
+            $this->_beforeAssignCreateData($item, $data, $args, $field);
 
-        $this->_beforeSave($item, $data, $args, $field);
-        $this->_beforeCreate($item, $data, $args, $field);
+            $item->assign($data);
 
-        $success = $item->create();
+            $this->_afterAssignData($item, $data, $args, $field);
+            $this->_afterAssignCreateData($item, $data, $args, $field);
 
-        if ($success) {
+            $this->_beforeSave($item, $data, $args, $field);
+            $this->_beforeCreate($item, $data, $args, $field);
 
-            $this->_afterCreate($item, $data, $args, $field);
-            $this->_afterSave($item, $data, $args, $field);
+            $success = $item->create();
+
+            if ($success) {
+
+                $this->_afterCreate($item, $data, $args, $field);
+                $this->_afterSave($item, $data, $args, $field);
+
+                $this->db->commit();
+            }
+            else {
+
+                $this->db->rollback();
+            }
+        }
+        catch(\Exception $e){
+
+            $this->db->rollback();
+            throw $e;
         }
 
         return $success ? $item : null;
