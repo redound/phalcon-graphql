@@ -8,6 +8,7 @@ use Phalcon\DiInterface;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
+use PhalconGraphQL\Definition\ScalarTypes\AnyScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\DateScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\DateTimeScalarType;
 use PhalconGraphQL\Definition\ScalarTypes\JsonScalarType;
@@ -56,7 +57,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
             ->scalar(new DateScalarType())
             ->scalar(new DateTimeScalarType())
             ->scalar(new TimeScalarType())
-            ->scalar(new JsonScalarType());
+            ->scalar(new JsonScalarType())
+            ->scalar(new AnyScalarType());
     }
 
     public function plugin(PluginInterface $plugin){

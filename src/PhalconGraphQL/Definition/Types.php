@@ -15,6 +15,7 @@ class Types
     const DATE_TIME = "DateTime";
     const TIME = "Time";
     const JSON = "JSON";
+    const ANY = "Any";
 
     const QUERY = "Query";
     const MUTATION = "Mutation";
@@ -23,7 +24,7 @@ class Types
 
     public static function scalars(){
 
-        return [self::STRING, self::INT, self::FLOAT, self::BOOLEAN, self::ID, self::DATE, self::DATE_TIME, self::TIME, self::JSON];
+        return [self::STRING, self::INT, self::FLOAT, self::BOOLEAN, self::ID, self::DATE, self::DATE_TIME, self::TIME, self::JSON, self::ANY];
     }
 
     public static function addConnection($name){
