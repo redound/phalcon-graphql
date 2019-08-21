@@ -177,10 +177,12 @@ class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
         return $formatted;
     }
 
-    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, $debugMode=false)
+    public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, $debugMode=false, $data=null)
     {
-        $request = $this->di->get(Services::REQUEST);
-        $data = $request->getPostedData();
+        if(!$data) {
+            $request = $this->di->get(Services::REQUEST);
+            $data = $request->getPostedData();
+        }
 
         $requestString = isset($data['query']) && !empty($data['query']) ? $data['query'] : null;
         $operationName = isset($data['operation']) && !empty($data['operation']) ? $data['operation'] : null;
