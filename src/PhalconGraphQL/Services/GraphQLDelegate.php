@@ -84,15 +84,17 @@ class GraphQLDelegate extends \PhalconGraphQL\Mvc\Plugin
         $path = $base . '/' . $name . '.gql';
         $content = file_get_contents($path);
 
-        // Resolve includes
-        $content = preg_replace_callback('/#import\s?"(.+)"/', function($match) use ($base) {
+        return $this->_resolveImports($base, $content);
+    }
 
-            $includePath = $base . '/' . $match[1];
-            return file_get_contents($includePath);
+    protected function _resolveImports($base, $content){
+
+        return preg_replace_callback('/#import\s?"(.+)"/', function($match) use ($base) {
+
+            $includePath = realpath($base . '/' . $match[1]);
+            return $this->_resolveImports(dirname($includePath), file_get_contents($includePath));
 
         }, $content);
-
-        return $content;
     }
 
     protected function _getValue($data, $path) {
