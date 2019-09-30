@@ -107,12 +107,20 @@ class DocumentFactory
                 return null;
             }
 
-            if(!isset($value['__typename'])){
+            $typename = null;
+            if(is_array($value)){
+                $typename = isset($value['__typename']) ? $value['__typename'] : null;
+            }
+            else {
+                $typename = $value->__typename;
+            }
+
+            if(!$typename){
                 throw new \Exception('Key __typename needs to be present in response');
             }
 
             $graphqlSchema = $graphqlSchemaProvider();
-            return $graphqlSchema->getType($value['__typename']);
+            return $graphqlSchema->getType($typename);
         };
     }
 }
