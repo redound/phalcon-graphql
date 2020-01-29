@@ -2,6 +2,8 @@
 
 namespace PhalconGraphQL\Definition;
 
+use Wittig\PhalconToolkit\Utils;
+
 class EnumType
 {
     protected $_name;
@@ -54,8 +56,19 @@ class EnumType
         return $this->_values;
     }
 
-    public static function factory($name)
+    public static function factory($name, $enumClass=null)
     {
-        return new static($name);
+        $result = new static($name);
+
+        if($enumClass){
+
+            $options = Utils::getClassConstants($enumClass);
+
+            foreach ($options as $key => $value){
+                $result->value($key, $value);
+            }
+        }
+
+        return $result;
     }
 }
