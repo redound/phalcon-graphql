@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition\Collections;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\CreateModelField;
 use PhalconGraphQL\Definition\Fields\DeleteModelField;

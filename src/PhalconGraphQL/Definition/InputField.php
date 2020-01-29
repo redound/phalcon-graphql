@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 
 class InputField
 {
