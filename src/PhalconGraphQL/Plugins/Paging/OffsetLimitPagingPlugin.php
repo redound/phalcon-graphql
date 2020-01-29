@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Paging;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;

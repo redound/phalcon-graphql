@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Filtering;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
@@ -11,7 +11,6 @@ use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
-
 
 class SearchPlugin extends Plugin
 {

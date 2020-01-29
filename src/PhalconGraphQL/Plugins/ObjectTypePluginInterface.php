@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\ObjectType;
 
 interface ObjectTypePluginInterface

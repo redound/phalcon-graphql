@@ -5,9 +5,9 @@ namespace PhalconGraphQL\Resolvers;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
-use PhalconGraphQL\Mvc\Plugin;
+use PhalconGraphQL\Mvc\DiInjectable;
 
-class Resolver extends Plugin implements ResolverInterface
+class Resolver extends DiInjectable implements ResolverInterface
 {
     /** @var Schema */
     protected $schema;

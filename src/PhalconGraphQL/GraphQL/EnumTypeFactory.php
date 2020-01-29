@@ -11,7 +11,6 @@ use PhalconGraphQL\Definition\EnumTypeValue;
 
 class EnumTypeFactory
 {
-
     public static function build(SchemaEnumType $enumType)
     {
         $values = [];

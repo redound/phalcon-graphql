@@ -23,7 +23,7 @@ use PhalconGraphQL\Plugins\PluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
 use GraphQL\Type\Schema as GraphQLSchema;
 
-class Dispatcher extends \PhalconGraphQL\Mvc\Plugin
+class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
 {
     protected $defaultNamespace;
 

@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Exception;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;

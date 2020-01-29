@@ -2,8 +2,6 @@
 
 namespace PhalconGraphQL\Definition\ScalarTypes;
 
-use GraphQL\Language\AST\IntValue;
-use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 
 class DateTimeScalarType extends DateScalarType

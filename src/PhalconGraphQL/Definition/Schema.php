@@ -4,7 +4,7 @@ namespace PhalconGraphQL\Definition;
 
 use GraphQL\Type\Definition\ScalarType;
 use Phalcon\Acl;
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
@@ -407,8 +407,8 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         }
 
         return [
-            Acl::ALLOW => $allowItems,
-            Acl::DENY => $denyItems
+            Acl\Enum::ALLOW => $allowItems,
+            Acl\Enum::DENY => $denyItems
         ];
     }
 
