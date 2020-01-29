@@ -137,85 +137,106 @@ class ModelCollection extends Collection
     }
 
 
-    public function all($objectType=Types::VIEWER, $name=null)
+    public function all(callable $configurator=null)
     {
-        $field = AllModelField::factory($this->_modelClass, $name);
+        $field = AllModelField::factory($this->_modelClass);
+        if($configurator){
+            $configurator($field);
+        }
 
         $this->configureQueryField($field);
         $this->configureAllField($field);
 
-        $this->queryField($field, $objectType);
+        $this->queryField($field);
 
         return $this;
     }
 
-    public function find($objectType=Types::VIEWER, $name=null)
+    public function find(callable $configurator=null)
     {
-        $field = FindModelField::factory($this->_modelClass, $name);
+        $field = FindModelField::factory($this->_modelClass);
+        if($configurator){
+            $configurator($field);
+        }
 
         $this->configureQueryField($field);
         $this->configureFindField($field);
 
-        $this->queryField($field, $objectType);
+        $this->queryField($field);
 
         return $this;
     }
 
-    public function create($objectType=Types::MUTATION, $name=null, $returnType=null)
+    public function create(callable $inputConfigurator=null, callable $fieldConfigurator=null)
     {
         $inputObject = ModelInputObjectType::create($this->_modelClass);
-        $this->configureCreateInputObjectType($inputObject);
+        if($inputConfigurator){
+            $inputConfigurator($inputObject);
+        }
 
+        $this->configureCreateInputObjectType($inputObject);
         $this->inputObject($inputObject);
 
-        $field = new CreateModelField($this->_modelClass, $name, $returnType);
+        $field = new CreateModelField($this->_modelClass);
+        if($fieldConfigurator){
+            $fieldConfigurator($field);
+        }
 
         $this->configureMutationField($field);
         $this->configureCreateField($field);
 
-        $this->mutationField($field, $objectType);
+        $this->mutationField($field);
 
         return $this;
     }
 
-    public function update($objectType=Types::MUTATION, $name=null, $returnType=null)
+    public function update(callable $inputConfigurator=null, callable $fieldConfigurator=null)
     {
         $inputObject = ModelInputObjectType::update($this->_modelClass);
-        $this->configureUpdateInputObjectType($inputObject);
+        if($inputConfigurator){
+            $inputConfigurator($inputObject);
+        }
 
+        $this->configureUpdateInputObjectType($inputObject);
         $this->inputObject($inputObject);
 
-        $field = new UpdateModelField($this->_modelClass, $name, $returnType);
+        $field = new UpdateModelField($this->_modelClass);
+        if($fieldConfigurator){
+            $fieldConfigurator($field);
+        }
 
         $this->configureMutationField($field);
         $this->configureUpdateField($field);
 
-        $this->mutationField($field, $objectType);
+        $this->mutationField($field);
 
         return $this;
     }
 
-    public function delete($objectType=Types::MUTATION, $name=null)
+    public function delete(callable $configurator=null)
     {
-        $field = new DeleteModelField($this->_modelClass, $name);
+        $field = new DeleteModelField($this->_modelClass);
+        if($configurator){
+            $configurator($field);
+        }
 
         $this->configureMutationField($field);
         $this->configureDeleteField($field);
 
-        $this->mutationField($field, $objectType);
+        $this->mutationField($field);
 
         return $this;
     }
 
-    public function crud($queryObjectType = Types::VIEWER, $mutationObjectType = Types::MUTATION)
+    public function crud()
     {
         $this
-            ->all($queryObjectType)
-            ->find($queryObjectType)
+            ->all()
+            ->find()
 
-            ->create($mutationObjectType)
-            ->update($mutationObjectType)
-            ->delete($mutationObjectType);
+            ->create()
+            ->update()
+            ->delete();
 
         return $this;
 
