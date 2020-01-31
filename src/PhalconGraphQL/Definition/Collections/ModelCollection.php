@@ -38,6 +38,8 @@ class ModelCollection extends Collection
     protected $_allowedModelObjectRoles = [];
     protected $_deniedModelObjectRoles = [];
 
+    private $_objectConfigurator;
+
     public function __construct($modelClass=null)
     {
         $this->_modelClass = $modelClass;
@@ -47,6 +49,15 @@ class ModelCollection extends Collection
         if($this->_modelClass) {
 
             $objectType = ModelObjectType::factory($this->_modelClass);
+            if($this->_objectConfigurator) {
+
+                $configurator = $this->_objectConfigurator;
+                $configurator($objectType);
+
+                // Set to null to prevent serialization
+                $this->_objectConfigurator = null;
+            }
+
             $this->configureObjectType($objectType);
 
             $embeddedGroup = EmbeddedObjectTypeGroup::factory($objectType);
@@ -59,9 +70,11 @@ class ModelCollection extends Collection
         }
     }
 
-    public function model($modelClass){
+    public function model($modelClass, $objectConfigurator=null){
 
         $this->_modelClass = $modelClass;
+        $this->_objectConfigurator = $objectConfigurator;
+
         return $this;
     }
 
