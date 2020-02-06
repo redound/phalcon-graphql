@@ -64,6 +64,7 @@ class Types
         switch ($type) {
 
             case Column::TYPE_INTEGER:
+            case Column::TYPE_TINYINTEGER:
             case Column::TYPE_BIGINTEGER: {
 
                 $responseType = Types::INT;
