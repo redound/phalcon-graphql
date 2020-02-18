@@ -117,6 +117,42 @@ class Schema implements \PhalconApi\Acl\MountableInterface
         return $this->_enumTypes;
     }
 
+    public function resolveEnumValue($type, $enumName){
+
+        /** @var EnumType $enumType */
+        $enumType = $this->findType($type);
+
+        $values = $enumType->getValues();
+
+        /** @var EnumTypeValue $value */
+        foreach($values as $value){
+
+            if($value->getName() == $enumName){
+                return $value->getValue();
+            }
+        }
+
+        return null;
+    }
+
+    public function resolveEnumName($type, $enumValue){
+
+        /** @var EnumType $enumType */
+        $enumType = $this->findType($type);
+
+        $values = $enumType->getValues();
+
+        /** @var EnumTypeValue $value */
+        foreach($values as $value){
+
+            if($value->getValue() == $enumValue){
+                return $value->getName();
+            }
+        }
+
+        return null;
+    }
+
     public function scalar(ScalarType $type)
     {
         $this->_scalarTypes[] = $type;
