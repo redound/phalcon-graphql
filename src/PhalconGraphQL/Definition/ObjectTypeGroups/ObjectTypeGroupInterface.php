@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition\ObjectTypeGroups;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
 

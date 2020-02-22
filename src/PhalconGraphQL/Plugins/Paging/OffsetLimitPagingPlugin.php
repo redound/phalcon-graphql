@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Paging;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Definition\Fields\AllModelField;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\Fields\ModelField;
@@ -35,12 +35,14 @@ class OffsetLimitPagingPlugin extends Plugin
         $offset = isset($args['offset']) && !empty($args['offset']) ? (int)$args['offset'] : null;
         $limit = isset($args['limit']) && !empty($args['limit']) ? (int)$args['limit'] : null;
 
-        if($offset !== null){
-            $query->offset($offset);
-        }
+        // TODO: Remove this fix due to Phalcon bug (offset is not added without limit)
+        if($limit !== null || $offset !== null){
 
-        if($limit !== null){
-            $query->limit($limit);
+            if($limit === null){
+                $limit = 999999999999;
+            }
+
+            $query->limit($limit, $offset);
         }
     }
 

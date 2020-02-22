@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Filtering;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\AllModelField;

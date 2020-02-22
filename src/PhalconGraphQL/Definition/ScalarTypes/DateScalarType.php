@@ -2,8 +2,8 @@
 
 namespace PhalconGraphQL\Definition\ScalarTypes;
 
-use GraphQL\Language\AST\IntValue;
-use GraphQL\Language\AST\StringValue;
+use GraphQL\Language\AST\IntValueNode;
+use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 
 class DateScalarType extends ScalarType
@@ -50,7 +50,7 @@ class DateScalarType extends ScalarType
 
     public function parseLiteral($valueNode, array $variables = null)
     {
-        if ($valueNode instanceof \StringValue || $valueNode instanceof \IntValue) {
+        if ($valueNode instanceof StringValueNode || $valueNode instanceof IntValueNode) {
             return $this->parseValue($valueNode->value);
         }
 

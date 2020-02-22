@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition\ScalarTypes;
 
-use GraphQL\Language\AST\StringValue;
+use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 
 class JsonScalarType extends ScalarType
@@ -31,7 +31,7 @@ class JsonScalarType extends ScalarType
 
     public function parseLiteral($valueNode, array $variables = null)
     {
-        if ($valueNode instanceof StringValue) {
+        if ($valueNode instanceof StringValueNode) {
             return $this->parseValue($valueNode->value);
         }
 

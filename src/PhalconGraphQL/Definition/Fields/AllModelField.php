@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Definition\Fields;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\InputField;
 use PhalconGraphQL\Definition\Schema;

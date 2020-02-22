@@ -6,9 +6,9 @@ use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\Schema;
-use PhalconGraphQL\Mvc\Plugin;
+use PhalconGraphQL\Mvc\DiInjectable;
 
-class Handler extends Plugin
+class Handler extends DiInjectable
 {
     /** @var ObjectType */
     protected $objectType;

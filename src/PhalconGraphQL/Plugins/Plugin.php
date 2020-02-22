@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\ObjectType;

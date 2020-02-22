@@ -7,7 +7,7 @@ use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Dispatcher;
 use PhalconGraphQL\Exception;
 
-class GraphQLDelegate extends \PhalconGraphQL\Mvc\Plugin
+class GraphQLDelegate extends \PhalconGraphQL\Mvc\DiInjectable
 {
     protected $_queriesPath;
     protected $_mutationsPath;

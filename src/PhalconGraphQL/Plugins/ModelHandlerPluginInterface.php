@@ -5,7 +5,6 @@ namespace PhalconGraphQL\Plugins;
 use PhalconGraphQL\Definition\Fields\Field;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
 
-
 interface ModelHandlerPluginInterface
 {
     public function beforeHandle(array $args, Field $field);

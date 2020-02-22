@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Sorting;
 
-use Phalcon\DiInterface;
+use Phalcon\Di\DiInterface;
 use PhalconGraphQL\Core;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\EnumTypeValue;
@@ -16,7 +16,6 @@ use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Plugins\Plugin;
 use Phalcon\Mvc\Model\Query\BuilderInterface as QueryBuilder;
-
 
 class SimpleSortingPlugin extends Plugin
 {

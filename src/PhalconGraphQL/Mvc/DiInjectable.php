@@ -7,7 +7,7 @@ namespace PhalconGraphQL\Mvc;
  * @property \PhalconGraphQL\Dispatcher $graphqlDispatcher
  */
 
-class Plugin extends \PhalconApi\Mvc\Plugin
+class DiInjectable extends \PhalconApi\Mvc\DiInjectable
 {
 
 }
