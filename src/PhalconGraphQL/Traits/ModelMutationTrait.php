@@ -103,7 +103,7 @@ trait ModelMutationTrait
     {
         $messages = isset($messages) ? $messages : [];
 
-        return array_map(function (Model\Message $message) {
+        return array_map(function (\Phalcon\Messages\Message $message) {
             return $message->getMessage();
         }, $messages);
     }
