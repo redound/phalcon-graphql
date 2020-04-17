@@ -11,6 +11,7 @@ use PhalconGraphQL\Definition\ObjectType;
 use PhalconGraphQL\Definition\ObjectTypeGroups\ObjectTypeGroupInterface;
 use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\Definition\SchemaMountableInterface;
+use PhalconGraphQL\Definition\Types;
 use PhalconGraphQL\Definition\UnionType;
 
 class Collection implements SchemaMountableInterface
@@ -20,14 +21,29 @@ class Collection implements SchemaMountableInterface
     protected $_objectTypes = [];
     protected $_objectTypeGroups = [];
     protected $_inputObjectTypes = [];
+
     protected $_allowedRoles = [];
     protected $_deniedRoles = [];
     protected $_allowedFieldRoles = [];
     protected $_deniedFieldRoles = [];
     protected $_allowedObjectRoles = [];
     protected $_deniedObjectRoles = [];
+
+    protected $_mutationHandler = null;
+    protected $_queryHandler = null;
+
+    protected $_queryFields = [];
+    protected $_mutationFields = [];
+
+    protected $_allowedQueryRoles = [];
+    protected $_deniedQueryRoles = [];
+
+    protected $_allowedMutationRoles = [];
+    protected $_deniedMutationRoles = [];
+
     protected $_fields = [];
     protected $_fieldGroups = [];
+
     protected $_plugins = [];
 
 
@@ -180,6 +196,65 @@ class Collection implements SchemaMountableInterface
         return $this;
     }
 
+    public function mutationHandler($mutationHandler)
+    {
+        $this->_mutationHandler = $mutationHandler;
+        return $this;
+    }
+
+    public function queryHandler($queryHandler)
+    {
+        $this->_queryHandler = $queryHandler;
+        return $this;
+    }
+
+    public function allowQuery($roles)
+    {
+        $this->_allowedQueryRoles = array_merge($this->_allowedQueryRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function denyQuery($roles)
+    {
+        $this->_deniedQueryRoles = array_merge($this->_deniedQueryRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function allowMutation($roles)
+    {
+        $this->_allowedMutationRoles = array_merge($this->_allowedMutationRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function denyMutation($roles)
+    {
+        $this->_deniedMutationRoles = array_merge($this->_deniedMutationRoles, is_array($roles) ? $roles : [$roles]);
+        return $this;
+    }
+
+    public function queryField(Field $field, $objectType=Types::VIEWER)
+    {
+        $this->configureQueryField($field);
+
+        $this->field($objectType, $field);
+        $this->_queryFields[] = $field;
+
+        return $this;
+    }
+
+    public function mutationField(Field $field, $objectType=Types::MUTATION)
+    {
+        $this->configureMutationField($field);
+
+        $this->field($objectType, $field);
+        $this->_mutationFields[] = $field;
+
+        return $this;
+    }
+
+    protected function configureQueryField(Field $field){}
+    protected function configureMutationField(Field $field){}
+
 
     protected function initialize()
     {
@@ -188,6 +263,28 @@ class Collection implements SchemaMountableInterface
 
     public function build(Schema $schema, DiInterface $di)
     {
+        /** @var Field $field */
+        foreach($this->_queryFields as $field){
+
+            if($this->_queryHandler) {
+                $field->handler($this->_queryHandler);
+            }
+
+            $field->allow($this->_allowedQueryRoles);
+            $field->deny($this->_deniedQueryRoles);
+        }
+
+        /** @var Field $field */
+        foreach($this->_mutationFields as $field){
+
+            if($this->_mutationHandler) {
+                $field->handler($this->_mutationHandler);
+            }
+
+            $field->allow($this->_allowedMutationRoles);
+            $field->deny($this->_deniedMutationRoles);
+        }
+
         foreach($this->_fields as $objectTypeFields){
 
             /** @var Field $field */
