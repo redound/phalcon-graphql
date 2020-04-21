@@ -205,6 +205,10 @@ class ModelCollection extends Collection
 
     public function build(Schema $schema, DiInterface $di)
     {
+        if($this->_handler){
+            $this->_modelObjectType->handler($this->_handler);
+        }
+
         $this->_modelObjectTypeGroup->allow($this->_allowedQueryRoles);
         $this->_modelObjectTypeGroup->allow($this->_allowedMutationRoles);
 
