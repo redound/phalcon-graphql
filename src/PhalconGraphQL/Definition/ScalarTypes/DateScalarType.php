@@ -81,6 +81,10 @@ class DateScalarType extends ScalarType
                     }
                 }
             }
+
+            if($date){
+                $date->setTimezone(new \DateTimeZone('UTC'));
+            }
         }
         catch(\Exception $e){}
 
