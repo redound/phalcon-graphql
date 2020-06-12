@@ -57,6 +57,10 @@ class MultiFilterPlugin extends Plugin
 
         foreach($filter as $filterField => $filterValues) {
 
+            if($filterValues === null){
+                continue;
+            }
+
             $this->modifyAllQueryForFilter($query, $filterField, $filterValues, $model, $field, $isCount);
         }
     }
@@ -138,6 +142,10 @@ class MultiFilterPlugin extends Plugin
             $counter = 1;
             $fieldConditions = [];
 
+            if($values === null){
+                continue;
+            }
+
             foreach($values as $val){
 
                 $valueKey = 'filter' . $filterField . 'Value' . $counter;
@@ -151,7 +159,9 @@ class MultiFilterPlugin extends Plugin
             $filterConditions[] = '(' . implode(' OR ', $fieldConditions) . ')';
         }
 
-        $conditions .= '(' . implode(' AND ', $filterConditions) . ')';
+        if(count($filterConditions) > 0) {
+            $conditions .= '(' . implode(' AND ', $filterConditions) . ')';
+        }
 
         $options['conditions'] = $conditions;
         $options['bind'] = $bind;
