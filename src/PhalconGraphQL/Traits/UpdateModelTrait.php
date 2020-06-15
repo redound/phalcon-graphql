@@ -26,7 +26,7 @@ trait UpdateModelTrait
             return $this->_onItemNotFound($id, $args, $field);
         }
 
-        if (!$this->_dataValid($data, $args, $field) || !$this->_updateDataValid($data, $args, $field)) {
+        if (!$this->_dataValid($data, $args, $field) || !$this->_updateDataValid($item, $data, $args, $field)) {
             return $this->_onDataInvalid($data, $args, $field);
         }
 
@@ -53,7 +53,7 @@ trait UpdateModelTrait
         return $response;
     }
 
-    protected function _updateDataValid(array $data, array $args, Field $field)
+    protected function _updateDataValid($item, array $data, array $args, Field $field)
     {
         return true;
     }
