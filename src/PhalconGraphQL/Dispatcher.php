@@ -200,7 +200,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
             $this->createDefaultFieldResolver($schema)
         );
 
-        $flags = $debugMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : null;
+        $flags = $debugMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
 
         return $result
             ->setErrorFormatter(function($error) use ($debugMode) { return $this->formatError($error, $debugMode); })
