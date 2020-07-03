@@ -20,20 +20,10 @@ class ModelCollection extends Collection
 {
     protected $_modelClass;
 
-    protected $_mutationHandler = null;
-    protected $_queryHandler = null;
     protected $_handler = null;
 
-    protected $_queryFields = [];
-    protected $_mutationFields = [];
     protected $_modelObjectType;
     protected $_modelObjectTypeGroup;
-
-    protected $_allowedQueryRoles = [];
-    protected $_deniedQueryRoles = [];
-
-    protected $_allowedMutationRoles = [];
-    protected $_deniedMutationRoles = [];
 
     protected $_allowedModelObjectRoles = [];
     protected $_deniedModelObjectRoles = [];
@@ -78,47 +68,13 @@ class ModelCollection extends Collection
         return $this;
     }
 
-    public function mutationHandler($mutationHandler)
-    {
-        $this->_mutationHandler = $mutationHandler;
-        return $this;
-    }
-
-    public function queryHandler($queryHandler)
-    {
-        $this->_queryHandler = $queryHandler;
-        return $this;
-    }
-
     public function handler($handler)
     {
         $this->_handler = $handler;
         return $this;
     }
 
-    public function allowQuery($roles)
-    {
-        $this->_allowedQueryRoles = array_merge($this->_allowedQueryRoles, is_array($roles) ? $roles : [$roles]);
-        return $this;
-    }
 
-    public function denyQuery($roles)
-    {
-        $this->_deniedQueryRoles = array_merge($this->_deniedQueryRoles, is_array($roles) ? $roles : [$roles]);
-        return $this;
-    }
-
-    public function allowMutation($roles)
-    {
-        $this->_allowedMutationRoles = array_merge($this->_allowedMutationRoles, is_array($roles) ? $roles : [$roles]);
-        return $this;
-    }
-
-    public function denyMutation($roles)
-    {
-        $this->_deniedMutationRoles = array_merge($this->_deniedMutationRoles, is_array($roles) ? $roles : [$roles]);
-        return $this;
-    }
 
     public function allowModelObject($roles)
     {
@@ -133,23 +89,6 @@ class ModelCollection extends Collection
     }
 
 
-    public function queryField(Field $field, $objectType=Types::VIEWER)
-    {
-        $this->field($objectType, $field);
-        $this->_queryFields[] = $field;
-
-        return $this;
-    }
-
-    public function mutationField(Field $field, $objectType=Types::MUTATION)
-    {
-        $this->field($objectType, $field);
-        $this->_mutationFields[] = $field;
-
-        return $this;
-    }
-
-
     public function all(callable $configurator=null)
     {
         $field = AllModelField::factory($this->_modelClass);
@@ -157,7 +96,6 @@ class ModelCollection extends Collection
             $configurator($field);
         }
 
-        $this->configureQueryField($field);
         $this->configureAllField($field);
 
         $this->queryField($field);
@@ -172,7 +110,6 @@ class ModelCollection extends Collection
             $configurator($field);
         }
 
-        $this->configureQueryField($field);
         $this->configureFindField($field);
 
         $this->queryField($field);
@@ -195,7 +132,6 @@ class ModelCollection extends Collection
             $fieldConfigurator($field);
         }
 
-        $this->configureMutationField($field);
         $this->configureCreateField($field);
 
         $this->mutationField($field);
@@ -218,7 +154,6 @@ class ModelCollection extends Collection
             $fieldConfigurator($field);
         }
 
-        $this->configureMutationField($field);
         $this->configureUpdateField($field);
 
         $this->mutationField($field);
@@ -233,7 +168,6 @@ class ModelCollection extends Collection
             $configurator($field);
         }
 
-        $this->configureMutationField($field);
         $this->configureDeleteField($field);
 
         $this->mutationField($field);
@@ -252,7 +186,6 @@ class ModelCollection extends Collection
             ->delete();
 
         return $this;
-
     }
 
 
@@ -261,12 +194,10 @@ class ModelCollection extends Collection
 
     protected function configureAllField(AllModelField $field){}
     protected function configureFindField(FindModelField $field){}
-    protected function configureQueryField(ModelField $field){}
 
     protected function configureCreateField(CreateModelField $field){}
     protected function configureUpdateField(UpdateModelField $field){}
     protected function configureDeleteField(DeleteModelField $field){}
-    protected function configureMutationField(ModelField $field){}
 
     protected function configureCreateInputObjectType(ModelInputObjectType $objectType){}
     protected function configureUpdateInputObjectType(ModelInputObjectType $objectType){}
@@ -276,28 +207,6 @@ class ModelCollection extends Collection
     {
         if($this->_handler){
             $this->_modelObjectType->handler($this->_handler);
-        }
-
-        /** @var ModelField $field */
-        foreach($this->_queryFields as $field){
-
-            if($this->_queryHandler) {
-                $field->handler($this->_queryHandler);
-            }
-
-            $field->allow($this->_allowedQueryRoles);
-            $field->deny($this->_deniedQueryRoles);
-        }
-
-        /** @var ModelField $field */
-        foreach($this->_mutationFields as $field){
-
-            if($this->_mutationHandler) {
-                $field->handler($this->_mutationHandler);
-            }
-
-            $field->allow($this->_allowedMutationRoles);
-            $field->deny($this->_deniedMutationRoles);
         }
 
         $this->_modelObjectTypeGroup->allow($this->_allowedQueryRoles);
