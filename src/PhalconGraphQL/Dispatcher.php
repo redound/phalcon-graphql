@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL;
 
-use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\Executor;
@@ -200,7 +200,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
             $this->createDefaultFieldResolver($schema)
         );
 
-        $flags = $debugMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : null;
+        $flags = $debugMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : null;
 
         return $result
             ->setErrorFormatter(function($error) use ($debugMode) { return $this->formatError($error, $debugMode); })
