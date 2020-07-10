@@ -1,21 +1,17 @@
 {
     "name": "redound/phalcon-graphql",
     "description": "Phalcon GraphQL Library",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "require": {
         "php": ">=7.1",
         "ext-phalcon": ">=4.0.0",
-        "webonyx/graphql-php": "^0.13.8",
-        "redound/phalcon-api": "dev-development"
+        "webonyx/graphql-php": "^14.0.0",
+        "redound/phalcon-api": "^4.0.0"
     },
     "suggest": {
         "firebase/php-jwt": "^5.0"
     },
     "authors": [
-        {
-            "name": "Olivier Andriessen",
-            "email": "olivierandriessen@gmail.com"
-        },
         {
             "name": "Bart Blok",
             "email": "bart@wittig.nl"
