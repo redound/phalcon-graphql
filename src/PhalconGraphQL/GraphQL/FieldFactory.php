@@ -5,6 +5,7 @@ namespace PhalconGraphQL\GraphQL;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\NodeList;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\InputField;
@@ -32,7 +33,7 @@ class FieldFactory
             'name' => new NameNode(['value' => $field->getName()]),
             'description' => $field->getDescription(),
             'type' => TypeUtils::node($type, $nonNull, $isList, $isNonNullList),
-            'arguments' => $args
+            'arguments' => NodeList::create($args),
         ]);
     }
 }
