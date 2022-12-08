@@ -2,7 +2,7 @@
 
 namespace PhalconGraphQL\Plugins\Authorization;
 
-use Phalcon\Di;
+use Phalcon\Di\Di;
 use Phalcon\Di\DiInterface;
 use PhalconApi\Acl\MountingEnabledAdapterInterface as MountingEnabledAclAdapterInterface;
 use PhalconApi\Constants\ErrorCodes;
