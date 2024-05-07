@@ -1,11 +1,11 @@
 {
     "name": "redound/phalcon-graphql",
     "description": "Phalcon GraphQL Library",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "require": {
         "php": ">=8.0",
         "ext-phalcon": ">=5.0.0",
-        "webonyx/graphql-php": "^14.4.0",
+        "webonyx/graphql-php": "^15.11.1",
         "redound/phalcon-api": "^5.0.0"
     },
     "suggest": {
