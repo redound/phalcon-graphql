@@ -10,8 +10,8 @@ class TimeScalarType extends ScalarType
 {
     const DEFAULT_TIME_FORMAT = 'H:i:s';
 
-    public $name = 'Time';
-    public $description = 'The `Time` scalar type represents a time';
+    public string $name = 'Time';
+    public ?string $description = 'The `Time` scalar type represents a time';
 
     protected $fallbackFormats = ["H:i"];
 

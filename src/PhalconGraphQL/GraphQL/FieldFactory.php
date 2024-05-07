@@ -29,11 +29,14 @@ class FieldFactory
             $args[] = InputFieldFactory::build($inputField);
         }
 
-        return new FieldDefinitionNode([
+        $fieldDefinitionNodeArray = [
             'name' => new NameNode(['value' => $field->getName()]),
             'description' => $field->getDescription(),
             'type' => TypeUtils::node($type, $nonNull, $isList, $isNonNullList),
-            'arguments' => NodeList::create($args),
-        ]);
+            'arguments' => new NodeList($args),
+            'directives' => new NodeList([]),
+        ];
+
+        return new FieldDefinitionNode($fieldDefinitionNodeArray);
     }
 }

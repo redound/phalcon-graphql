@@ -10,6 +10,7 @@ use GraphQL\Language\AST\SchemaDefinitionNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Phalcon\Di\DiInterface;
+use GraphQL\Language\AST\NodeList;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\InputObjectType;
 use PhalconGraphQL\Definition\ObjectType;
@@ -30,7 +31,7 @@ class DocumentFactory
 
         /** @var ScalarType $scalarType */
         foreach ($schema->getScalarTypes() as $scalarType) {
-            $definitions[] = new ScalarTypeDefinitionNode(['name' => new NameNode(['value' => $scalarType->name])]);
+            $definitions[] = new ScalarTypeDefinitionNode(['name' => new NameNode(['value' => $scalarType->name]), 'directives' => new NodeList([])]);
         }
 
         /** @var EnumType $enumType */
@@ -54,7 +55,7 @@ class DocumentFactory
         }
 
         return new DocumentNode([
-            'definitions' => $definitions
+            'definitions' => new NodeList($definitions)
         ]);
     }
 

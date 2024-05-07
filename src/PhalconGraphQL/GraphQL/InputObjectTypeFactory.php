@@ -23,7 +23,8 @@ class InputObjectTypeFactory
         return new InputObjectTypeDefinitionNode([
             'name' => new NameNode(['value' => $objectType->getName()]),
             'description' => $objectType->getDescription(),
-            'fields' => NodeList::create($fields)
+            'fields' => new NodeList($fields),
+            'directives' => new NodeList([])
         ]);
     }
 }

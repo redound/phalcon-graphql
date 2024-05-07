@@ -5,6 +5,7 @@ namespace PhalconGraphQL\GraphQL;
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Language\AST\NodeList;
 use PhalconGraphQL\Definition\Fields\Field;
 use PhalconGraphQL\Definition\FieldGroups\FieldGroupInterface;
 use PhalconGraphQL\Definition\ObjectType as SchemaObjectType;
@@ -25,7 +26,9 @@ class ObjectTypeFactory
         return new ObjectTypeDefinitionNode([
             'name' => new NameNode(['value' => $objectType->getName()]),
             'description' => $objectType->getDescription(),
-            'fields' => $fields
+            'fields' => new NodeList($fields),
+            'directives' => new NodeList([]),
+            'interfaces' => new NodeList([])
         ]);
     }
 }

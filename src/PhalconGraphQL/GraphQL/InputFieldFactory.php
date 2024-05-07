@@ -4,6 +4,7 @@ namespace PhalconGraphQL\GraphQL;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\NodeList;
 use PhalconGraphQL\Definition\InputField;
 
 class InputFieldFactory
@@ -18,7 +19,8 @@ class InputFieldFactory
         return new InputValueDefinitionNode([
             'name' => new NameNode(['value' => $field->getName()]),
             'description' => $field->getDescription(),
-            'type' => TypeUtils::node($type, $nonNull, $isList, $isNonNullList)
+            'type' => TypeUtils::node($type, $nonNull, $isList, $isNonNullList),
+            'directives' => new NodeList([])
         ]);
     }
 }

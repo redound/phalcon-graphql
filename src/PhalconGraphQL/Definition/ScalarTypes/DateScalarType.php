@@ -10,13 +10,13 @@ class DateScalarType extends ScalarType
 {
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
 
-    public $name = 'Date';
-    public $description = 'The `Date` scalar type represents a date';
+    public string $name = 'Date';
+    public ?string $description = 'The `Date` scalar type represents a date';
 
     protected $fallbackFormats = ["Y-m-d H:i:s", "Y-m-d H:i", "Y-m-d", \DateTime::ISO8601, 'Y-m-d\TH:i:s.uP'];
 
-    protected $externalFormat;
-    protected $internalFormat;
+    protected string $externalFormat;
+    protected string $internalFormat;
 
     public function __construct($externalFormat=self::DEFAULT_DATE_FORMAT, $internalFormat=self::DEFAULT_DATE_FORMAT)
     {

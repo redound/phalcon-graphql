@@ -7,8 +7,8 @@ use GraphQL\Type\Definition\ScalarType;
 
 class JsonScalarType extends ScalarType
 {
-    public $name = 'JSON';
-    public $description = 'The `JSON` scalar type represents a JSON structure';
+    public string $name = 'JSON';
+    public ?string $description = 'The `JSON` scalar type represents a JSON structure';
 
     public function __construct()
     {

@@ -5,6 +5,7 @@ namespace PhalconGraphQL\GraphQL;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\NameNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\EnumType;
 use PhalconGraphQL\Definition\EnumType as SchemaEnumType;
 use PhalconGraphQL\Definition\EnumTypeValue;
@@ -20,14 +21,16 @@ class EnumTypeFactory
 
             $values[] = new EnumValueDefinitionNode([
                 'name' => new NameNode(['value' => $value->getName()]),
-                'description' => $value->getDescription()
+                'description' => $value->getDescription(),
+                'directives' => new NodeList([])
             ]);
         }
 
         return new EnumTypeDefinitionNode([
             'name' => new NameNode(['value' => $enumType->getName()]),
             'description' => $enumType->getDescription(),
-            'values' => $values
+            'values' => new NodeList($values),
+            'directives' => new NodeList([])
         ]);
     }
 }
