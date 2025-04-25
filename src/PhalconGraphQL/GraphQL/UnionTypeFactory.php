@@ -4,6 +4,7 @@ namespace PhalconGraphQL\GraphQL;
 
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\UnionType;
 use PhalconGraphQL\Definition\UnionType as SchemaUnionType;
 use PhalconGraphQL\Definition\Schema;
@@ -22,7 +23,8 @@ class UnionTypeFactory
         return new UnionTypeDefinitionNode([
             'name' => new NameNode(['value' => $unionType->getName()]),
             'description' => $unionType->getDescription(),
-            'types' => $types
+            'directives' => new NodeList([]),
+            'types' => new NodeList($types)
         ]);
     }
 }
