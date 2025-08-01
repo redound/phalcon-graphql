@@ -6,7 +6,7 @@
         "php": ">=8.4",
         "ext-phalcon": ">=5.0.0",
         "webonyx/graphql-php": "^15.11.1",
-        "redound/phalcon-api": "^5.0.0"
+        "redound/phalcon-api": "^6.0.0"
     },
     "suggest": {
         "firebase/php-jwt": "^5.0"
