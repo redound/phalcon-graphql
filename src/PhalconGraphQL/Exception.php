@@ -9,10 +9,12 @@ class Exception extends \Exception implements ClientAware
     protected $isClientSafe = true;
     protected $category = 'graphql';
     protected $errorCode;
+    protected array $extra;
 
-    public function __construct($message, $code = 0, \Throwable $previous = null)
+    public function __construct($code, $message = '', \Throwable $previous = null, array $extra = [])
     {
         $this->errorCode = $code;
+        $this->extra = $extra;
         $numericCode = is_numeric($code) ? (int)$code : 0;
 
         parent::__construct($message, $numericCode, $previous);
@@ -42,10 +44,10 @@ class Exception extends \Exception implements ClientAware
      */
     public function getUserInfo(): ?array
     {
-        return [
+        return array_merge([
             'code' => $this->getErrorCode(),
             'category' => $this->getCategory()
-        ];
+        ], $this->extra);
     }
 
     /**
