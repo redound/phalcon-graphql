@@ -14,7 +14,7 @@ trait UpdateModelTrait
         $primaryKey = $this->_getModelPrimaryKey($field);
         $id = isset($data[$primaryKey]) ? $data[$primaryKey] : null;
         if($id === null){
-            throw new Exception(ErrorCodes::POST_DATA_INVALID, 'No ID found in data (key is ' . $primaryKey . ')', $data);
+            throw new Exception(ErrorCodes::POST_DATA_INVALID, 'No ID found in data (key is ' . $primaryKey . ')', null, $data);
         }
 
         $this->_beforeHandle($args, $field);
@@ -132,7 +132,7 @@ trait UpdateModelTrait
 
     protected function _onUpdateFailed($item, array $data, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to update item', [
+        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to update item', null, [
             'messages' => $this->_getMessages($item->getMessages()),
             'data' => $data,
             'item' => $item->toArray()

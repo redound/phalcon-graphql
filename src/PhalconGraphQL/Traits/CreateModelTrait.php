@@ -122,7 +122,7 @@ trait CreateModelTrait
 
     protected function _onCreateFailed($item, array $data, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to create item', [
+        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to create item', null, [
             'messages' => $this->_getMessages($item->getMessages()),
             'data' => $data,
             'item' => $item->toArray()

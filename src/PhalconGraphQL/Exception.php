@@ -11,7 +11,7 @@ class Exception extends \Exception implements ClientAware
     protected $errorCode;
     protected array $extra;
 
-    public function __construct($code, $message = '', \Throwable $previous = null, array $extra = [])
+    public function __construct($code, $message = '', ?\Throwable $previous = null, array $extra = [])
     {
         $this->errorCode = $code;
         $this->extra = $extra;

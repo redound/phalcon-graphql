@@ -75,7 +75,7 @@ trait FindModelTrait
 
     protected function _onItemNotFound($id, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found', ['id' => $id]);
+        throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found', null, ['id' => $id]);
     }
 
     protected function _findAllowed($id, $item, array $args, Field $field)

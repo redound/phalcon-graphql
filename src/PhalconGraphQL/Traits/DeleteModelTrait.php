@@ -87,7 +87,7 @@ trait DeleteModelTrait
 
     protected function _onDeleteFailed($item, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to delete item', [
+        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to delete item', null, [
             'messages' => $this->_getMessages($item->getMessages()),
             'item' => $item->toArray()
         ]);

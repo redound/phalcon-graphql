@@ -70,7 +70,7 @@ class GraphQLDelegate extends \PhalconGraphQL\Mvc\DiInjectable
             $firstMessage = $firstError && isset($firstError['message']) ? $firstError['message'] : 'Unknown error';
             $firstCode = $firstError && isset($firstError['code']) ? $firstError['code'] : ErrorCodes::DATA_FAILED;
 
-            throw new Exception($firstCode, $firstMessage, $firstError);
+            throw new Exception($firstCode, $firstMessage, null, $firstError ?? []);
         }
 
         $basePath = 'data';
