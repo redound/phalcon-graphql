@@ -77,6 +77,10 @@ class FieldGroup implements FieldGroupInterface
 
     public function plugin($plugin)
     {
+        if ($plugin instanceof \PhalconGraphQL\Plugins\SchemaPluginInterface) {
+            throw new \LogicException('This plugin must be registered using Schema::plugin()');
+        }
+
         $this->_plugins[] = $plugin;
         return $this;
     }

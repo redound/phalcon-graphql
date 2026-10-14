@@ -34,6 +34,10 @@ class ObjectType
 
     public function plugin(ObjectTypePluginInterface $plugin, $addToFields=true)
     {
+        if ($plugin instanceof \PhalconGraphQL\Plugins\SchemaPluginInterface) {
+            throw new \LogicException('This plugin must be registered using Schema::plugin()');
+        }
+
         $this->_plugins[] = $plugin;
 
         if($addToFields){

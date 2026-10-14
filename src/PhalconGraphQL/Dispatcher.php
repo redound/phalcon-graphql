@@ -5,11 +5,12 @@ namespace PhalconGraphQL;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
-use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\BuildSchema;
 use Phalcon\Http\Request;
+use Phalcon\Di\DiInterface;
+use PhalconApi\Constants\ErrorCodes;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Definition\EnumType;
 use PhalconGraphQL\Definition\Fields\Field;
@@ -20,6 +21,7 @@ use PhalconGraphQL\Definition\Schema;
 use PhalconGraphQL\GraphQL\DocumentFactory;
 use PhalconGraphQL\Handlers\Handler;
 use PhalconGraphQL\Plugins\PluginInterface;
+use PhalconGraphQL\Plugins\ExecutionPluginInterface;
 use PhalconGraphQL\Resolvers\Resolver;
 use GraphQL\Type\Schema as GraphQLSchema;
 
@@ -29,6 +31,15 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
 
     protected $handlerCache = [];
     protected $resolverCache = [];
+    protected ?DiInterface $executionDi = null;
+
+    public function setDI(DiInterface $container): void
+    {
+        parent::setDI($container);
+        $this->executionDi = $container;
+        $this->handlerCache = [];
+        $this->resolverCache = [];
+    }
 
     public function setDefaultNamespace($namespace)
     {
@@ -55,7 +66,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
         }
 
         if ($handler instanceof \Phalcon\Di\Injectable) {
-            $handler->setDI($this->di);
+            $handler->setDI($this->executionDi);
         }
 
         if($handler instanceof Handler){
@@ -69,22 +80,27 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
         return $handler;
     }
 
-    protected function createDefaultFieldResolver(Schema $schema)
+    protected function createDefaultFieldResolver(Schema $schema, DiInterface $di)
     {
         $dispatcher = $this;
 
-        return function ($source, $args, $context, \GraphQL\Type\Definition\ResolveInfo $info) use ($schema, $dispatcher) {
+        return function ($source, $args, $context, \GraphQL\Type\Definition\ResolveInfo $info) use ($schema, $dispatcher, $di) {
 
             $objectType = $info->parentType ? $schema->findObjectType($info->parentType->name) : null;
             $field = $objectType ? $objectType->findField($info->fieldName) : null;
 
             if(!$objectType || !$field){
-                return Executor::defaultFieldResolver($source, $args, $context, $info);
+                throw new Exception(ErrorCodes::ACCESS_DENIED, 'Field definition is unavailable');
             }
 
             /** @var PluginInterface $plugin */
             foreach($schema->getPlugins() as $plugin){
-                $plugin->beforeResolve($schema, $objectType, $field);
+                if ($plugin instanceof ExecutionPluginInterface) {
+                    $plugin->beforeResolveWithContext($schema, $objectType, $field, $di);
+                }
+                else {
+                    $plugin->beforeResolve($schema, $objectType, $field);
+                }
             }
 
             $resolver = $field->getResolver();
@@ -118,7 +134,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
 
                         $obj = new $className;
                         if ($obj instanceof \Phalcon\Di\Injectable) {
-                            $obj->setDI($this->di);
+                            $obj->setDI($this->executionDi);
                         }
 
                         $this->resolverCache[$resolver] = $obj;
@@ -139,7 +155,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
                         $resolverObject = new $resolver();
 
                         if ($resolverObject instanceof \Phalcon\Di\Injectable) {
-                            $resolverObject->setDI($this->di);
+                            $resolverObject->setDI($this->executionDi);
                         }
 
                         $this->resolverCache[$resolver] = $resolverObject;
@@ -179,8 +195,15 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
 
     public function dispatch(Schema $schema, GraphQLSchema $graphqlSchema, $debugMode=false, $data=null)
     {
+        if ($this->executionDi === null) {
+            throw new \LogicException('Set the dispatcher DI explicitly before dispatching');
+        }
+
+        $this->handlerCache = [];
+        $this->resolverCache = [];
+
         if(!$data) {
-            $request = $this->di->get(Services::REQUEST);
+            $request = $this->executionDi->get(Services::REQUEST);
             $data = $request->getPostedData();
         }
 
@@ -197,7 +220,7 @@ class Dispatcher extends \PhalconGraphQL\Mvc\DiInjectable
             null, // context
             $variableValues,
             $operationName,
-            $this->createDefaultFieldResolver($schema)
+            $this->createDefaultFieldResolver($schema, $this->executionDi)
         );
 
         $flags = $debugMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;

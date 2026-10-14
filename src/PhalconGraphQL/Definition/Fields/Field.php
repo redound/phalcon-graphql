@@ -41,6 +41,10 @@ class Field
 
     public function plugin(FieldPluginInterface $plugin)
     {
+        if ($plugin instanceof \PhalconGraphQL\Plugins\SchemaPluginInterface) {
+            throw new \LogicException('This plugin must be registered using Schema::plugin()');
+        }
+
         $this->_plugins[] = $plugin;
         return $this;
     }

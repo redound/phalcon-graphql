@@ -1,6 +1,8 @@
 <?php
 
 use PhalconGraphQL\Definition\Fields\Field;
+use PhalconGraphQL\Definition\Fields\ModelField;
+use PhalconGraphQL\Constants\Services;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconGraphQL\Exception;
 use Phalcon\Mvc\Model;
@@ -14,12 +16,12 @@ trait ModelMutationTrait
 
     protected function _onDataInvalid(array $data, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid', null, ['data' => $data]);
+        throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Post-data is invalid');
     }
 
     protected function _onItemNotFound($id, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found', null, ['id' => $id]);
+        throw new Exception(ErrorCodes::DATA_NOT_FOUND, 'Item was not found');
     }
 
     protected function _beforeAssignData($item, array $data, array $args, Field $field)
@@ -59,6 +61,17 @@ trait ModelMutationTrait
         return true;
     }
 
+    protected function _inputAllowed($item, array $data, array $args, Field $field)
+    {
+        if (!$field instanceof ModelField) {
+            return false;
+        }
+
+        $fields = $field->getWritableFields($item, $data, $args, $this->getDI());
+
+        return is_array($fields) && !array_diff(array_keys($data), $fields);
+    }
+
     protected function _transformPostData(array $data, array $args, Field $field)
     {
         $result = [];
@@ -79,24 +92,66 @@ trait ModelMutationTrait
     {
         $modelClass = $this->getModel($field);
 
-        return new $modelClass();
+        return new $modelClass(null, $this->getDI());
     }
 
     protected function _findModel($id, Field $field)
     {
-        $modelClass = $this->getModel($field);
+        if (!is_int($id) && !is_string($id)) {
+            throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Invalid ID');
+        }
 
-        return $modelClass::findFirst($id);
+        $modelClass = $this->getModel($field);
+        $primaryKey = $this->_getModelPrimaryKey($field);
+
+        $modelInstance = $this->_createModelInstance($field);
+        $metadata = $modelInstance->getModelsMetaData();
+        $primaryAttribute = $metadata->getPrimaryKeyAttributes($modelInstance)[0];
+        $numericAttributes = $metadata->getDataTypesNumeric($modelInstance);
+
+        // Avoid database coercion of arbitrary strings to a numeric key.
+        if (!empty($numericAttributes[$primaryAttribute]) && !is_numeric($id)) {
+            throw new Exception(ErrorCodes::POST_DATA_INVALID, 'Invalid numeric ID');
+        }
+
+        $modelsManager = $this->getDI()->get(Services::MODELS_MANAGER);
+        $results = $modelsManager->createBuilder()
+            ->from($modelClass)
+            ->andWhere('[' . $primaryKey . '] = :mutationId:', ['mutationId' => $id])
+            ->limit(1)
+            ->getQuery()->execute();
+
+        return count($results) > 0 ? $results->getFirst() : null;
     }
 
     protected function _getModelPrimaryKey(Field $field)
     {
-        $modelClass = $this->getModel($field);
-
         /** @var Model $modelInstance */
-        $modelInstance = new $modelClass();
+        $modelInstance = $this->_createModelInstance($field);
 
-        return $modelInstance->getModelsMetaData()->getIdentityField($modelInstance);
+        $metadata = $modelInstance->getModelsMetaData();
+        $primaryKeys = $metadata->getPrimaryKeyAttributes($modelInstance);
+
+        if (count($primaryKeys) !== 1) {
+            throw new \LogicException('Model mutations require a single primary key');
+        }
+
+        $primaryKey = $primaryKeys[0];
+        $columnMap = $metadata->getColumnMap($modelInstance);
+
+        if (is_array($columnMap)) {
+            if (!isset($columnMap[$primaryKey])) {
+                throw new \LogicException('Primary key is missing from the column map');
+            }
+
+            $primaryKey = $columnMap[$primaryKey];
+        }
+
+        if (!is_string($primaryKey) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/D', $primaryKey)) {
+            throw new \LogicException('Unsupported primary key attribute');
+        }
+
+        return $primaryKey;
     }
 
     protected function _getMessages($messages)

@@ -17,6 +17,26 @@ class ModelField extends Field
     protected $_embedMode = null;
 
     protected $_model;
+    protected $_writableFields;
+
+    public function writableFields($fields)
+    {
+        if (!is_array($fields) && !is_callable($fields)) {
+            throw new \InvalidArgumentException('Writable fields must be an array or a callback');
+        }
+
+        $this->_writableFields = $fields;
+        return $this;
+    }
+
+    public function getWritableFields($item, array $data, array $args, DiInterface $di)
+    {
+        if (is_callable($this->_writableFields)) {
+            return call_user_func($this->_writableFields, $item, $data, $args, $this, $di);
+        }
+
+        return $this->_writableFields;
+    }
 
     public function __construct($model=null, $name=null, $type=null)
     {

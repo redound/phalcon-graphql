@@ -44,10 +44,18 @@ class Exception extends \Exception implements ClientAware
      */
     public function getUserInfo(): ?array
     {
-        return array_merge([
+        return [
             'code' => $this->getErrorCode(),
             'category' => $this->getCategory()
-        ], $this->extra);
+        ];
+    }
+
+    /**
+     * Internal diagnostics. Redact sensitive values before logging.
+     */
+    public function getDiagnosticInfo(): array
+    {
+        return $this->extra;
     }
 
     /**

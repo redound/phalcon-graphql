@@ -10,6 +10,11 @@ trait CreateModelTrait
     protected function _create(array $args, Field $field)
     {
         $data = $args['input'];
+        $primaryKey = $this->_getModelPrimaryKey($field);
+
+        if (!$this->_inputAllowed(null, $data, $args, $field)) {
+            return $this->_onNotAllowed($args, $field);
+        }
 
         $this->_beforeHandle($args, $field);
         $this->_beforeHandleCreate($args, $field);
@@ -33,7 +38,6 @@ trait CreateModelTrait
             return $this->_onCreateFailed($item, $data, $args, $field);
         }
 
-        $primaryKey = $this->_getModelPrimaryKey($field);
         $responseData = $this->_findModel($newItem->$primaryKey, $field);
 
         $response = $this->_getCreateResponse($responseData, $data, $args, $field);
@@ -122,11 +126,7 @@ trait CreateModelTrait
 
     protected function _onCreateFailed($item, array $data, array $args, Field $field)
     {
-        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to create item', null, [
-            'messages' => $this->_getMessages($item->getMessages()),
-            'data' => $data,
-            'item' => $item->toArray()
-        ]);
+        throw new Exception(ErrorCodes::DATA_FAILED, 'Unable to create item');
     }
 
     protected function _getCreateResponse($createdItem, array $data, array $args, Field $field)

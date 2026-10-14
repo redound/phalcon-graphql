@@ -16,9 +16,16 @@ class ModelInputObjectType extends InputObjectType
     protected $_modelClass;
 
     protected $_excludedFields = [];
+    protected ?array $_includedFields = null;
 
     protected $_excludeIdentity = false;
     protected $_fieldsOptional = false;
+
+    public function only(array $fields)
+    {
+        $this->_includedFields = $fields;
+        return $this;
+    }
 
     public function __construct($modelClass, $name=null)
     {
@@ -62,6 +69,15 @@ class ModelInputObjectType extends InputObjectType
             return;
         }
 
+        if ($this->_includedFields === null) {
+            if (!$this->_fields) {
+                throw new \LogicException('Model input types require an explicit only() list or explicit input fields');
+            }
+
+            parent::build($schema, $di);
+            return;
+        }
+
         /** @var MetaData $modelsMetadata */
         $modelsMetadata = $di->get(Services::MODELS_METADATA);
 
@@ -69,7 +85,7 @@ class ModelInputObjectType extends InputObjectType
         $modelsManager = $di->get(Services::MODELS_MANAGER);
 
         $modelClass = $this->_modelClass;
-        $model = new $modelClass();
+        $model = new $modelClass(null, $di);
 
         $originalFields = $this->_fields;
         $newFields = [];
@@ -79,6 +95,7 @@ class ModelInputObjectType extends InputObjectType
         $dataTypes = $modelsMetadata->getDataTypes($model);
         $nonNullAttributes = $modelsMetadata->getNotNullAttributes($model);
         $identityField = $modelsMetadata->getIdentityField($model);
+        $primaryKeys = $modelsMetadata->getPrimaryKeyAttributes($model);
 
         $skip = $this->_excludedFields;
         $typeMap = [];
@@ -117,11 +134,15 @@ class ModelInputObjectType extends InputObjectType
 
             $mappedAttributeName = is_array($columnMap) && array_key_exists($attributeName, $columnMap) ? $columnMap[$attributeName] : $attributeName;
 
+            if (!in_array($mappedAttributeName, $this->_includedFields, true)) {
+                continue;
+            }
+
             $type = null;
             if(array_key_exists($mappedAttributeName, $typeMap)){
                 $type = $typeMap[$mappedAttributeName];
             }
-            else if($attributeName == $identityField || in_array($mappedAttributeName, $relationFields)){
+            else if(in_array($attributeName, $primaryKeys) || in_array($mappedAttributeName, $relationFields)){
                 $type = Types::ID;
             }
             else {
@@ -130,7 +151,7 @@ class ModelInputObjectType extends InputObjectType
 
             $mappedDataTypes[$mappedAttributeName] = $type;
 
-            if((!$this->_fieldsOptional && in_array($attributeName, $nonNullAttributes)) || $attributeName == $identityField){
+            if((!$this->_fieldsOptional && in_array($attributeName, $nonNullAttributes)) || ($this->_fieldsOptional && in_array($attributeName, $primaryKeys))){
                 $mappedNonNullAttributes[] = $mappedAttributeName;
             }
         }
