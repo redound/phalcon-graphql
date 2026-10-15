@@ -8,7 +8,7 @@ model queries and mutations, and extensible plugins.
 - PHP 8.4 or newer.
 - Phalcon 5 or newer.
 - `webonyx/graphql-php` 15.32.3 or newer within the 15.x line.
-- `redound/phalcon-api` 6.x.
+- `redound/phalcon-api` 7.x.
 
 ## Installation
 
@@ -18,7 +18,8 @@ composer require redound/phalcon-graphql:^9.0
 
 ## Releases and migration
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes and the
+See [CHANGELOG.md](CHANGELOG.md) for release notes, the
+[API 7 upgrade guide](CHANGELOG.md#upgrading-to-phalcon-api-7), and the
 [migration guide for 9.0.0](CHANGELOG.md#migration-from-8x).
 
 ## Tests

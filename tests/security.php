@@ -204,6 +204,71 @@ function verifyRejected(string $name, callable $action)
     verify($name, false);
 }
 
+$unconfiguredDi = new PhalconGraphQL\Di\FactoryDefault();
+try {
+    $unconfiguredDi->get('tokenParser');
+    verify('GraphQL DI rejects missing API 7 token parser configuration', false);
+}
+catch (PhalconApi\Exception $e) {
+    verify('GraphQL DI rejects missing API 7 token parser configuration', true);
+}
+
+$tokenParser = new class implements PhalconApi\Auth\TokenParserInterface {
+    public function getToken(PhalconApi\Auth\Session $session)
+    {
+        return 'test-only-token';
+    }
+
+    public function getSession($token)
+    {
+        return $token === 'test-only-token'
+            ? new PhalconApi\Auth\Session('accounts', '42', time(), time() + 600)
+            : null;
+    }
+};
+$di = new PhalconGraphQL\Di\FactoryDefault($tokenParser);
+Di::setDefault($di);
+$di->get('acl')->addRole('member');
+$di->get('acl')->addRole('guest');
+$userService = new class extends PhalconApi\User\Service {
+    public function getRole()
+    {
+        return $this->authManager->loggedIn() ? 'member' : 'guest';
+    }
+};
+$userService->setDI($di);
+$di->setShared('userService', $userService);
+$di->get('authManager')->registerAccountType('accounts', new class implements PhalconApi\Auth\AccountType {
+    public function login($data)
+    {
+        return '42';
+    }
+
+    public function authenticate(PhalconApi\Auth\Session $session)
+    {
+        return $session->getIdentity() === '42';
+    }
+});
+$authentication = new PhalconApi\Middleware\AuthenticationMiddleware();
+$authentication->setDI($di);
+$schema = securitySchema();
+$graphql = securityExecutable($schema, $di);
+$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer test-only-token';
+$authentication->beforeHandleRoute();
+$r = securityDispatch($schema, $graphql, $di, '{ public }');
+verify('API 7 authentication through GraphQL DI permits an authorized request', !isset($r['errors']) && $r['data']['public'] === 'public');
+unset($_SERVER['HTTP_AUTHORIZATION']);
+$authentication->beforeHandleRoute();
+$r = securityDispatch($schema, $graphql, $di, '{ public }');
+verify('Reused GraphQL DI without credentials cannot retain the previous identity', !$di->get('authManager')->loggedIn() && isset($r['errors']) && $r['data']['public'] === null);
+$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer test-only-token';
+$authentication->beforeHandleRoute();
+$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer invalid-token';
+$authentication->beforeHandleRoute();
+$r = securityDispatch($schema, $graphql, $di, '{ public }');
+verify('Invalid credentials clear the previous identity before GraphQL authorization', !$di->get('authManager')->loggedIn() && isset($r['errors']) && $r['data']['public'] === null);
+unset($_SERVER['HTTP_AUTHORIZATION']);
+
 $di = securityDi();
 $schema = securitySchema();
 $schema->findObjectType('Query')

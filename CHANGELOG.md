@@ -21,6 +21,13 @@ dependency lockfiles together with the library.
   prevent unintended assignment of model properties.
 - Raise the minimum `webonyx/graphql-php` version to `15.32.3`.
 
+### Changed
+
+- Require `redound/phalcon-api ^7.0.0` instead of `^6.0.0` to use the route
+  authorization and authentication security mitigations in API 7.
+- Allow an explicitly configured `TokenParserInterface` to be passed to
+  `PhalconGraphQL\Di\FactoryDefault`; it is forwarded to the API container.
+
 ### Added
 
 - `ModelInputObjectType::only()` and `ModelField::writableFields()` for explicit
@@ -31,6 +38,48 @@ dependency lockfiles together with the library.
 - An isolated security regression suite, available as `composer test:security`.
 
 ### Migration from 8.x
+
+#### Upgrading to phalcon-api 7
+
+This release requires phalcon-api 7. Applications upgrading from API 6 must
+update their authentication configuration as part of the GraphQL migration.
+
+When using JWT authentication, install `firebase/php-jwt ^7.2.1` and configure a
+strong signing key, issuer and audience explicitly. Pass the configured parser to
+the GraphQL DI container, or register `tokenParser` before authentication services
+are resolved:
+
+```php
+use PhalconApi\Auth\TokenParsers\JWTTokenParser;
+use PhalconGraphQL\Di\FactoryDefault;
+
+$parser = new JWTTokenParser(
+    secret: getenv('API_JWT_SECRET') ?: '',
+    algorithm: JWTTokenParser::ALGORITHM_HS256,
+    audience: getenv('API_JWT_AUDIENCE') ?: '',
+    issuer: getenv('API_JWT_ISSUER') ?: ''
+);
+$di = new FactoryDefault($parser);
+```
+
+Custom token parsers remain supported; JWT is not a required dependency of this
+library. An unconfigured token parser fails when resolved. Never restore the old
+default signing key as a fallback.
+
+API 7 changes the JWT claims: `iss` identifies the configured issuer, `aud` the
+intended API, and `account_type` the internal account type. Update token producers,
+invalidate legacy tokens and require users to authenticate again. In applications
+that use API route permissions as well, migrate direct path/name ACL grants to
+collection permission declarations and rebuild the ACL at initialization.
+
+Use `AuthenticationMiddleware` before GraphQL dispatch on every request, or
+explicitly reset and authenticate the API manager per request. The GraphQL
+dispatcher does not run the API authentication middleware itself. Missing or
+invalid credentials must not retain the previous user's session when services
+are reused.
+
+See the [phalcon-api 7.0.0 migration guide](https://github.com/redound/phalcon-api/blob/v7.0.0/CHANGELOG.md#migration-from-6x)
+for the complete configuration, key strength and permission requirements.
 
 #### Authorization context and plugin registration
 
@@ -148,7 +197,8 @@ The minimum `webonyx/graphql-php` version is now `15.32.3`, covering the
 [parser recursion advisory](https://github.com/webonyx/graphql-php/security/advisories/GHSA-r7cg-qjjm-xhqq)
 and preceding validation advisories. Audit each application's actual lockfile.
 The obsolete direct JWT v5 suggestion was removed; JWT configuration and
-authentication fixes belong to phalcon-api and still require separate work.
+authentication fixes are provided by the required phalcon-api 7 line; consuming
+applications must configure and deploy them explicitly.
 
 With PHP 8.4+, Phalcon and PDO SQLite installed, resolve the current dependencies
 and run the isolated in-memory regression suite:
@@ -164,9 +214,12 @@ files must be refreshed. Tests can use another Composer runtime through
 `GRAPHQL_TEST_AUTOLOAD=/absolute/path/to/vendor/autoload.php`. The tests use only
 temporary SQLite databases and make no external application changes.
 
-Validated on PHP 8.4.26 / Phalcon 5.22.1 with graphql-php 15.32.3 and 15.38.1:
-56 regression checks per version, PHP syntax checks and isolated dependency
-audits. Applications must validate their own supported runtime combinations.
+Validated on PHP 8.4.26 / Phalcon 5.22.1 with the published phalcon-api 7.0.0
+and graphql-php 15.32.3 and 15.38.1: 60 regression checks per version, PHP syntax
+checks and isolated dependency audits. The additional integration checks cover
+explicit token parser configuration, authenticated GraphQL access, and identity
+reset between requests with missing or invalid credentials. Applications must
+validate their own supported runtime combinations.
 
 ### Known limitations
 

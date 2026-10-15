@@ -2,15 +2,16 @@
 
 namespace PhalconGraphQL\Di;
 
+use PhalconApi\Auth\TokenParserInterface;
 use PhalconGraphQL\Constants\Services;
 use PhalconGraphQL\Dispatcher;
 use PhalconGraphQL\Http\Response;
 
 class FactoryDefault extends \PhalconApi\Di\FactoryDefault
 {
-    public function __construct()
+    public function __construct(?TokenParserInterface $tokenParser = null)
     {
-        parent::__construct();
+        parent::__construct($tokenParser);
 
         $this->setShared(Services::RESPONSE, new Response());
 

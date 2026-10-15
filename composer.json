@@ -6,7 +6,7 @@
         "php": ">=8.4",
         "ext-phalcon": ">=5.0.0",
         "webonyx/graphql-php": "^15.32.3",
-        "redound/phalcon-api": "^6.0.0"
+        "redound/phalcon-api": "^7.0.0"
     },
     "authors": [
         {
