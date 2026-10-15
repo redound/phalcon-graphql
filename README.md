@@ -13,13 +13,13 @@ model queries and mutations, and extensible plugins.
 ## Installation
 
 ```sh
-composer require redound/phalcon-graphql:^9.0
+composer require redound/phalcon-graphql:^9.0.1
 ```
 
 ## Releases and migration
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes, the
-[API 7 upgrade guide](CHANGELOG.md#upgrading-to-phalcon-api-7), and the
+[migration guide for 9.0.1](CHANGELOG.md#migration-from-900), and the
 [migration guide for 9.0.0](CHANGELOG.md#migration-from-8x).
 
 ## Tests

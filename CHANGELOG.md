@@ -1,43 +1,21 @@
 # Changelog
 
-## [9.0.0] - 2026-10-15
-
-This major release contains high-priority security mitigations and requires
-migration of using applications. Deploy application policies and updated
-dependency lockfiles together with the library.
-
-### Security fixes
-
-- Remove model data, submitted input and raw model validation messages from
-  standard mutation errors. Keep exception extras available only as explicit
-  internal diagnostics.
-- Bind mutation IDs to primary-key lookups instead of interpreting them as PHQL
-  conditions. Support mapped string keys and reject unsupported keys safely.
-- Use the dispatch DI for authorization, handlers, resolvers and mutation models.
-  Clear resolver and handler caches between dispatches.
-- Reject unsupported ACL plugin registration and deny resolution when application
-  field definitions or authorization context are missing.
-- Require explicit generated input fields and writable mutation properties to
-  prevent unintended assignment of model properties.
-- Raise the minimum `webonyx/graphql-php` version to `15.32.3`.
+## [9.0.1] - 2026-10-15
 
 ### Changed
 
-- Require `redound/phalcon-api ^7.0.0` instead of `^6.0.0` to use the route
-  authorization and authentication security mitigations in API 7.
+- Require `redound/phalcon-api ^7.0.0` instead of `^6.0.0` to use its route
+  authorization, session reset and JWT authentication security mitigations.
 - Allow an explicitly configured `TokenParserInterface` to be passed to
   `PhalconGraphQL\Di\FactoryDefault`; it is forwarded to the API container.
+- Add integration checks for authenticated GraphQL access and identity reset
+  when requests reuse the same DI container.
 
-### Added
+### Migration from 9.0.0
 
-- `ModelInputObjectType::only()` and `ModelField::writableFields()` for explicit
-  mutation input policies.
-- `ExecutionPluginInterface` for plugins that need the current dispatch DI, and
-  `SchemaPluginInterface` for plugins restricted to schema registration.
-- `Exception::getDiagnosticInfo()` for internal diagnostics.
-- An isolated security regression suite, available as `composer test:security`.
-
-### Migration from 8.x
+Applications upgrading from 9.0.0 must migrate the API 6 authentication
+configuration to API 7. The GraphQL input and field policy requirements introduced
+in 9.0.0 continue to apply.
 
 #### Upgrading to phalcon-api 7
 
@@ -80,6 +58,49 @@ are reused.
 
 See the [phalcon-api 7.0.0 migration guide](https://github.com/redound/phalcon-api/blob/v7.0.0/CHANGELOG.md#migration-from-6x)
 for the complete configuration, key strength and permission requirements.
+
+### Validation
+
+All 60 security checks passed with the published phalcon-api 7.0.0, PHP 8.4.26,
+Phalcon 5.22.1, and both graphql-php 15.32.3 and 15.38.1. The additional integration
+checks cover explicit token parser configuration, authenticated GraphQL access,
+and identity reset between requests with missing or invalid credentials.
+
+The remaining GraphQL mitigations and PHP 8.4 deprecation notices documented for
+9.0.0 still apply. API 7 also requires projects to configure and deploy its
+authentication policies; updating the dependency alone does not migrate them.
+
+## [9.0.0] - 2026-10-15
+
+This major release contains high-priority security mitigations and requires
+migration of using applications. Deploy application policies and updated
+dependency lockfiles together with the library.
+
+### Security fixes
+
+- Remove model data, submitted input and raw model validation messages from
+  standard mutation errors. Keep exception extras available only as explicit
+  internal diagnostics.
+- Bind mutation IDs to primary-key lookups instead of interpreting them as PHQL
+  conditions. Support mapped string keys and reject unsupported keys safely.
+- Use the dispatch DI for authorization, handlers, resolvers and mutation models.
+  Clear resolver and handler caches between dispatches.
+- Reject unsupported ACL plugin registration and deny resolution when application
+  field definitions or authorization context are missing.
+- Require explicit generated input fields and writable mutation properties to
+  prevent unintended assignment of model properties.
+- Raise the minimum `webonyx/graphql-php` version to `15.32.3`.
+
+### Added
+
+- `ModelInputObjectType::only()` and `ModelField::writableFields()` for explicit
+  mutation input policies.
+- `ExecutionPluginInterface` for plugins that need the current dispatch DI, and
+  `SchemaPluginInterface` for plugins restricted to schema registration.
+- `Exception::getDiagnosticInfo()` for internal diagnostics.
+- An isolated security regression suite, available as `composer test:security`.
+
+### Migration from 8.x
 
 #### Authorization context and plugin registration
 
@@ -197,8 +218,7 @@ The minimum `webonyx/graphql-php` version is now `15.32.3`, covering the
 [parser recursion advisory](https://github.com/webonyx/graphql-php/security/advisories/GHSA-r7cg-qjjm-xhqq)
 and preceding validation advisories. Audit each application's actual lockfile.
 The obsolete direct JWT v5 suggestion was removed; JWT configuration and
-authentication fixes are provided by the required phalcon-api 7 line; consuming
-applications must configure and deploy them explicitly.
+authentication fixes belong to phalcon-api and still require separate work.
 
 With PHP 8.4+, Phalcon and PDO SQLite installed, resolve the current dependencies
 and run the isolated in-memory regression suite:
@@ -214,12 +234,9 @@ files must be refreshed. Tests can use another Composer runtime through
 `GRAPHQL_TEST_AUTOLOAD=/absolute/path/to/vendor/autoload.php`. The tests use only
 temporary SQLite databases and make no external application changes.
 
-Validated on PHP 8.4.26 / Phalcon 5.22.1 with the published phalcon-api 7.0.0
-and graphql-php 15.32.3 and 15.38.1: 60 regression checks per version, PHP syntax
-checks and isolated dependency audits. The additional integration checks cover
-explicit token parser configuration, authenticated GraphQL access, and identity
-reset between requests with missing or invalid credentials. Applications must
-validate their own supported runtime combinations.
+Validated on PHP 8.4.26 / Phalcon 5.22.1 with graphql-php 15.32.3 and 15.38.1:
+56 regression checks per version, PHP syntax checks and isolated dependency
+audits. Applications must validate their own supported runtime combinations.
 
 ### Known limitations
 
@@ -232,4 +249,5 @@ The existing scalar types and several `ModelCollection` methods still emit PHP
 suite or syntax checks; applications must keep PHP diagnostic output out of
 public production responses.
 
+[9.0.1]: https://github.com/redound/phalcon-graphql/compare/v9.0.0...v9.0.1
 [9.0.0]: https://github.com/redound/phalcon-graphql/compare/v8.0.2...v9.0.0
